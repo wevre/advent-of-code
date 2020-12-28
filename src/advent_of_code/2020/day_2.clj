@@ -1,27 +1,26 @@
-(ns advent-of-code.2020.day-2)
+(ns advent-of-code.2020.day-2
+  (:require [clojure.edn :as edn]))
 
 (defn valid-password-1? [[l h c s]]
-  (<= l ((frequencies s) c 0) h))
+  (let [l (edn/read-string l) h (edn/read-string h)]
+    (<= l (count (filter (set c) s)) h)))
 
-(defn valid-password-2? [[l h c s]]
-  (not= (= c (nth s (dec l))) (= c (nth s (dec h)))))
+(defn valid-password-2? [[l h [c] s]]
+  (let [l (dec (edn/read-string l)) h (dec (edn/read-string h))]
+    (not= (= c (nth s l)) (= c (nth s h)))))
 
-(defn parse [[l h c s]]
-  [(Integer/parseInt l) (Integer/parseInt h) (first c) s])
-
-(defn puzzle [in pred]
-  (->> (re-seq #"[\d\w]+" in)
+(defn puzzle [pred input]
+  (->> (re-seq #"[\d\w]+" input)
        (partition 4)
-       (map parse)
        (filter pred)
        count))
 
 (comment
-  (puzzle (slurp "input/2020/2-passwords.txt") valid-password-1?)
+  (puzzle valid-password-1? (slurp "input/2020/2-passwords.txt"))
   
-  (puzzle (slurp "input/2020/2-passwords.txt") valid-password-2?)
+  (puzzle valid-password-2? (slurp "input/2020/2-passwords.txt"))
   
   (let [input "1-3 a: abcde\n1-3 b: cdefg\n2-9 c: ccccccccc"]
-    [(puzzle input valid-password-1?)
-     (puzzle input valid-password-2?)])
+    [(puzzle valid-password-1? input)
+     (puzzle valid-password-2? input)])
   )
