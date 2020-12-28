@@ -1,0 +1,51 @@
+:project Advent of Code 2020
+   :author Mike Weaver
+   :created 2020-12-08
+
+:section Introduction
+
+   I've been working through the advent of code challenges and then comparing
+   with some others who have posted their Clojure solutiosn on github.
+   Apparently there is a point system and ranking for getting correct answers in
+   quickly, but I'm not interested in that. And I don't think the focus here is
+   code golf, either, because there is no built-in way to see others' solutions.
+
+   So what I want to capture here is some of the things I've learned.
+
+:section Regular expressions
+
+   I've found that I don't naturally turn to regular expressions as a tool as
+   much as, probably, I should.
+
+:section Partial
+
+   There are times when you have a function that needs to be called with some
+   extra arguments, but those arguments mess up the flow of, say, the threading
+   macros. So one trick is to use `partial` to create an use of that function
+   with the extra arguments already supplied. Brilliant.
+
+:section logic
+
+   Day 7 is all about logic programming, which I have never done. So I'm going
+   to read up on core.logic and see if I can make sense of the answer that some
+   dude posted.
+
+   Day 13 makes use of the chinese remainder theorem. Um, what? Why do I need to
+   know or care about that? Bothers.
+
+:section Solutions
+
+   Here is one github repo with solutions that I like:
+   https://github.com/ocisly/advent2020
+
+   Here are some others with past year solutions:
+
+   https://github.com/bhauman/advent-of-clojure
+
+   https://github.com/derekslager/advent-of-code-2015
+
+   Of course, the reddit daily megathreads are also a place to find solution
+   ideas, but I've noticed that not many are in Clojure.
+
+   Here is one I found in Clojure, and the solutions are very interesting.
+   https://gist.github.com/zengxinhui/692fad81db75a073716d3527aac68863#file-aoc2020-clj-L275

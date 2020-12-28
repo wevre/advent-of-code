@@ -1,0 +1,4 @@
+{:paths ["src" "input"]
+ :deps {org.clojure/math.combinatorics {:mvn/version "0.1.6"}
+        org.clojure/core.logic {:mvn/version "1.0.0"}
+        digest/digest {:mvn/version "1.4.9"}}}
