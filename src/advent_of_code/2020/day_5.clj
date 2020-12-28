@@ -3,14 +3,15 @@
 
 (defn convert [in]
   (->> (str/split-lines (str/escape in {\B \1 \F \0 \R \1 \L \0}))
-       (map #(Integer/parseInt % 2))
-       sort))
+       (map #(Integer/parseInt % 2))))
 
-(defn puzzle1 [in]
-  (last (convert in)))
+(defn puzzle1 [input]
+  (last (sort (convert input))))
 
-(defn puzzle2 [in]
-  (reduce #(if (= (inc %1) %2) %2 (reduced (inc %1))) (convert in)))
+(defn puzzle2 
+  "Finds gap between seat locations"
+  [input]
+  (reduce #(if (= (inc %1) %2) %2 (reduced (inc %1))) (sort (convert input))))
 
 (comment
   
