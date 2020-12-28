@@ -2,25 +2,18 @@
   (:require [clojure.string :as str]
             [clojure.math.combinatorics :as combo]))
 
-(defn parse 
-  "Returns a set of active cell locations from the input. Input is 2-D, returned
-   coordinates are padded with zeros up to length `dimensions`."
-  [dimensions lines]
+(defn parse [dimensions y line]
   (let [pad (fn [& cs] (take dimensions (concat cs (repeat 0))))]
-    (reduce-kv (fn [acc y l]
-                 (into acc 
-                       (keep-indexed (fn [x c] (when (= c \#) (pad x y))) l)))
-               #{}
-               (vec lines))))
+    (keep-indexed (fn [x c] (when (= c \#) (pad x y))) line)))
 
-(def neighbors
+(defn neighbors
   "Generates a list of all neighbors of `cells`, repeats intentionally included.
    Taking `frequencies` of that list produces a map that answers the question 
-   'How many neighbors from `cells` do you have'?"
-  (memoize
-  (fn neighs [cells]
-    (map #(map + cells %)
-         (remove #(apply = 0 %) (combo/selections [-1 0 1] (count cells)))))))
+   'How many neighbors do you have from among `cells`?'"
+  [cells]
+  (->> (combo/selections [-1 0 1] (count cells))
+       (remove #(apply = 0 %))
+       (map #(map + cells %))))
 
 (defn step [neighbors cubes]
   (set (for [[loc n] (frequencies (mapcat neighbors cubes))
@@ -28,7 +21,7 @@
          loc)))
 
 (defn puzzle [cycles dimensions input]
-  (->> (parse dimensions (str/split-lines input))
+  (->> (set (mapcat (partial parse dimensions) (range) (str/split-lines input)))
        (iterate (partial step neighbors))
        (drop cycles)
        first
