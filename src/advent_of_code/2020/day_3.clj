@@ -1,20 +1,19 @@
 (ns advent-of-code.2020.day-3
   (:require [clojure.string :as str]))
 
-(defn find-trees [lines [r d]]
+(defn find-trees [[r d] lines]
   (->> (take-nth d lines)
-       (map-indexed (fn [n line] (#{\#} (nth line (* n r)))))
-       (filter some?)
+       (keep-indexed (fn [n line] (#{\#} (nth line (* n r)))))
        count))
   
-(defn puzzle [in slopes]
-  (let [in (map cycle (str/split-lines in))]
-    (reduce * (map (partial find-trees in) slopes))))
+(defn puzzle [slopes input]
+  (let [input (map cycle (str/split-lines input))]
+    (reduce * (map #(find-trees % input) slopes))))
 
 (comment
-  (puzzle (slurp "input/2020/3-trees.txt") [[3 1]])
+  (puzzle [[3 1]] (slurp "input/2020/3-trees.txt"))
 
-  (puzzle (slurp "input/2020/3-trees.txt") [[1 1] [3 1] [5 1] [7 1] [1 2]])
+  (puzzle [[1 1] [3 1] [5 1] [7 1] [1 2]] (slurp "input/2020/3-trees.txt"))
 
   (let [input "..##.......
 #...#...#..
@@ -27,5 +26,5 @@
 #.##...#...
 #...##....#
 .#..#...#.#"]
-    [(puzzle input [[3 1]])
-     (puzzle input [[1 1] [3 1] [5 1] [7 1] [1 2]])]))
+    [(puzzle [[3 1]] input)
+     (puzzle [[1 1] [3 1] [5 1] [7 1] [1 2]] input)]))
