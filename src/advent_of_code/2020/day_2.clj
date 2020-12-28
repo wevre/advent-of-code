@@ -17,10 +17,9 @@
 
 (comment
   (puzzle valid-password-1? (slurp "input/2020/2-passwords.txt"))
-  
+
   (puzzle valid-password-2? (slurp "input/2020/2-passwords.txt"))
-  
+
   (let [input "1-3 a: abcde\n1-3 b: cdefg\n2-9 c: ccccccccc"]
     [(puzzle valid-password-1? input)
-     (puzzle valid-password-2? input)])
-  )
+     (puzzle valid-password-2? input)]))

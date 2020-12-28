@@ -30,10 +30,10 @@
     (count (filter pred passports))))
 
 (comment
-  
+
   (puzzle keys-present? (slurp "input/2020/4-passports.txt"))
   (puzzle (every-pred keys-present? valid?) (slurp "input/2020/4-passports.txt"))
-  
+
   (let [input "ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
 byr:1937 iyr:2017 cid:147 hgt:183cm
 
@@ -48,5 +48,4 @@ hgt:179cm
 hcl:#cfa07d eyr:2025 pid:166559648
 iyr:2011 ecl:brn hgt:59in"]
     [(puzzle keys-present? input)
-     (puzzle (every-pred keys-present? valid?) input)])
-  )
+     (puzzle (every-pred keys-present? valid?) input)]))
