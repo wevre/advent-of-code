@@ -1,36 +1,41 @@
 (ns advent-of-code.2020.day-17
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [clojure.math.combinatorics :as combo]))
 
-(defn parse [z w lines]
-  (reduce-kv (fn [acc y l]
-               (into acc (keep-indexed (fn [x c] (when (= c \#) [x y z w])) l)))
-             #{}
-             (vec lines)))
+(defn parse 
+  "Returns a set of active cell locations from the input. Input is 2-D, returned
+   coordinates are padded with zeros up to length `dimensions`."
+  [dimensions lines]
+  (let [pad (fn [& cs] (take dimensions (concat cs (repeat 0))))]
+    (reduce-kv (fn [acc y l]
+                 (into acc 
+                       (keep-indexed (fn [x c] (when (= c \#) (pad x y))) l)))
+               #{}
+               (vec lines))))
 
 (def neighbors
-  (memoize 
-   (fn neighbors [w-rng [x y z w]]
-     (for [dx [-1 0 1] dy [-1 0 1] dz [-1 0 1] dw w-rng :when (not= 0 dx dy dz dw)]
-       [(+ x dx) (+ y dy) (+ z dz) (+ w dw)]))))
-
-; `neighbors` generates a list of all the neighbors of all active cells, repeats
-; intentionally included. Taking `frequencies` of that list produces a map that 
-; for each cell answers the question 'How many active neighbors do you have'?
+  "Generates a list of all neighbors of `cells`, repeats intentionally included.
+   Taking `frequencies` of that list produces a map that answers the question 
+   'How many neighbors from `cells` do you have'?"
+  (memoize
+  (fn neighs [cells]
+    (map #(map + cells %)
+         (remove #(apply = 0 %) (combo/selections [-1 0 1] (count cells)))))))
 
 (defn step [neighbors cubes]
   (set (for [[loc n] (frequencies (mapcat neighbors cubes))
              :when (or (= 3 n) (and (cubes loc) (= 2 n)))]
          loc)))
 
-(defn puzzle [n w-rng in]
-  (->> (parse 0 0 (str/split-lines in))
-       (iterate (partial step (partial neighbors w-rng)))
-       (drop n)
+(defn puzzle [cycles dimensions input]
+  (->> (parse dimensions (str/split-lines input))
+       (iterate (partial step neighbors))
+       (drop cycles)
        first
        count))
 
 (comment
-  (puzzle 2 [0] ".#.\n..#\n###")
-  (puzzle 6 [0] (slurp "input/2020/17-cubes.txt"))
-  (puzzle 6 [-1 0 1] (slurp "input/2020/17-cubes.txt"))
+  (puzzle 2 3 ".#.\n..#\n###")
+  (puzzle 6 3 (slurp "input/2020/17-cubes.txt"))
+  (puzzle 6 4 (slurp "input/2020/17-cubes.txt"))
   )
