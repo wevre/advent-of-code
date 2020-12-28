@@ -22,7 +22,6 @@
      ; add empty seats that had no neighbors
      (s/difference seats occupied (set neighs)))))
 
-
 (defn stabilize [stepper]
   (->> #{}
        (iterate stepper)
