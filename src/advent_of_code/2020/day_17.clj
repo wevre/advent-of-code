@@ -2,8 +2,10 @@
   (:require [clojure.string :as str]
             [clojure.math.combinatorics :as combo]))
 
-(defn parse [dimensions y line]
-  (let [pad (fn [& cs] (take dimensions (concat cs (repeat 0))))]
+;; --- Day 17: Conway Cubes ---
+
+(defn parse [dims [y line]]
+  (let [pad (fn [& cs] (take dims (concat cs (repeat 0))))]
     (keep-indexed (fn [x c] (when (= c \#) (pad x y))) line)))
 
 (defn neighbors
@@ -15,14 +17,15 @@
        (remove #(apply = 0 %))
        (map #(map + cells %))))
 
-(defn step [neighbors cubes]
+(defn step [cubes]
   (set (for [[loc n] (frequencies (mapcat neighbors cubes))
              :when (or (= 3 n) (and (cubes loc) (= 2 n)))]
          loc)))
 
-(defn puzzle [cycles dimensions input]
-  (->> (set (mapcat (partial parse dimensions) (range) (str/split-lines input)))
-       (iterate (partial step neighbors))
+(defn puzzle [cycles dims input]
+  (->> (str/split-lines input)
+       (into #{} (comp (map-indexed vector) (mapcat (partial parse dims))))
+       (iterate step)
        (drop cycles)
        first
        count))
@@ -30,5 +33,4 @@
 (comment
   (puzzle 2 3 ".#.\n..#\n###")
   (puzzle 6 3 (slurp "input/2020/17-cubes.txt"))
-  (puzzle 6 4 (slurp "input/2020/17-cubes.txt"))
-  )
+  (puzzle 6 4 (slurp "input/2020/17-cubes.txt")))

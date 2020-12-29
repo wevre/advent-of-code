@@ -15,8 +15,8 @@
                 (partition 2)
                 (reduce (fn [s [x y]] (into s (range x (inc y)))) #{}))]))
 
-(defn puzzle1 [in]
-  (let [[s1 _s2 s3] (str/split in #"\n\n")
+(defn puzzle1 [input]
+  (let [[s1 _s2 s3] (str/split input #"\n\n")
         ranges (map parse-rules (str/split-lines s1))
         all-valid (reduce set/union (map second ranges))
         nearby (map edn/read-string (re-seq #"\d+" s3))]
@@ -28,8 +28,8 @@
 (defn matching-fields [ranges vals]
   (into #{} (keep (fn [[fld valid?]] (when (every? valid? vals) fld))) ranges))
 
-(defn puzzle2 [in]
-  (let [[s1 s2 s3] (str/split in #"\n\n")
+(defn puzzle2 [input]
+  (let [[s1 s2 s3] (str/split input #"\n\n")
         ticket (mapv edn/read-string (re-seq #"\d+" s2))
         ranges (map parse-rules (str/split-lines s1))
         all-valid (reduce set/union (map second ranges))

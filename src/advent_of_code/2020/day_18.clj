@@ -3,10 +3,12 @@
             [clojure.string :as str]
             [clojure.walk :as walk]))
 
+;; --- Day 18: Operation Order ---
+
 ; First version didn't do postwalk elimination of lists. Without that, the eval 
-; functions have to test every arg1 and arg2 if they are lists, and recursively 
-; evaluate them. With postwalk, however, lists are taken care of before eval 
-; ever gets called, resulting in cleaner logic.
+; functions have to wrap every arg1 and arg2 to test if they are lists, and 
+; recursively evaluate them. With postwalk, however, lists are taken care of 
+; before eval ever gets called, resulting in cleaner logic.
 
 (defn math-eval [[arg1 op & [arg2 & rest]]]
   (if op (recur (cons ((resolve op) arg1 arg2) rest)) arg1))
