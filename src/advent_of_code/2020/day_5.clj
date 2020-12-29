@@ -1,6 +1,8 @@
 (ns advent-of-code.2020.day-5
   (:require [clojure.string :as str]))
 
+;; --- Day 5: Binary Boarding ---
+
 (defn convert [in]
   (->> (str/split-lines (str/escape in {\B \1 \F \0 \R \1 \L \0}))
        (map #(Integer/parseInt % 2))))

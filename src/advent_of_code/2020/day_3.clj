@@ -1,6 +1,8 @@
 (ns advent-of-code.2020.day-3
   (:require [clojure.string :as str]))
 
+;; --- Day 3: Toboggan Trajectory ---
+
 (defn find-trees [[r d] lines]
   (->> (take-nth d lines)
        (keep-indexed (fn [n line] (#{\#} (nth line (* n r)))))

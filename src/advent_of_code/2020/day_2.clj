@@ -1,6 +1,8 @@
 (ns advent-of-code.2020.day-2
   (:require [clojure.edn :as edn]))
 
+;; --- Day 2: Password Philosophy ---
+
 (defn valid-password-1? [[l h c s]]
   (let [l (edn/read-string l) h (edn/read-string h)]
     (<= l (count (filter (set c) s)) h)))

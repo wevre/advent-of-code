@@ -2,6 +2,8 @@
   (:require [clojure.string :as str]
             [clojure.math.combinatorics :as combo]))
 
+;; --- Day 1: Report Repair ---
+
 ; A brute-corce approach, trying every possible combination. There are only 
 ; about 200 numbers in the input file, so this works okay.
 

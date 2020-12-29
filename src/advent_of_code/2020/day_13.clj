@@ -1,8 +1,14 @@
 (ns day-13
-  (:require [clojure.string :as str]))
+  (:require [clojure.edn :as edn]))
+
+;; --- Day 13: Shuttle Search ---
+
+; Uses a simple implemenation of Chinese remainder theorem. A more complicated
+; (and I suppose, efficient) algorithm, Gauss's, is described here
+; https://www.di-mgt.com.au/crt.html. 
 
 (defn puzzle1 [in]
-  (let [[ts & ids] (map #(Long/parseLong %) (re-seq #"\d+" in))]
+  (let [[ts & ids] (map edn/read-string (re-seq #"\d+" in))]
     (->> (map (juxt #(- % (rem ts %)) identity) ids)
          sort
          first
@@ -15,14 +21,11 @@
 
 (defn lcm [a b] (/ (* a b) (gcd a b)))
 
-;; This is the "simpler" method, as opposed to the Gauss's algorithm, which
-;; is faster. https://www.di-mgt.com.au/crt.html
 (defn puzzle2 [in]
   (->> (rest (re-seq #"(\d+)|x" in))
-       (map second)
-       (map #(when % (Long/parseLong %)))
-       (map-indexed (fn [i x] (when x [x (mod (- x i) x)])))
-       (filter some?)
+       (keep-indexed (fn [i [_ x]]
+                       (when-let [x (and x (edn/read-string x))]
+                         [x (mod (- x i) x)])))
        (reduce (fn [[n1 t] [n2 a2]]
                  (loop [t t]
                    (if (= (mod t n2) a2)

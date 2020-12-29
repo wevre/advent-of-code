@@ -3,6 +3,8 @@
             [clojure.set]
             [clojure.edn :as edn]))
 
+;; --- Day 4: Passport Processing ---
+
 (defn keys-present? [pp]
   (clojure.set/subset? #{:hgt :pid :byr :eyr :iyr :ecl :hcl} (set (keys pp))))
 

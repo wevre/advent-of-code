@@ -2,6 +2,8 @@
   (:require [clojure.string :as str]
             [clojure.set :as set]))
 
+;; --- Day 6: Custom Customs ---
+
 (defn puzzle [rf input]
   (->> (str/split input #"\n\n")
        (map str/split-lines)

@@ -1,11 +1,13 @@
 (ns advent-of-code.2020.day-9
   (:require [clojure.string :as str]))
 
+;; --- Day 9: Encoding Error ---
+
 (defn sum-of-prev? [coll]
-(let [targ (last coll)
-      xs (butlast coll)
-      xs' (map #(- targ %) xs)]
-   (some (set xs') xs)))
+  (let [targ (last coll)
+        xs (butlast coll)
+        xs' (map #(- targ %) xs)]
+    (some (set xs') xs)))
 
 (comment (sum-of-prev? '(35 20 15 25 47 40)))
 
@@ -17,7 +19,11 @@
        first
        last))
 
-(defn find-range-sum-to [targ nums]
+(defn find-range-sum-to 
+  "Returns a sequence of numbers that add to target. Accordians its way 
+   through `nums`, expanding on the right when too small, shrinking on the left 
+   when too large."
+  [targ nums]
   (loop [i 0 j 0 sum 0]
     (cond
       (= sum targ) (map nums (range i j))
@@ -35,6 +41,5 @@
     [(puzzle1 5 input)
      (puzzle2 5 input)])
 
-  (puzzle1 25 (slurp "input/2020/9-xmas.txt")))
-
-  (puzzle2 25 (slurp "input/2020/9-xmas.txt"))
+  (puzzle1 25 (slurp "input/2020/9-xmas.txt"))
+  (puzzle2 25 (slurp "input/2020/9-xmas.txt")))
