@@ -19,7 +19,7 @@
        (reduce +)))
 
 (defn all-dists [in]
-  (let [graph (into {} (map parse (str/split-lines in)))
+  (let [graph (into {} (map parse) (str/split-lines in))
         cities (reduce clojure.set/union (keys graph))]
     (map (partial route-dist graph) (combo/permutations cities))))
 

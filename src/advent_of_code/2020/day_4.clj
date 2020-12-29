@@ -23,7 +23,7 @@
    (#{"amb" "blu" "brn" "gry" "grn" "hzl" "oth"} ecl)))
 
 (defn parse [entries]
-  (into {} (map (fn [[k w]] [(keyword k) w]) (partition 2 entries))))
+  (into {} (map (fn [[k w]] [(keyword k) w])) (partition 2 entries)))
 
 (defn puzzle [pred input]
   (let [passports (->> (str/split input #"\n\n")
