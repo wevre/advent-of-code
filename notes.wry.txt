@@ -5,33 +5,76 @@
 :section Introduction
 
    I've been working through the advent of code challenges and then comparing
-   with some others who have posted their Clojure solutiosn on github.
+   with some others who have posted their Clojure solutions on github.
    Apparently there is a point system and ranking for getting correct answers in
    quickly, but I'm not interested in that. And I don't think the focus here is
    code golf, either, because there is no built-in way to see others' solutions.
 
    So what I want to capture here is some of the things I've learned.
 
-:section Regular expressions
+:section Things I've learned
 
-   I've found that I don't naturally turn to regular expressions as a tool as
-   much as, probably, I should.
+   * Regular expressions -- I don't turn to regular expressions as often as I
+   should. But they are essential for parsing input files. Also, you can overdo
+   it with RE's. Only pull out what you need, you usually don't have to map
+   every space and punctuation character.
 
-:section Partial
+   * Partial -- Often I have a function with multiple arguments, but they mess
+   up the flow of the threading macros. One trick is to use `partial` to curry
+   a new function with those extra arguments already supplied.
 
-   There are times when you have a function that needs to be called with some
-   extra arguments, but those arguments mess up the flow of, say, the threading
-   macros. So one trick is to use `partial` to create an use of that function
-   with the extra arguments already supplied. Brilliant.
+   * keep, keep-indexed -- These are my new favorite functions. They work well
+   in places where you are using map and filter. So they probably could be
+   replaced with a reduce? I have to think about the different use cases and
+   make some rules about when to use map+filter, when to reduce, when to keep.
 
-:section logic
+   * reduce-kv -- Wait, this is my new favorite function. It works on maps and
+   vectors, and you can accumulate results into anything you want. I love the
+   flexibility of this function.
+
+   * postwalk -- I discovered this while reviewing other's solutions for Day 18.
+   What a gem! It makes the recursive logic cleaner because it does the work of
+   reducing internal lists, so the evaluation code can assume a flat list input.
+
+   * Game of Life -- Two puzzles (so far, 11 and 17) are based on 'game of
+   life'. So I naturally used the approach taken in 'Clojure Programming' (2012,
+   Emerick, Carper, Grand) and utilized a set to keep track of active cells. For
+   puzzle 11, I had to alter the logic to deal with different rules for empty
+   and occupied seats. For puzzle 17 I had to deal with 3 and 4 dimensions, but
+   the approach still scaled nicely. I also changed 17 to use combinatorics
+   rather than `for` list comprehension to find neighbors.
+
+   * fnil -- This is handy when reducing into a multi-level collection and using
+   update, where the _old_ value is passed to the update function. What if the
+   old value doesn't exist yet? You either have to write your update function to
+   detect and deal with that, or you can use _fnil_ to supply an initial value.
+
+:section Puzzles to review
 
    Day 7 is all about logic programming, which I have never done. So I'm going
    to read up on core.logic and see if I can make sense of the answer that some
    dude posted.
 
-   Day 13 makes use of the chinese remainder theorem. Um, what? Why do I need to
-   know or care about that? Bothers.
+   Day 8 want to review my solution compared to others.
+
+   Day 10 needs some commenting.
+
+   Day 11 I can make same improvements I did for Day 17. Also, I want to create
+   a transducer, 'non-repeating' that will tell us when the pattern stops
+   changing. Or maybe use reduced and a function similar to Day 5 to find gap.
+
+   Day 12. It might make for cleaner code if I store :loc as an [x y] vector
+   rather than each under separate :x and :y keys.
+
+   Day 14 I want to document the AND and OR mask logic.
+
+   Check for use of Integer/parseInt and replace (if possible) with
+   edn/read-string.
+
+:section keep, keep-indexed
+
+   These functions are interesting, sort of a blend of filter & map. So why not
+   use reduce? I need to think about how keep changes the code vs. reduce.
 
 :section Solutions
 
@@ -49,3 +92,11 @@
 
    Here is one I found in Clojure, and the solutions are very interesting.
    https://gist.github.com/zengxinhui/692fad81db75a073716d3527aac68863#file-aoc2020-clj-L275
+
+   Some others I found on github:
+   https://github.com/elektronaut/advent-of-code
+   https://github.com/coyotesqrl/advent2020
+   https://github.com/zelark/AoC-2020
+
+   Here is a complete (all years) repo written in Go
+   https://github.com/alexchao26/advent-of-code-go
