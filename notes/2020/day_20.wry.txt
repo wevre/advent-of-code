@@ -1,0 +1,99 @@
+:project Advent of Code 2020-20
+   :author Mike Weaver
+   :created 2020-12-31
+
+:section Plan
+
+   1
+      Create a big list of all possible borders (8 for each image, because of
+      flipping), where a border is {:border (\. \# ...), :id 1234, :edge :E} and
+      then group-by :border, which will give us all matching edges...twice
+      (again, because of flipping).
+
+   2
+      Some conventions: edges of an original image are denoted :N, :E, :S, and
+      :W. The edges of the flipped side are :n, :e, :s, and :w, but they don't
+      correspond exactly to their unflipped counterparts. I'm doing a horizontal
+      flip, so :N and :n stay paired, as do :S and :s. But East and West switch.
+
+      I'm forcing a polarity on the borders, by making them run clockwise around
+      the image. This prevents an image's edge from matching itself, but it
+      presents a different complication: If tile A and tile B match side by
+      side, such that tile A's East side matches tile B's West side, it will be
+      grouped as A's :E edge matchs B's :e edge. What? Why did :W for B switch
+      to :e? It's because A's E border runs _down_ the image, but B's W border
+      runs _up_ the image. So even though it is E and W that match, it will be
+      the flipped side of B, the :e side, that will be grouped. A grouping of
+      A's :E to B's :w can be interpreted two ways. I can turn it back into :E
+      matching :W, or I can turn it into :w matching :e. Both are correct. In
+      the `edge-map` function where we reduce the border groups into an edge
+      map, that is exactly what we do.
+
+      '''
+         +---------+ +---------+
+         |        v| |^        |
+         |    A   v| |^   B    |
+         |        v| |^        |
+         +---------+ +---------+
+
+
+   3
+      Reduce the edge groups into a map of maps. The outer maps's key is an id,
+      whose value is a map of edges to matching other-image-id and
+      other-image-edge. For example, if image A's :W edge matches image B's :s
+      edge, then the edge-map would have entries like so (with duplicates
+      arising from flipping):
+
+      ```
+         {A {:W {:id B, :edge :s}
+             :e {:id B, :edge :S}  ;<-- flip also matches
+             ...}
+          B {:s {:id A, :edge :W}
+             :S {:id A, :edge :e}  ;<-- another flip match
+             ...}
+          ...}
+
+   4
+      The four corners will be the id's in the edge-map with exactly 4 matches.
+
+   5
+      Another convention: As we arrange images, we need to keep track of how an
+      image is oriented in the final layout. Thus we create a new entity, a
+      'tile', which is an image id together with an orientation. The orientation
+      of a tile is the one edge (among the possible eight) which is oriented
+      north in the layout. It is represented as a map, such as:
+
+      ```
+         {:id 123 :orient :e}
+
+      When we speak of 'edges' there are eight of them for the original image.
+      When we speak of 'direction' there are only four, N, E, S, and W, in the
+      layout. Which of an image's eight edges align with those four directions
+      is determine by it orientation and captured as a 'tile'.
+
+      Given a tile (that is, an image oriented in the layout) I can produce the
+      correct tiles for its neighbors. That is, I can determine what their
+      orientation should be in order to match up to the shared edge of the first
+      tile.
+
+   6
+      Here are the pieces that accomplish what is described above. The map
+      `orient-map` tells me, for a given tile's orientation, which of the
+      original sides of an image are now pointing N, E, S, and W in the layout.
+
+      The function `find-orient` does something of the reverse: for a specific
+      edge of an image to point in a given direction, what must its orientation
+      be?
+
+      The function `get-adj` takes a tile and desired direction and returns its
+      match oriented correcty in the layout.
+
+      The function `get-next` is provided alread-layed-out-tiles to the north
+      and west, and returns which tile will match up. We assemble the entire
+      layout with this function. We first call it with 'nil' for the north and
+      west neighbors, and it returns (randomly) one of the corner tiles. We work
+      our way to the East, adding tiles until we hit the NE corner. Then we
+      start on the second row of the layout, only now we have tiles to the north
+      in addition to tiles to the west to lock in the next placement.
+
+      This row-by-row construction is carried out in the `assemble` function.
