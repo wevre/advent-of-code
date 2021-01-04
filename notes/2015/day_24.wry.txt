@@ -1,0 +1,15 @@
+:project Advent of Code 2015-24
+   :author Mike Weaver
+   :created 2021-01-04
+
+:section A puzzle
+
+   bhauman has a function for generating subsets that is fast, and memoized. I'm
+   not 100% sure I understand how it works. I need to walk through a few sample
+   iterations to make sure it is solid in my brain.
+
+   But, aside from understanding that, one flaw in his solution, and from
+   reading Reddit, it is probably similar with many who solved this, there is no
+   checking that a found subset still leaves the remaining numbers able to be
+   divided into correct subsets. I liked how one Reddit poster laid out the
+   issue, and I created my solution by following that outline.
