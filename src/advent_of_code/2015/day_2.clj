@@ -1,40 +1,28 @@
 (ns advent-of-code.2015.day-2
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [clojure.edn :as edn]))
 
-(defn parse [line]
-  (->> (str/split line #"x")
-       (map #(Integer/parseInt %))))
+;; --- Day 2: I Was Told There Would Be No Math ---
 
-(defn calc-wrapper [[x y z]]
-  (+ (* 3 x y) (* 2 x z) (* 2 y z)))
+(defn parse [line] (sort (map edn/read-string (re-seq #"\d+" line))))
 
-(defn puzzle1 [in]
-  (->> in
-       str/split-lines
+(defn puzzle [calc input]
+  (->> (str/split-lines input)
        (map parse)
-       (map sort)
-       (map calc-wrapper)
+       (map calc)
        (reduce +)))
 
-(comment
-  (let [input "2x3x4
-1x1x10"] (puzzle1 input))
-  
-  (let [input (slurp "input/2015/2-dimensions.txt")] (puzzle1 input)))
+(defn calc-wrapper [[x y z]] (+ (* 3 x y) (* 2 x z) (* 2 y z)))
 
-(defn calc-ribbon [[x y z]]
-  (+ x x y y (* x y z)))
-
-(defn puzzle2 [in]
-  (->> in
-       str/split-lines
-       (map parse)
-       (map sort)
-       (map calc-ribbon)
-       (reduce +)))
+(defn calc-ribbon [[x y z]] (+ x x y y (* x y z)))
 
 (comment
-  (let [input "2x3x4
-1x1x10"] (puzzle2 input))
+  (let [input (slurp "input/2015/2-dimensions.txt")] 
+    (puzzle calc-wrapper input))
+
+  (let [input "2x3x4\n1x1x10"] (puzzle calc-wrapper input))
   
-  (let [input (slurp "input/2015/2-dimensions.txt")] (puzzle2 input)))
+  (let [input (slurp "input/2015/2-dimensions.txt")]
+    (puzzle calc-ribbon input))
+
+  (let [input "2x3x4\n1x1x10"] (puzzle calc-wrapper input)))

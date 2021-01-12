@@ -4,18 +4,17 @@
 ;; --- Day 24: It Hangs in the Balance ---
 
 (defn entangled [targ xs]
-  (let [step
+  (let [valid-remain? (fn [xs] (or (empty? xs) (seq (entangled targ xs))))
+        step
         (fn step [res acc n [f & r]]
           (cond
             (neg? n) res
             (< 0 (count res) (count acc)) res
-            (zero? n) (if (or (empty? res)
-                              (< (count acc) (count res))
-                              (< (reduce * acc) (reduce * res)))
-                        (let [rem (remove (set acc) xs)]
-                          (if (or (empty? rem) (seq (entangled targ rem)))
-                            acc
-                            res))
+            (zero? n) (if (and (or (empty? res)
+                                   (< (count acc) (count res))
+                                   (< (reduce * acc) (reduce * res)))
+                               (valid-remain? (remove (set acc) xs)))
+                        acc
                         res)
             (nil? f) res
             :else

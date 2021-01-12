@@ -1,46 +1,37 @@
 (ns advent-of-code.2015.day-5
   (:require [clojure.string :as str]))
 
+;; --- Day 5: Doesn't He Have Intern-Elves For This? ---
+
 (defn nice? [s]
   (and
-   (<= 3 (count (take 3 (re-seq #"[aeiou]" s))))
-   (some #(apply = %) (partition 2 1 s))
-   (empty? (re-seq #"ab|cd|pq|xy" s))))
-
-(defn non-adjacent-pairs? [s]
-  (->> (partition 2 1 s)
-       (reduce #(conj %1 (and (not= %2 (first %1)) %2)) ())
-       frequencies
-       (some (fn [[k v]] (and k (< 1 v))))))
+   (<= 3 (count (re-seq #"[aeiou]" s)))   ; at least three vowels
+   (re-find #"([a-z])\1" s)               ; two letters in a row
+   (not (re-find #"ab|cd|pq|xy" s))))     ; no naughty strings
 
 (defn nice-v2? [s]
   (and
-   (non-adjacent-pairs? s)
-   (some (fn [[f _ l]] (= f l)) (partition 3 1 s))))
+   (re-find #"([a-z][a-z]).*\1" s)   ; non-overlap repeating pair
+   (re-find #"([a-z])[a-z]\1" s)))   ; repeat with letter in-between
 
-(defn puzzle1 [in pred]
-  (->> in
-       str/split-lines
+(defn puzzle [pred input]
+  (->> (str/split-lines input)
        (filter pred)
        count))
 
 (comment
+  (let [input (slurp "input/2015/5-naughty_or_nice.txt")] (puzzle nice? input))
+
   (let [input "ugknbfddgicrmopn
 aaa
 jchzalrnumimnmhp
 haegwjzuvuyypxyu
-dvszwmarrgswjxmb"] (puzzle1 input nice?))
-  
-  (let [input (slurp "input/2015/5-naughty_or_nice.txt")] (puzzle1 input nice?))
+dvszwmarrgswjxmb"] (puzzle nice? input))
+
+  (let [input (slurp "input/2015/5-naughty_or_nice.txt")]
+    (puzzle nice-v2? input))
 
   (let [input "qjhvhtzxzqqjkmpb
 xxyxx
 uurcxstgmygtbstg
-ieodomkazucvgmuy
-xyxy
-aabcdefgaa
-abdcefeghi"] 
-    
-    (puzzle1 input nice-v2?))
-
-  (let [input (slurp "input/2015/5-naughty_or_nice.txt")] (puzzle1 input nice-v2?)))
+ieodomkazucvgmuy"] (puzzle nice-v2? input)))

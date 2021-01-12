@@ -28,8 +28,7 @@
     (optimal-happiness people hap-map)))
 
 (comment
-  (let [input (slurp "input/2015/13-seating.txt")]
-    (puzzle1 input)))
+  (let [input (slurp "input/2015/13-seating.txt")] (puzzle1 input)))
 
 (defn puzzle2 [input]
   (let [hap-map (hap-map input)
@@ -39,5 +38,4 @@
     (optimal-happiness people hap-map)))
 
 (comment
-  (let [input (slurp "input/2015/13-seating.txt")]
-    (puzzle2 input)))
+  (let [input (slurp "input/2015/13-seating.txt")] (puzzle2 input)))

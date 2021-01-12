@@ -3,23 +3,17 @@
             [clojure.edn :as edn]
             [clojure.walk :as walk]))
 
-(defn puzzle1 [input]
-  (->> (str/escape input {\: \ })
-       edn/read-string
-       (walk/postwalk #(if (map? %) (seq %) %))
-       flatten
-       (filter number?)
-       (reduce +)))
+;; --- Day 12: JSAbacusFramework.io ---
 
-(defn puzzle2 [input]
+(defn puzzle [de-map input]
   (->> (str/escape input {\: \ })
        edn/read-string
-       (walk/postwalk 
-        #(if (map? %) (when (not-any? #{"red"} (vals %)) (seq %)) %))
+       (walk/postwalk #(if (map? %) (de-map %) %))
        flatten
        (filter number?)
        (reduce +)))
 
 (comment
-  (puzzle2 (slurp "input/2015/12-json.txt"))
-  (puzzle1 (slurp "input/2015/12-json.txt")))
+  (let [input (slurp "input/2015/12-json.txt")]
+    [(puzzle #(seq %) input)
+     (puzzle #(when (not-any? #{"red"} (vals %)) (seq %)) input)]))

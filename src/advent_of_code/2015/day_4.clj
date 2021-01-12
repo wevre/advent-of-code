@@ -2,17 +2,17 @@
   (:require [digest :refer [md5]]
             [clojure.string :as str]))
 
-(defn puzzle1 [secret test]
+;; --- Day 4: The Ideal Stocking Stuffer ---
+
+(defn puzzle [pre secret]
   (->> (map str (repeat secret) (drop 1 (range)))
        (map md5)
-       (take-while #(not (str/starts-with? % test)))
-       count
-       inc))
+       (reduce (fn [r v] (cond-> (inc r) (str/starts-with? v pre) reduced)) 0)))
 
 (comment
-  (let [secret "abcdef"] (puzzle1 secret "00000"))
-  (let [secret "pqrstuv"] (puzzle1 secret "00000"))
+  (let [secret "abcdef"] (puzzle "00000" secret))
+  (let [secret "pqrstuv"] (puzzle "00000" secret))
   
-  (puzzle1 "ckczppom" "00000")
+  (puzzle "00000" "ckczppom")
   
-  (puzzle1 "ckczppom" "000000"))
+  (puzzle "000000" "ckczppom"))
