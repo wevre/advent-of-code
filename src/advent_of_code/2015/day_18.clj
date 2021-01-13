@@ -5,10 +5,10 @@
 ;; --- Day 18: Like a GIF For Your Yard ---
 
 (defn parse [lines]
-  (reduce (fn [res [r l]]
-            (into res (keep-indexed (fn [c v] (when (= \# v) [r c])) l)))
-          #{}
-          (map-indexed vector lines)))
+  (reduce
+   (fn [res [r l]] (into res (keep-indexed (fn [c v] (when (= \# v) [r c]))) l))
+   #{}
+   (map-indexed vector lines)))
 
 (defn neighbors [cell]
   (->> (combo/selections [-1 0 1] (count cell))
@@ -23,9 +23,7 @@
                loc))))
 
 (defn puzzle [cycles wid keep-on input]
-  (->> (str/split-lines input)
-       parse
-       (into keep-on)
+  (->> (into keep-on (parse (str/split-lines input)))
        (iterate (partial step wid keep-on))
        (drop cycles)
        first
