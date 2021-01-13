@@ -1,4 +1,4 @@
-:project Advent of Code 2015-24
+:project Advent of Code 2015-d24
    :author Mike Weaver
    :created 2021-01-04
 
@@ -8,19 +8,22 @@
    not 100% sure I understand how it works. I need to walk through a few sample
    iterations to make sure it is solid in my brain.
 
-   But, aside from understanding that, one flaw in his solution, and from
-   reading Reddit, it is probably similar with many who solved this, there is no
+   But, aside from understanding that, one flaw in his solution--and from
+   reading Reddit it is probably similar with many who solved this--there is no
    checking to confirm that a found subset still leaves the remaining numbers
    able to be divided into correct subsets. I liked how one Reddit poster laid
-   out the issue, and I created my solution by following that outline. That is
-   my code in day_24.clj.
+   out the issue, and I created a solution following that outline. That is
+   probably saved in some commit in the repository, but is no longer my final
+   solution. I might need to revisit it because I had some ideas of optimizing
+   it a tiny bit.
 
-   So here is what I learned. bhauman's function is not just creating subsets.
-   In fact, for just the purpose of generating subsets, it won't work, because
-   it doesn't reach the end case and cons onto '(), so none of the single-item
-   subsets get generated. But because it includes checking that the generated
-   subsets sum to a target, it doesn't matter that these small subsets don't
-   ever get reached.
+   So here is what I learned. bhauman's function is not just creating subsets,
+   it is keeping track of the running total so that subsets will add to the
+   correct target sum. As a general-purpose, create all subsets function, it
+   actually doesn't work, because it doesn't reach the end case and cons onto
+   '(), so none of the single-item subsets get generated. But because it
+   includes checking that the generated subsets sum to a target, it doesn't
+   matter that these small subsets don't ever get reached.
 
    I did figure out how to write a similar function to return all subsets, it
    uses `concat` and it probaby isn't very fast. I didn't keep it, so hopefully
@@ -36,4 +39,4 @@
    in one all-inclusinve function, but it is sort of ungainly, and hard to read
    and figure out what is going on. Also, it is no faster than the easier to
    understand solution (which ends up generating more subsets, but is still
-   fast). This alternate version is day_24_v2.clj.
+   fast). But for now, it is my final solution.

@@ -1,0 +1,16 @@
+:project Advent of Code 2020-d17
+   :author Mike Weaver
+   :created 2020-12-31
+
+:section Reduce
+
+   I love me some `reduce` action. For a solution, I thought it might be faster
+   to generate the subsets with combinatorics, then reduce over them, checking
+   that the target sum is met, and also keeping track of a :minimum (the number
+   of containers needed) and a :ways (how many subsets have this number of
+   minimum containers). The logic isn't that complicated and I thought, hey, one
+   pass through the data, should be faster, right? Turns out it is not. In
+   addition to not being any faster than the general, API-based approach (which
+   is what I have now), it buried a 'complicated' reducing funciton in the
+   middle of the code, so it was too clever for its own good. At least I tested
+   and found out that the simpler cleaner way is just as fast.

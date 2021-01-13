@@ -1,4 +1,4 @@
-:project Advent of Code 2020-20
+:project Advent of Code 2020-d20
    :author Mike Weaver
    :created 2020-12-31
 
@@ -8,13 +8,13 @@
       Create a big list of all possible borders (8 for each image, because of
       flipping), where a border is {:border (\. \# ...), :id 1234, :edge :E} and
       then group-by :border, which will give us all matching edges...twice
-      (again, because of flipping).
+      (because, again, flipping).
 
    2
       Some conventions: edges of an original image are denoted :N, :E, :S, and
       :W. The edges of the flipped side are :n, :e, :s, and :w, but they don't
       correspond exactly to their unflipped counterparts. I'm doing a horizontal
-      flip, so :N and :n stay paired, as do :S and :s. But East and West switch.
+      flip, so :N and :n stay paired, as do :S and :s. East and West switch.
 
       I'm forcing a polarity on the borders, by making them run clockwise around
       the image. This prevents an image's edge from matching itself, but it
@@ -88,7 +88,7 @@
       The function `get-adj` takes a tile and desired direction and returns its
       match oriented correcty in the layout.
 
-      The function `get-next` is provided alread-layed-out-tiles to the north
+      The function `get-next` is provided already-layed-out-tiles to the north
       and west, and returns which tile will match up. We assemble the entire
       layout with this function. We first call it with 'nil' for the north and
       west neighbors, and it returns (randomly) one of the corner tiles. We work
