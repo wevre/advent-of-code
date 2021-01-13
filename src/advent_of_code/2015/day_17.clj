@@ -1,15 +1,14 @@
 (ns advent-of-code.2015.day-17
-  (:require [clojure.string :as str]
-            [clojure.edn :as edn]
+  (:require [clojure.edn :as edn]
             [clojure.math.combinatorics :as combo]))
 
 ;; --- Day 17: No Such Thing as Too Much ---
 
 (defn containers [vol input]
-  (let [cs (map edn/read-string (re-seq #"\d+" input))]
-    (->> (map-indexed vector cs)
-         (combo/subsets)
-         (filter #(= vol (apply + (map second %)))))))
+  (->> (map edn/read-string (re-seq #"\d+" input))
+       (map-indexed vector)
+       (combo/subsets)
+       (filter #(= vol (apply + (map second %))))))
 
 (defn puzzle1 [vol input]
   (count (containers vol input)))
