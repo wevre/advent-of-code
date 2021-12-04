@@ -41,3 +41,46 @@
 
   (map #(dec<-bin (apply str %)) (parse (slurp "input/2021/3-diagnostics.txt")))
   )
+
+(defn filter-bits [input test]
+  (loop [acc [] [v & rest :as input] input]
+    (if (nil? rest)
+      (concat acc v)
+      (let [bits (reduce reduce-bits nil input)
+            most-common (test (first bits))
+            filtered (->> input (filter #(= most-common (first %))) (map next))]
+        (recur (conj acc most-common) filtered)))))
+
+(defn puzzle2 [file]
+  (let [input (parse (slurp file))
+        test-oxygen (fn [b] (if (neg? b) "0" "1"))
+        test-co2 (fn [b] (if (neg? b) "1" "0"))
+        oxygen (dec<-bin (apply str (filter-bits input test-oxygen)))
+        co2 (dec<-bin (apply str (filter-bits input test-co2)))]
+    (* oxygen co2)))
+
+(comment
+  (puzzle2 "input/2021/3-diagnostics.txt")
+  
+  (let [data "00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010"
+        input (parse data)
+        test-oxygen (fn [b] (if (neg? b) "0" "1"))
+        test-co2 (fn [b] (if (neg? b) "1" "0"))
+        oxygen (dec<-bin (apply str (filter-bits input test-oxygen)))
+        co2 (dec<-bin (apply str (filter-bits input test-co2)))]
+    (println "oxygen rating is " oxygen)
+    (println "co2 rating is " co2))
+  
+
+  )
