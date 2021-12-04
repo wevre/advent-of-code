@@ -1,6 +1,8 @@
 (ns advent-of-code.2020.day-12
   (:require [clojure.string :as str]))
 
+;; --- Day 12: Rain Risk ---
+
 (defn parse [line]
   (let [[_ action value] (re-find #"(.)(\d+)" line)]
     {:action (keyword action) :value (Integer/parseInt value)}))

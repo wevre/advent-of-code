@@ -1,6 +1,8 @@
 (ns advent-of-code.2020.day-14
   (:require [clojure.string :as str]))
 
+;; --- Day 14: Docking Data ---
+
 (defn decode [mask]
   (letfn [(step [acc l [c & cs]]
                 (case c

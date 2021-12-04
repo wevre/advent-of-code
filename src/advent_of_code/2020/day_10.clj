@@ -1,6 +1,8 @@
 (ns advent-of-code.2020.day-10
   (:require [clojure.string :as str]))
 
+;; --- Day 10: Adapter Array ---
+
 (defn diffs [in]
   (->> (str/split-lines in)
        (map #(Integer/parseInt %))

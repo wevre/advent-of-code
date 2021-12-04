@@ -34,3 +34,24 @@
 
   (let [input "1\n2\n3\n4\n5\n7\n8\n9\n10\n11"]
     [(puzzle 3 input) (puzzle 4 input)]))
+
+;; This approach follows an algorithm laid out by a reddit poster. I think it
+;; is faster than the above (and probably clearer about what it is doing).
+;; I also think could do a quick reduce before the `loop` and determine what the
+;; smallest group size n is, then start loop at i=n rather than i=1.
+(defn entangled
+  "Find smallest subset with lowest entanglement such that remaining ps _also_
+   can form a valid subset."
+  [targ ps]
+  (loop [i 1]
+    (cond
+      (empty? ps) ()
+      (< (count ps) i) nil
+      :else
+      (if-let [r (->> (combo/combinations ps i)
+                      (filter #(= targ (reduce + %)))
+                      (sort-by #(reduce * %))
+                      (filter #(entangled targ (remove (set %) ps)))
+                      seq)]
+        (first r)
+        (recur (inc i))))))

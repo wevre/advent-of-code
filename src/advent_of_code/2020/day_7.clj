@@ -4,6 +4,8 @@
             [clojure.core.logic.fd :as fd]
             [clojure.string :as str]))
 
+;; --- Day 7: Handy Haversacks ---
+
 (defn parse-spec [spec]
   (->> (str/split spec #" " 2)
        ((juxt second (comp #(Integer/parseInt %) first)))))
@@ -12,7 +14,7 @@
   (let [[head body] (str/split s #" bags contain ")
         specs (str/split body #" bags?[,.] ?")]
     {:container head
-     :contents (into {} (map parse-spec (remove #{"no other"} specs)))})
+     :contents (into {} (comp (remove #{"no other"}) (map parse-spec)) specs)})
   )
 
 (defn expand-rule [{:keys [container contents]}]
@@ -46,6 +48,7 @@
   (->> rules
        str/split-lines
        (map parse-rule)
+       #_#_#_#_#_#_
        (mapcat expand-rule)
        ingest
        (bags-contained-in bag)
@@ -54,10 +57,8 @@
        count
        ))
 
-(def input (slurp "input/2020/7-bags.txt"))
-
 (comment
-  (puzzle1 "shiny gold" input))
+  (puzzle1 "shiny gold" (slurp "input/2020/7-bags.txt")))
 
 (defn bags-that-contain [needle facts]
   (pldb/with-db facts

@@ -1,6 +1,8 @@
 (ns advent-of-code.2020.day-8
   (:require [clojure.string :as str]))
 
+;; --- Day 8: Handheld Halting ---
+
 (defn parse [line]
   (let [[instr offset] (str/split line #" ")]
     {:instr (keyword instr)

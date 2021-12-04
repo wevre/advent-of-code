@@ -49,6 +49,15 @@
    old value doesn't exist yet? You either have to write your update function to
    detect and deal with that, or you can use _fnil_ to supply an initial value.
 
+   * clojure.lang.PersistenQueue -- I suppose I'd noticed this when scanning
+   through documentation, but never had a reason to pay close attention. So when
+   you need to do a 'queue' kind of thing (LIFO) this is your friend.
+
+   * deftype/defprotocol -- I know these are used to implement all kinds of
+   things, to provide interfaces to java stuff. I've never really dug into the
+   guts of it. But for solving day 23, zelark used them and it made lots of
+   sense.
+
 :section Puzzles to review
 
    Day 7 is all about logic programming, which I have never done. So I'm going

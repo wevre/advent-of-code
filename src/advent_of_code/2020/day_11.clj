@@ -2,6 +2,8 @@
   (:require [clojure.set :as s]
             [clojure.string :as str]))
 
+;; --- Day 11: Seating System ---
+
 (defn print-grid [seats rows cols occupied]
   (doseq [r (range rows)]
     (println (str/join (for [c (range cols)]
@@ -34,7 +36,7 @@
   "Treating `in` as a grid, return a set of [r c] locations of L's."
   [lines]
   (reduce (fn [acc [r l]]
-            (into acc (keep-indexed (fn [c v] (when (= v \L) [r c])) l)))
+            (into acc (keep-indexed (fn [c v] (when (= v \L) [r c]))) l))
           #{}
           (map-indexed vector lines)))
 
