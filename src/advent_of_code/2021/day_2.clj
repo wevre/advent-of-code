@@ -24,6 +24,10 @@
 ;; another way to do this would be to reduce into a map of :forward, :up, :down,
 ;; adding the newest amount to the value sitting under the appropriate key.
 
+;; I like this solution here:
+;; https://github.com/neilcode/advent-of-code-2021/blob/main/src/calendar/2021/day_02.clj
+;; it uses condp which I've never used before.
+
 (defn puzzle [input]
   (let [{:keys [forward down up]} (group-commands input)]
     (* forward (- down up))))
