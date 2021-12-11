@@ -3,6 +3,11 @@
 
 ;; --- Day 2: Dive! ---
 
+;; An approach that is more consistent for both parts, is to reduce the input
+;; with a function that takes a vector of [hpos vpos] and returns an updated
+;; vector based on the current command. For part two it's a vector of [pos depth
+;; aim] and same approach.
+
 (defn second-sums
   "Returns sum of second value in list of lists.
   input of [(up 3) (up 5)] returns sum of 8."
@@ -20,13 +25,6 @@
    (partition 2)
    (group-by first)
    (reduce-kv (fn [m k v] (assoc m (keyword k) (second-sums v))) {})))
-
-;; another way to do this would be to reduce into a map of :forward, :up, :down,
-;; adding the newest amount to the value sitting under the appropriate key.
-
-;; I like this solution here:
-;; https://github.com/neilcode/advent-of-code-2021/blob/main/src/calendar/2021/day_02.clj
-;; it uses condp which I've never used before.
 
 (defn puzzle [input]
   (let [{:keys [forward down up]} (group-commands input)]

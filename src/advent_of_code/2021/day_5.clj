@@ -12,28 +12,37 @@
 (comment
   (parse test-file))
 
-(defn is-ortho? [[x0 y0 x1 y1]]
-  (or (= x0 x1) (= y0 y1)))
+(defn is-ortho? [[x1 y1 x2 y2]]
+  (or (= x1 x2) (= y1 y2)))
 
 (comment
   (->> (parse test-file) (map is-ortho?)))
 
-(defn get-points [[x0 y0 x1 y1]]
-  (let [len (max (Math/abs (- x1 x0)) (Math/abs (- y1 y0)))
-        x-step (cond (< x0 x1) +1 (> x0 x1) -1 :else 0)
-        y-step (cond (< y0 y1) +1 (> y0 y1) -1 :else 0)]
-    (for [i (range (inc len))]
-      [(+ x0 (* i x-step)) (+ y0 (* i y-step))])))
+;; Idea for `rangex` came from zelark, with my own modification to handle ortho
+;; and diagonal lines all within same function.
+(defn rangex [start end]
+  (cond
+    (< start end) (range start (inc end))
+    (< end start) (range start (dec end) -1)
+    :else (repeat start)))
+
+(defn get-points [[x1 y1 x2 y2]]
+  (map vector (rangex x1 x2) (rangex y1 y2)))
 
 (defn puzzle [file filt]
-  (->> (parse file) (filter filt) (mapcat get-points)
-       (reduce (fn [acc val] (update acc val (fnil inc 0))) {})
-       (reduce-kv (fn [acc k v] (if (< 1 v) (conj acc k) acc)) [])
+  (->> (parse file)
+       (filter filt)
+       (mapcat get-points)         ;; Get all points into one big list.
+       (group-by identity)         ;; Group same points.
+       vals                        ;; We don't need the keys.
+       (filter #(< 1 (count %)))   ;; Keep points hit by more than one line.
        count))
 
 (comment
+  ;; For part one we keep only orthogonal lines.
   (puzzle test-file is-ortho?)
   (puzzle file is-ortho?)
-  
+
+  ;; For part two we let all lines through.
   (puzzle test-file (constantly true))
   (puzzle file (constantly true)))

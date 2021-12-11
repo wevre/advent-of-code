@@ -1,0 +1,24 @@
+:project Advent of code 2021
+   :created 2021-12-10
+   :author Mike Weaver
+
+:section Introduction
+   I'm already a few days in to AOC 2021, but I thought I'd jot a few notes
+   here.
+
+:section To Do's
+
+   [] Redo Day-2 with using reduce (instead of loop-recur) and a function that
+   switches on a condition based on the command. Also, a re-seq looking for \w+
+   and \d+ can then be mapped into keyword and parseInt quite simply.
+
+   [] Day_4 I had an idea to process each bingo card and return back how many
+   turns before it won. That would have been a solution I could have used for
+   both parts, maybe go back and redo it that way.
+
+   [] I love my solutions for days 5 and 6 and haven't seen anything else out
+   there that is better.
+
+   [] Day 8 has a more elegant solution based on the overall frequencies of each
+   segment for easy and other. Checking those frequencies on the random inputs,
+   one can map back to original segment and then determine what the number is.

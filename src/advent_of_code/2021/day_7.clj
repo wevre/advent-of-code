@@ -1,58 +1,52 @@
 (ns advent-of-code.2021.day-7)
 
-;; This was really hacky, I just poked around with the input list in the REPL
-;; and didn't really write a "puzzle" function.
+;; --- Day 7: The Treachery of Whales ---
 
-;; find the median, then find the cost for everyone to be moved to that.
+;; I didn't write typical functions here, because I didn't want to calculate the
+;; cost for _every_ position, just needed to find the median/mean and then test
+;; enough numbers nearby to make sure it was correct.
 
+(def input (->> (slurp "input/2021/7-crabs.txt")
+                (re-seq #"\d+")
+                (map #(Integer/parseInt %))))
 (comment
-    
   ;; find out how many
-  (->> (slurp "input/2021/7-crabs.txt")
-       (re-seq #"\d+")
-       #_count)   ;;=> 1000
-  
+  (count input)   ;;=> 1000
   ;; find the median
-  (->> (slurp "input/2021/7-crabs.txt")
-       (re-seq #"\d+")
-       (map #(Integer/parseInt %))
-       sort
-       (drop 499)
-       (take 2))   ;;=> (362 362)
+  (->> input sort (drop 499) (take 2))   ;;=> (362 362)
   )
 
-(defn cost [mid]
+(defn cost-1 [mid]
   (->>
-   (slurp "input/2021/7-crabs.txt")
-   (re-seq #"\d+")
-   (map #(Integer/parseInt %))
-   (map #(Math/abs (- mid %)))
+   input
+   (map #(- mid %))
+   (map #(Math/abs %))
    (apply +)))
 
 (comment
-  (require '[clojure.pprint :refer [pprint]])
-  (pprint (map #(str "mid is " % " cost is " (cost %)) '(361 362 363)))
+  (let [test '(361 362 363)]
+    (->> test
+         (map #(vector (cost-1 %) %))
+         (sort-by first)
+         first))   ;;=> [355150 362]
   )
 
-;; The cost for part 2 leads towards the mean as the best point, since the cost
-;; is now essentially the distance squared, so we want to find the least square.
+;; The cost for part 2 is a squared distance, which hints towards the mean.
 (defn cost-2 [mid]
   (->>
-   (slurp "input/2021/7-crabs.txt")
-   (re-seq #"\d+")
-   (map #(Integer/parseInt %))
-   (map #(Math/abs (- mid %)))
-   (map #(/ (* % (inc %)) 2))
+   input
+   (map #(- mid %))
+   (map #(/ (* % (inc %)) 2))   ;; Sum from 1 to n is n*(n+1)/2.
    (apply +)))
 
 (comment
   ;; find the sum
-  (->> (slurp "input/2021/7-crabs.txt")
-       (re-seq #"\d+")
-       (map #(Integer/parseInt %))
-       (apply +))   ;;=>499568
-  
-  ;; so the average is 500, but it turns out 499 has lower cost.
-  (pprint (map #(str "mid is " % " cost is " (cost-2 %)) '(498 499 500 501 502)))
+  (->> input (apply +))   ;;=> 499568
 
+  ;; mean is between 499 and 500, it turns out 499 has lower cost.
+  (let [test '(498 499 500 501)]
+    (->> test
+         (map #(vector (cost-2 %) %))
+         (sort-by first)
+         first))   ;;=> [98368490 499]
   )

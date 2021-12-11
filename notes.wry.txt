@@ -47,7 +47,7 @@
    * fnil -- This is handy when reducing into a multi-level collection and using
    update, where the _old_ value is passed to the update function. What if the
    old value doesn't exist yet? You either have to write your update function to
-   detect and deal with that, or you can use _fnil_ to supply an initial value.
+   detect and deal with that, or you can use `fnil` to supply an initial value.
 
    * clojure.lang.PersistenQueue -- I suppose I'd noticed this when scanning
    through documentation, but never had a reason to pay close attention. So when
