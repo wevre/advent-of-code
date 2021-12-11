@@ -11,6 +11,6 @@
    minimum containers). The logic isn't that complicated and I thought, hey, one
    pass through the data, should be faster, right? Turns out it is not. In
    addition to not being any faster than the general, API-based approach (which
-   is what I have now), it buried a 'complicated' reducing funciton in the
+   is what I have now), it buried a 'complicated' reducing function in the
    middle of the code, so it was too clever for its own good. At least I tested
    and found out that the simpler cleaner way is just as fast.
