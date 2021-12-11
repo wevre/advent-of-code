@@ -1,19 +1,10 @@
 (ns advent-of-code.2021.day-9
-  (:require [clojure.string :as str]))
+  (:require [advent-of-code.2021.common :refer [locmap<-digits]]))
 
 ;; --- Day 9: Smoke Basin ---
 ;; https://adventofcode.com/2021/day/9
 
-(defn parse-line [[r l]]
-  (for [[c v] (map-indexed vector l)]
-    [[r c] (Character/digit v 10)]))
-
-;; `input` is a map from location [r c] to height value.
-(def input (->> (slurp "input/2021/9-heights.txt")
-                (str/split-lines)
-                (map-indexed vector)
-                (mapcat parse-line)
-                (into {})))
+(def input (locmap<-digits (slurp "input/2021/9-heights.txt")))
 
 (defn neighbors [[r c]]
   (for [[dr dc] [[0 -1] [0 1] [-1 0] [1 0]]]
