@@ -28,6 +28,13 @@
    replaced with a reduce? I have to think about the different use cases and
    make some rules about when to use map+filter, when to reduce, when to keep.
 
+   One idiom for keep is
+      (remove nil? (map <transform> coll))
+   is same as
+      (keep <transform> coll)
+
+   So `keep` performs a transform and removes nil from the results.
+
    * reduce-kv -- Wait, this is my new favorite function. It works on maps and
    vectors, and you can accumulate results into anything you want. I love the
    flexibility of this function.
@@ -51,7 +58,7 @@
 
    * clojure.lang.PersistenQueue -- I suppose I'd noticed this when scanning
    through documentation, but never had a reason to pay close attention. So when
-   you need to do a 'queue' kind of thing (LIFO) this is your friend.
+   you need to do a 'queue' kind of thing (FIFO) this is your friend.
 
    * deftype/defprotocol -- I know these are used to implement all kinds of
    things, to provide interfaces to java stuff. I've never really dug into the
