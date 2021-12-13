@@ -1,5 +1,5 @@
 (ns advent-of-code.2021.day-9
-  (:require [advent-of-code.2021.common :refer [locmap<-digits]]))
+  (:require [advent-of-code.common :refer [locmap<-digits]]))
 
 ;; --- Day 9: Smoke Basin ---
 ;; https://adventofcode.com/2021/day/9

@@ -1,5 +1,5 @@
 (ns advent-of-code.2021.day-11
-  (:require [advent-of-code.2021.common :refer [locmap<-digits]]))
+  (:require [advent-of-code.common :refer [locmap<-digits]]))
 
 ;; --- Day 11: Dumbo Octopus ---
 ;; https://adventofcode.com/2021/day/11
