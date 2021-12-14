@@ -1,4 +1,4 @@
-(ns advent-of-code.2021.day-2
+(ns advent-of-code.2021.day-02
   (:require [clojure.string :as str]))
 
 ;; --- Day 2: Dive! ---

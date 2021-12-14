@@ -1,4 +1,4 @@
-(ns advent-of-code.2021.day-3
+(ns advent-of-code.2021.day-03
   (:require [clojure.string :as str]))
 
 ;; --- Day 3: Binary Diagnostic ---

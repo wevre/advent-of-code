@@ -1,4 +1,4 @@
-(ns advent-of-code.2021.day-5
+(ns advent-of-code.2021.day-05
   (:require [advent-of-code.common :refer [parse-longs]]))
 
 ;; --- Day 5: Hydrothermal Venture ---

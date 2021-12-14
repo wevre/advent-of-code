@@ -1,4 +1,4 @@
-(ns advent-of-code.2021.day-6
+(ns advent-of-code.2021.day-06
   (:require [advent-of-code.common :refer [parse-longs]]))
 
 ;; --- Day 6: Lanternfish ---

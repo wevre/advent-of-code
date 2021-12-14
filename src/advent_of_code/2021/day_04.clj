@@ -1,4 +1,4 @@
-(ns advent-of-code.2021.day-4
+(ns advent-of-code.2021.day-04
   (:require [clojure.string :as str]
             [clojure.edn :as edn]
             [clojure.pprint :refer [pprint]]))

@@ -1,4 +1,4 @@
-(ns advent-of-code.2021.day-1
+(ns advent-of-code.2021.day-01
   (:require [advent-of-code.common :refer [parse-longs]]))
 
 ;; --- Day 1: Sonar Sweep ---

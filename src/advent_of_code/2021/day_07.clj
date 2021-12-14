@@ -1,4 +1,4 @@
-(ns advent-of-code.2021.day-7)
+(ns advent-of-code.2021.day-07)
 
 ;; --- Day 7: The Treachery of Whales ---
 

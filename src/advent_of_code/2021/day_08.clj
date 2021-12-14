@@ -1,6 +1,6 @@
-(ns advent-of-code.2021.day-8
+(ns advent-of-code.2021.day-08
   (:require [clojure.set :as set]
-            [clojure.pprint :refer [pprint]]))
+            #_[clojure.pprint :refer [pprint]]))
 
 ;; --- Day 8: Seven Segment Search ---
 
