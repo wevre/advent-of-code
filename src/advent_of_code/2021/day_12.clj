@@ -46,12 +46,12 @@ b-end")
     (->> (finder [start]) (map #(str/join "," %)) sort pprint)))
 
 (comment
-  ;; Puzzle 1
+  ;; puzzle 1
   (let [cave-map (parse-input (slurp "input/2021/12-caves.txt"))
         finder (find-paths cave-map 1)]
     (count (finder [start])))
 
-  ;; Puzzle 2
+  ;; puzzle 2
   (let [cave-map (parse-input (slurp "input/2021/12-caves.txt"))
         finder (find-paths cave-map 2)]
     (count (finder [start])))

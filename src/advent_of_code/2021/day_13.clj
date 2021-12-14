@@ -32,11 +32,11 @@
     (print (string<-dots (reduce do-fold dots folds #_(take 1 folds))))))
 
 (comment
-  ;; Puzzle 1
+  ;; puzzle 1
   (let [{:keys [dots folds]} (parse-input (slurp "input/2021/13-dots.txt"))]
     (count (reduce do-fold dots (take 1 folds))))
 
-  ;; Puzzle 2
+  ;; puzzle 2
   (let [{:keys [dots folds]} (parse-input (slurp "input/2021/13-dots.txt"))]
     (print (string<-dots (reduce do-fold dots folds))))
   )

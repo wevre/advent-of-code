@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]))
 
 ;; --- Day 2: Dive! ---
+;; https://adventofcode.com/2021/day/2
 
 ;; An approach that is more consistent for both parts, is to reduce the input
 ;; with a function that takes a vector of [hpos vpos] and returns an updated

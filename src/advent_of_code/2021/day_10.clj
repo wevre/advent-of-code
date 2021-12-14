@@ -10,7 +10,7 @@
 (def matches {\< \>, \[ \], \{ \}, \( \)})
 
 (defn scan
-  "Returns vector of [nil `stack`] if line is incomplete, where `stack` is list
+  "Return vector of [nil `stack`] if line is incomplete, where `stack` is list
    of characters needed to complete. If line is invalid, return vector is
    [`c` `stack`] where `c` is the invalid character and `stack` can be ignored."
   [line]

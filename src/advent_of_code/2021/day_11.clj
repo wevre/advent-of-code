@@ -47,7 +47,7 @@
        first
        (print-omap 10))
 
-  ;; Puzzle 1
+  ;; puzzle 1
   (->> input
        (iterate step)
        (drop 1)
@@ -57,7 +57,7 @@
   )
 
 (comment
-  ;; Puzzle 2
+  ;; puzzle 2
   (->> input
        (iterate step)
        (map-indexed vector)

@@ -1,30 +1,28 @@
 (ns advent-of-code.2021.day-1
-  (:require [clojure.string :as str]))
+  (:require [advent-of-code.common :refer [parse-longs]]))
 
 ;; --- Day 1: Sonar Sweep ---
+;; https://adventofcode.com/2021/day/1
 
-(defn get-input [file]
-  (->>
-   (slurp file)
-   (str/split-lines)
-   (map #(Integer/parseInt %))))
-
-(defn puzzle1
-  "Returns count of increasing pairs."
+(defn count-incr-pairs
+  "Return count of increasing pairs."
   [depths]
   (->>
    (partition 2 1 depths)
    (filter #(apply < %))
    count))
 
-(defn puzzle2
-  "Returns count of increasing triple-sums."
+(defn sum-of-triples
+  "Return sums of triplets."
   [depths]
   (->>
    (partition 3 1 depths)
-   (map #(apply + %))
-   puzzle1))
+   (map #(apply + %))))
 
 (comment
-  (puzzle1 (get-input "input/2021/1-depths.txt"))
-  (puzzle2 (get-input "input/2021/1-depths.txt")))
+  ;; puzzle 1
+  (count-incr-pairs (parse-longs (slurp "input/2021/1-depths.txt")))
+
+  ;; puzzle 2
+  (count-incr-pairs (sum-of-triples (parse-longs (slurp "input/2021/1-depths.txt"))))
+  )
