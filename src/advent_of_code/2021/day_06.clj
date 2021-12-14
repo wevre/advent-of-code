@@ -6,13 +6,14 @@
 
 (def get-count
   "Return count of fish after `gen` generations, based on the starting `age`."
-  (memoize (fn [gen age]
-             (if (> gen age)
-               (+ (get-count (- gen age 1) 6) (get-count (- gen age 1) 8))
-               1))))
+  (memoize
+   (fn [gen age]
+     (if (> gen age)
+       (+ (get-count (- gen age 1) 6) (get-count (- gen age 1) 8))
+       1))))
 
 (defn fish-count [gens input]
-  (apply + (map #(get-count gens %) input)))
+  (reduce + (map #(get-count gens %) input)))
 
 (comment
   ;; puzzle 1
