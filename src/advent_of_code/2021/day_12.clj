@@ -1,5 +1,6 @@
 (ns advent-of-code.2021.day-12
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [clojure.set :as set]))
 
 ;; --- Day 12: Passage Pathing ---
 ;; https://adventofcode.com/2021/day/12
@@ -9,11 +10,8 @@
   [s]
   (->> (str/split-lines s)
        (map #(re-seq #"\w+" %))
-       (reduce (fn [acc [cave1 cave2]]
-                 (-> acc
-                     (update cave1 (fnil conj #{}) cave2)
-                     (update cave2 (fnil conj #{}) cave1)))
-               {})))
+       (mapcat (fn [[cave1 cave2]] [{cave1 #{cave2}} {cave2 #{cave1}}]))
+       (apply merge-with set/union)))
 
 (def start "start")
 (def end "end")
