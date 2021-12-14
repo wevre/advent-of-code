@@ -1,6 +1,5 @@
 (ns advent-of-code.2021.day-12
-  (:require [clojure.string :as str]
-            [clojure.set :as set]))
+  (:require [clojure.string :as str]))
 
 ;; --- Day 12: Passage Pathing ---
 ;; https://adventofcode.com/2021/day/12

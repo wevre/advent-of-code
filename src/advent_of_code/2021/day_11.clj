@@ -25,7 +25,7 @@
        (<= 9 (omap loc)) (recur (assoc omap loc :f)
                                 (into (next queue)
                                       (->> (neighbors loc)
-                                           (select-keys input)
+                                           (select-keys omap)
                                            keys)))
        :else (recur (update omap loc inc) (next queue)))
      (reduce-kv (fn [m k v] (assoc m k (if (= :f v) 0 v))) {} omap))))
