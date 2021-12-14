@@ -11,17 +11,22 @@
     [(+ r dr) (+ c dc)]))
 
 (defn step
-  "Takes an octopi map as input, and returns octopi map as output.
-   Final values of 0 on the map indicate that octopus flashed.
-   While processing, any octopus that flashes gets replaced with :f, preventing
-   us from flashing it more than once. On final output, the :f's are converted
-   back to 0's."
+  "Takes an octopi map as input, along with a queue of locations to examine. The
+   queue starts with every location on the grid, and as flashes occur neighbor
+   locations will be thrown back onto the queue to be re-examined.
+   Returns octopi map as output, with a value of 0 indicating a flash.
+   During processing, any octopus that flashes gets replaced with :f, preventing
+   us from flashing it more than once. On return, converts :f's back to 0's."
   ([omap] (step omap (keys omap)))
   ([omap queue]
    (if-let [loc (first queue)]
      (cond
        (= :f (omap loc)) (recur omap (next queue))
-       (<= 9 (omap loc)) (recur (assoc omap loc :f) (into (next queue) (->> (neighbors loc) (select-keys input) keys)))
+       (<= 9 (omap loc)) (recur (assoc omap loc :f)
+                                (into (next queue)
+                                      (->> (neighbors loc)
+                                           (select-keys input)
+                                           keys)))
        :else (recur (update omap loc inc) (next queue)))
      (reduce-kv (fn [m k v] (assoc m k (if (= :f v) 0 v))) {} omap))))
 
@@ -48,19 +53,19 @@
        (print-omap 10))
 
   ;; puzzle 1
-  (->> input
-       (iterate step)
-       (drop 1)
-       (take 100)
-       (map #(count (keep #{0} (vals %))))
-       (reduce +))
-  )
+  (time
+   (->> input
+        (iterate step)
+        (drop 1)
+        (take 100)
+        (map #(count (keep #{0} (vals %))))
+        (reduce +)))
 
-(comment
   ;; puzzle 2
-  (->> input
-       (iterate step)
-       (map-indexed vector)
-       (drop-while #(not-every? zero? (vals (second %))))
-       ffirst)
+  (time
+   (->> input
+        (iterate step)
+        (map-indexed vector)
+        (drop-while #(not-every? zero? (vals (second %))))
+        ffirst))
   )
