@@ -21,7 +21,9 @@
 
    * Partial -- Often I have a function with multiple arguments, but they mess
    up the flow of the threading macros. One trick is to use `partial` to curry
-   a new function with those extra arguments already supplied.
+   a new function with those extra arguments already supplied. Another method is
+   to wrap some of the parameters and return a new function that takes the rest
+   of the parameters.
 
    * keep, keep-indexed -- These are my new favorite functions. They work well
    in places where you are using map and filter. So they probably could be
@@ -39,8 +41,8 @@
    vectors, and you can accumulate results into anything you want. I love the
    flexibility of this function.
 
-   * postwalk -- I discovered this while reviewing other's solutions for Day 18.
-   What a gem! It makes the recursive logic cleaner because it does the work of
+   * postwalk -- I discovered this while reviewing solutions for Day 18. What a
+   gem! It makes the recursive logic cleaner because it does the work of
    reducing internal lists, so the evaluation code can assume a flat list input.
 
    * Game of Life -- Two puzzles (so far, 11 and 17) are based on 'game of
@@ -85,12 +87,7 @@
    Day 14 I want to document the AND and OR mask logic.
 
    Check for use of Integer/parseInt and replace (if possible) with
-   edn/read-string.
-
-:section keep, keep-indexed
-
-   These functions are interesting, sort of a blend of filter & map. So why not
-   use reduce? I need to think about how keep changes the code vs. reduce.
+   edn/read-string. Or, this is new in 1.11.0_alpha: parse-long.
 
 :section Solutions
 
@@ -101,7 +98,7 @@
 
    https://github.com/bhauman/advent-of-clojure
 
-   https://github.com/derekslager/advent-of-code-2015
+   https://github.com/derekslager/advent-of-code-2015 (also 2019)
 
    Of course, the reddit daily megathreads are also a place to find solution
    ideas, but I've noticed that not many are in Clojure.
@@ -113,6 +110,3 @@
    https://github.com/elektronaut/advent-of-code
    https://github.com/coyotesqrl/advent2020
    https://github.com/zelark/AoC-2020
-
-   Here is a complete (all years) repo written in Go
-   https://github.com/alexchao26/advent-of-code-go
