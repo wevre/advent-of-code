@@ -1,10 +1,12 @@
 (ns advent-of-code.2021.day-07)
 
 ;; --- Day 7: The Treachery of Whales ---
+;; https://adventofcode.com/2021/day/7
 
 ;; I didn't write typical functions here, because I didn't want to calculate the
-;; cost for _every_ position, just needed to find the median/mean and then test
-;; enough numbers nearby to make sure it was correct.
+;; cost for _every_ position (i.e. the "brute force" approach). Instead I just
+;; needed to find the median/mean and then test enough numbers nearby to make
+;; sure it was correct. (Kind of like doing ad hoc analysis in Excel.)
 
 (def input (->> (slurp "input/2021/7-crabs.txt")
                 (re-seq #"\d+")
