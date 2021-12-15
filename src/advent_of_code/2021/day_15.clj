@@ -7,11 +7,14 @@
 ;; the map entry will be:
 ;; [x y] {:risk 5 :dist #Inf :prev [x y]}
 
+;;TODO: [] use transients (not faster! but maybe my impl is not good)
+;;      [] could use vector of vectors instead of map
+
 (def start [0 0])
 (def end [99 99])
 
 (defn parse-input [s]
-  (-> (locmap<-digits s #(hash-map :risk % :dist ##Inf :prev nil :visited? false))
+  (-> (locmap<-digits s #(hash-map :risk % :dist ##Inf :visited? false))
       (assoc-in [start :dist] 0)))
 
 (defn neighbors [[r c]]
@@ -24,10 +27,10 @@
 (defn unvisited-neighbors [node chitons]
   (->> node neighbors (select-keys chitons) (remove #(:visited? (val %))) keys))
 
-(defn update-node [node-map curr dist]
+(defn update-node [node-map dist]
   (let [test-dist (+ dist (:risk node-map))]
     (if (< test-dist (:dist node-map))
-      (assoc node-map :dist test-dist :prev curr)
+      (assoc node-map :dist test-dist)
       node-map)))
 
 (defn lowest-risk [chitons]
@@ -37,11 +40,25 @@
       (let [node (smallest-unvisited chitons)
             neighbors (unvisited-neighbors node chitons)]
         (recur (reduce (fn [acc loc]
-                         (update acc loc update-node node (:dist (chitons node))))
+                         (update acc loc update-node (:dist (chitons node))))
                        (assoc-in chitons [node :visited?] true)
                        neighbors))))))
 
 (comment
+
+  (with-redefs [end [9 9]]
+    (time
+     (lowest-risk (parse-input "1163751742
+1381373672
+2136511328
+3694931569
+7463417111
+1319128137
+1359912421
+3125421639
+1293138521
+2311944581"))))
+
   ;; puzzle 1
   (time
    (lowest-risk (parse-input (slurp "input/2021/15-chitons.txt"))))
