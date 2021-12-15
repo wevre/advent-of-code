@@ -1,91 +1,50 @@
 (ns advent-of-code.2021.day-08
-  (:require [clojure.set :as set]
-            #_[clojure.pprint :refer [pprint]]))
+  "Idea here is to create a 'fingerprint' for each segment, which is the count
+   of segments in each digit where the segment appears. For example, segment 'a'
+   is in the digits (0 2 3 5 6 7 8 9), and those digits have segment counts
+   of (6 5 5 5 6 3 7 6), respectively. Sorted, those are (3 5 5 5 6 6 6 7),
+   which is a unique fingerprint for segment 'a'. The other segments 'b' through
+   'g' likewise have unique fingerprints. We fingerprint the randomized input
+   and use it to identify the correct segment and ultimately the output digits."
+  (:require [clojure.set :as set]))
 
 ;; --- Day 8: Seven Segment Search ---
+;; https://adventofcode.com/2021/day/8
 
-(comment
-  ;; puzzle1: find how many "easy" numbers are in the output of each entry
-  (->> (slurp "input/2021/8-digits.txt")
-       (re-seq #"[a-g]+")
-       (partition 14)        ;; divide into entries
-       (map #(drop 10 %))    ;; keep only the "output" portion
-       (mapcat #(map count %))
-       (filter #{2 4 3 7})   ;; keep only the "easy" number of segments
-       count)                ;;=> 1000
-  )
-
-(def easy "map from (unique) number of segments to known digit"
-  {2 1, 4 4, 3 7, 7 8})
-
-(defn resolve-easy [freq-map known]
-  (reduce (fn [acc [cnt dig]]
-            (let [segs (first (freq-map cnt))]
-              (assoc acc dig segs)))
-          known
-          easy))
-
-(defn resolve-six-segs [freq-map known]
-  (let [four (nth known 4)
-        one (nth known 1)
-        six-segs (freq-map 6)]
-    (reduce (fn [m v]
-              (cond
-                (set/subset? four v) (assoc m 9 v)
-                (set/subset? one v) (assoc m 0 v)
-                :else (assoc m 6 v)))
-            known
-            six-segs)))
-
-(defn resolve-five-segs [freq-map known]
-  (let [one (nth known 1)
-        nine (nth known 9)
-        five-segs (freq-map 5)]
-    (reduce (fn [m v]
-              (cond
-                (set/subset? one v) (assoc m 3 v)
-                (set/subset? v nine) (assoc m 5 v)
-                :else (assoc m 2 v)))
-            known
-            five-segs)))
-
-(defn num<-digits [digits]
-  (->> digits
-       (map str)
-       (apply str)
-       Integer/parseInt))
-
-(comment
-  (num<-digits '(1 2 3 4))   ;;=> 1234
-  )
-
-(defn resolve-entry [entry]
-  (let [[input output] (split-at 10 entry)
-        freq-map (group-by count input)
-        known (->> (into [] (repeat 10 nil))
-                   (resolve-easy freq-map)
-                   (resolve-six-segs freq-map)
-                   (resolve-five-segs freq-map))
-        lookup (reduce-kv (fn [m k v] (assoc m v k)) {} known)]
-    (->> output
-         (map lookup)
-         num<-digits)))
-
-(defn puzzle2 [file]
-  (->> (slurp file)
-       (re-seq #"[a-g]+")
-       (map set)
+(defn parse-input [s]
+  (->> (re-seq #"[a-g]+" s)
        (partition 14)
-       (map resolve-entry)
-       (apply +)))
+       (map (partial split-at 10))
+       (map #(zipmap [:uniques :output] %))))
+
+(def digit<-segments
+  "Map from segments to digit."
+  (->> ["abcefg" "cf" "acdeg" "acdfg" "bcdf" "abdfg" "abdefg" "acf" "abcdefg" "abcdfg"]
+       (reduce-kv (fn [m k v] (assoc m (set (seq v)) k)) {})))
+
+(defn fingerprint
+  "Convert unique patterns (strings) to map of segment to fingerprint."
+  [uniques]
+  (as-> uniques $
+    (map #(zipmap (seq %) (repeat (list (count %)))) $)
+    (apply merge-with concat $)
+    (update-vals $ sort)))
+
+(defn decode [{:keys [uniques output]}]
+  (let [seg<-fprint (set/map-invert (fingerprint (keys digit<-segments)))
+        digit-map (update-vals (fingerprint uniques) seg<-fprint)]
+    (->> output
+         (sequence (comp (map #(map digit-map %))
+                         (map #(set %))
+                         (map digit<-segments))))))
 
 (comment
-  (puzzle2 "input/2021/8-digits.txt")
-  )
+  ;; puzzle 1
+  (->> (parse-input (slurp "input/2021/8-digits.txt"))
+       (sequence (comp (mapcat decode) (keep #{1 4 7 8})))
+       count)
 
-;; zelark had a different approach: there is a unique combination of the
-;; frequency of each of the segments used for the easy numbers and the others.
-;; For example, segment 'a' is used by 2 of the easy's and 6 of the other
-;; numbers, and so on for each of the other segments. So if you do frequencies
-;; of all the segments, split by easy and other, that will give you a unique
-;; mapping from random segment, back to correct segment.
+  ;; puzzle 2
+  (->> (parse-input (slurp "input/2021/8-digits.txt"))
+       (transduce (comp (map decode) (map #(apply str %)) (map parse-long)) +))
+  )
