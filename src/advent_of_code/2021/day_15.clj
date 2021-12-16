@@ -1,59 +1,69 @@
 (ns advent-of-code.2021.day-15
-  (:require [advent-of-code.common :refer [locmap<-digits]]))
+  "Three pieces to this solution, which is an implementation of Dijkstra's
+   algorithm: (1) a 1-dim vector of the input data, `risks`, and the function
+   `risk<-loc` that returns the risk for a given 'location' (where a 'location'
+   is a vector of `[row, col]` and basically lets us treat `risks` as if it were
+   a 2-dim matrix); (2) a set of `visited` locations; and, (3) a priority-map,
+   `distances`, whose keys are `[r c]` locations and whose values are tentative
+   distances. Because `distances` is a priority-map, it stays sorted by
+   tentative distance, so after we remove the current node from `distances` and
+   add it to `visited` then the next current node is simply `(first distances)`.
 
-;; --- Day 15: Chiton ---
-;; https://adventofcode.com/2021/day/15
+   Three other implementation notes: (1) I did not load up `distances` with
+   every location initialized to ##Inf, they are instead initialized on-the-fly
+   by the `update-distance` function; (2) for part 2 I did not expand `risks` to
+   be 25 times as big, instead the `risk<-loc` function translates larger
+   coordinates back onto the original vector, and likewise adjusts the original
+   risk level upward as necessary; and, (3) I switch from part 1 to part 2 by
+   redefining the var `scale` using `with-redefs`."
+  (:require [clojure.data.priority-map :refer [priority-map]]))
 
-;; the map entry will be:
-;; [x y] {:risk 5 :dist #Inf :prev [x y]}
-
-;;TODO: [] use transients (not faster! but maybe my impl is not good)
-;;      [] could use a big vector of vectors
-;;      [] could try a map (or vector) of atoms.
-;; I think vector is better than map, because we have to represent the entire
-;; grid anyway, and then we don't have to keep track of a location.
-;;      so we need a function to lookup in (lookup chiton loc) that will get the
-;;      correct value out of the vector.
+;;NOTE: I tried a manhattan distance penalty tacked on to the distance, but it
+;;      made no difference, so I removed it.
 
 (def start [0 0])
-(def end [99 99])
+(def dim 100)
+(def scale 1)
 
-(defn parse-input [s]
-  (-> (locmap<-digits s #(hash-map :risk % :dist ##Inf :visited? false))
-      (assoc-in [start :dist] 0)))
+(defn parse-input "Return a vector of risk values." [s]
+  (->> (re-seq #"\d" s) (map #(Integer/parseInt %))))
+
+(defn risk<-loc [coll [r c]]
+  (let [wrap (fn [x d] (if (< x dim) [x d] (recur (- x dim) (inc d))))
+        [nr dr] (wrap r 0)
+        [nc dc] (wrap c 0)
+        v (+ dr dc (nth coll (+ nc (* nr dim))))]
+    (inc (mod (dec v) 9))))
 
 (defn neighbors [[r c]]
-  (for [[dr dc] [[0 -1] [0 1] [-1 0] [1 0]]]
-    [(+ r dr) (+ c dc)]))
+  (let [upp (dec (* scale dim))]
+    (for [[dr dc] [[0 -1] [0 1] [-1 0] [1 0]]
+          :let [fr (+ r dr) fc (+ c dc)]
+          :when (and (<= 0 fr upp) (<= 0 fc upp))]
+      [fr fc])))
 
-(defn smallest-unvisited [chitons]
-  (->> chitons (remove #(:visited? (val %))) (sort-by #(:dist (val %))) ffirst))
+(defn update-distance [risks dist]
+  (fn [distances loc]
+    (update distances loc (fnil min ##Inf) (+ dist (risk<-loc risks loc)))))
 
-(defn unvisited-neighbors [node chitons]
-  (->> node neighbors (select-keys chitons) (remove #(:visited? (val %))) keys))
-
-(defn update-node [node-map dist]
-  (let [test-dist (+ dist (:risk node-map))]
-    (if (< test-dist (:dist node-map))
-      (assoc node-map :dist test-dist)
-      node-map)))
-
-(defn lowest-risk [chitons]
-  (loop [chitons chitons]
-    (if (:visited? (chitons end))
-      (:dist (chitons end))
-      (let [node (smallest-unvisited chitons)
-            neighbors (unvisited-neighbors node chitons)]
-        (recur (reduce (fn [acc loc]
-                         (update acc loc update-node (:dist (chitons node))))
-                       (assoc-in chitons [node :visited?] true)
-                       neighbors))))))
+(defn lowest-risk [risks]
+  (let [upp (dec (* scale dim))
+        end [upp upp]]
+    (loop [distances (priority-map start 0) visited #{}]
+      (let [[node dist] (first distances)
+            neighbors (->> node neighbors (remove visited))]
+        (if (= node end)
+          {:dist (distances node)
+           :untouched (- (* scale scale (count risks)) (count visited) (count distances))}
+          (recur (-> (reduce (update-distance risks dist) distances neighbors)
+                     (dissoc node))
+                 (conj visited node)))))))
 
 (comment
-
-  (with-redefs [end [9 9]]
+  (with-redefs [dim 10 scale 5]
     (time
-     (lowest-risk (parse-input "1163751742
+     (->
+      (parse-input "1163751742
 1381373672
 2136511328
 3694931569
@@ -62,10 +72,17 @@
 1359912421
 3125421639
 1293138521
-2311944581"))))
+2311944581")
+      (lowest-risk))))
 
   ;; puzzle 1
   (time
    (lowest-risk (parse-input (slurp "input/2021/15-chitons.txt"))))
-  ;;=> 811 "Elapsed time: 25791.095624 msecs"
+  ;;=> 811 "Elapsed time: 2402.363662 msecs"
+
+  ;; puzzle 2
+  (time
+   (with-redefs [scale 5]
+     (lowest-risk (parse-input (slurp "input/2021/15-chitons.txt")))))
+  ;;=> 3012 "Elapsed time: 57542.997612 msecs"
   )
