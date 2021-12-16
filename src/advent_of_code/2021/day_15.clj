@@ -8,7 +8,12 @@
 ;; [x y] {:risk 5 :dist #Inf :prev [x y]}
 
 ;;TODO: [] use transients (not faster! but maybe my impl is not good)
-;;      [] could use vector of vectors instead of map
+;;      [] could use a big vector of vectors
+;;      [] could try a map (or vector) of atoms.
+;; I think vector is better than map, because we have to represent the entire
+;; grid anyway, and then we don't have to keep track of a location.
+;;      so we need a function to lookup in (lookup chiton loc) that will get the
+;;      correct value out of the vector.
 
 (def start [0 0])
 (def end [99 99])
@@ -62,4 +67,5 @@
   ;; puzzle 1
   (time
    (lowest-risk (parse-input (slurp "input/2021/15-chitons.txt"))))
+  ;;=> 811 "Elapsed time: 25791.095624 msecs"
   )
