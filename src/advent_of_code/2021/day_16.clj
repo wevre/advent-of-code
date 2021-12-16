@@ -1,6 +1,23 @@
 (ns advent-of-code.2021.day-16
+  "I chose not to have a global atom to help consume the bits. Instead, all my
+   parse functions take bits and return a vector `[result bits]`. Consistently,
+   then, all calls to these functions destructure the results with this pattern:
+       (defn parse-zzz [bits]
+         (let [[result bits] (parse-xxx bits)
+               [other bits] (parse-yyy bits)]
+           ...do something...
+           [result bits])
+   I normally don't like clobbering vars with repeating let bindings, but here
+   the pattern is useful and consistent.
+   To evaluate the results, I use clojure.walk/postwalk which is one of those
+   'magical' functions that I love to use. And first time for me, I used
+   clojure.core.match/match to identify the particular subforms (during the
+   walk) that need to be evaluated."
   (:require [clojure.walk :refer [postwalk]]
             [clojure.core.match :refer [match]]))
+
+;; --- Day 16: Packet Decoder ---
+;; https://adventofcode.com/2021/day/16
 
 (def bin<-hex (-> {\0 "0000", \1 "0001", \2 "0010", \3 "0011"
                    \4 "0100", \5 "0101", \6 "0110", \7 "0111"
