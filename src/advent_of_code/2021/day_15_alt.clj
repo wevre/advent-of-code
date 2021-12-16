@@ -54,7 +54,8 @@
       (let [[node dist] (first distances)
             neighbors (->> node neighbors (remove visited))]
         (if (= node end)
-          (distances node)
+          {:dist (distances node)
+           :untouched (- (* scale scale (count risks)) (count visited) (count distances))}
           (recur (-> (reduce (update-distance risks dist) distances neighbors)
                      (dissoc node))
                  (conj visited node)))))))
