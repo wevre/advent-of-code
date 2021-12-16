@@ -29,11 +29,13 @@
   (->> (re-seq #"\d" s) (map #(Integer/parseInt %))))
 
 (defn risk<-loc [coll [r c]]
-  (let [wrap (fn [x d] (if (< x dim) [x d] (recur (- x dim) (inc d))))
-        [nr dr] (wrap r 0)
-        [nc dc] (wrap c 0)
-        v (+ dr dc (nth coll (+ nc (* nr dim))))]
-    (inc (mod (dec v) 9))))
+  ;; A more elegant solution uses iterate, but so many calls to `mod` is slower.
+  ;; (nth (iterate mod-9 (nth coll [mod-r mod-c])) (+ quot-r quot-c))
+  (loop [d 0 r r c c]
+    (cond
+      (<= dim r) (recur (inc d) (- r dim) c)
+      (<= dim c) (recur (inc d) r (- c dim))
+      :else (-> (nth coll (+ c (* r dim))) (+ d) dec (mod 9) inc))))
 
 (defn neighbors [[r c]]
   (let [upp (dec (* scale dim))]
@@ -53,8 +55,7 @@
       (let [[node dist] (first distances)
             neighbors (->> node neighbors (remove visited))]
         (if (= node end)
-          {:dist (distances node)
-           :untouched (- (* scale scale (count risks)) (count visited) (count distances))}
+          (distances node)
           (recur (-> (reduce (update-distance risks dist) distances neighbors)
                      (dissoc node))
                  (conj visited node)))))))
