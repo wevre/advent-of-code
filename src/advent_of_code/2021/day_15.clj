@@ -1,21 +1,4 @@
 (ns advent-of-code.2021.day-15
-  "Three pieces to this solution, which is an implementation of Dijkstra's
-   algorithm: (1) a 1-dim vector of the input data, `risks`, and the function
-   `risk<-loc` that returns the risk for a given 'location' (where a 'location'
-   is a vector of `[row, col]` and basically lets us treat `risks` as if it were
-   a 2-dim matrix); (2) a set of `visited` locations; and, (3) a priority-map,
-   `distances`, whose keys are `[r c]` locations and whose values are tentative
-   distances. Because `distances` is a priority-map, it stays sorted by
-   tentative distance, so after we remove the current node from `distances` and
-   add it to `visited` then the next current node is simply `(first distances)`.
-
-   Three other implementation notes: (1) I did not load up `distances` with
-   every location initialized to ##Inf, they are instead initialized on-the-fly
-   by the `update-distance` function; (2) for part 2 I did not expand `risks` to
-   be 25 times as big, instead the `risk<-loc` function translates larger
-   coordinates back onto the original vector, and likewise adjusts the original
-   risk level upward as necessary; and, (3) I switch from part 1 to part 2 by
-   redefining the var `scale` using `with-redefs`."
   (:require [clojure.data.priority-map :refer [priority-map]]))
 
 ;;NOTE: I tried a manhattan distance penalty tacked on to the distance, but it
@@ -29,7 +12,7 @@
   (->> (re-seq #"\d" s) (map #(Integer/parseInt %))))
 
 (defn risk<-loc [coll [r c]]
-  ;; A more elegant solution uses iterate, but so many calls to `mod` is slower.
+  ;; A more elegant, but slower (I'm looking at you, `mod`) approach:
   ;; (nth (iterate mod-9 (nth coll [mod-r mod-c])) (+ quot-r quot-c))
   (loop [d 0 r r c c]
     (cond
