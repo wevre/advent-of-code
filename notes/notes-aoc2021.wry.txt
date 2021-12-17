@@ -94,19 +94,19 @@
    Puzzle 1 was done 'by hand' with a calculator and Excel and some knowledge of
    triangle numbers. I confirmed with Excel that for my input, the x-velocity
    could be no lower than 17 otherwise drag would prevent the probe from ever
-   reaching the target area. (I made a rough guess by taking the target min-x
-   and max-x, doubling, and then taking the square root, and that rough estimate
-   got me pretty close.) Obviously the x-velocity has an upper bound of
-   target-max-x for the same reason. In my code, however, I don't bother with
-   the minimum x-velocity because it's only a few extra loops to check, and then
-   my code can be run on the sample problem with fewer modifications.
+   reaching the target area. (I made a rough guess by taking the target mid-x,
+   doubling, and then taking the square root, and that rough estimate got me
+   pretty close.) Obviously the x-velocity has an upper bound of target-max-x.
+   In my code, however, I don't bother with the minimum x-velocity because it's
+   only a few extra loops to check, and then my code can be run on the sample
+   problem with fewer modifications.
 
    For the y-velocity, we shoot the probe up and when it comes back to y=0, it
    will have negative of it's initial velocity, and then the next y-point it
    hits will be (inc (neg init-y-vel)). So, for example with my input, the
    biggest y-velocity we can choose is 114-1=113. And -114 is the lowest
    y-velocity allowed (continuing with my particular puzzle input) because
-   otherwise the completely overshoot the target on the very first step.
+   otherwise we completely overshoot the target on the very first step.
 
    The above logic gives a simple range to test: 0 <= x <= target-max-x and
    target-min-y <= y <= -target-min-y. You could shave a few milliseconds by

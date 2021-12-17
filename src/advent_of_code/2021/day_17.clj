@@ -36,6 +36,12 @@
        (keep seq)
        count)))   ;;=> 112
 
+  ;; puzzle 1
+  ;;    Um. I quickly solved this using a calculator and Excel in the few
+  ;;    moments I had before heading up to the ski hill. Largest y-velocity
+  ;;    allowed is 1 less than the minimum y-val: so 114-1=113, and the highest
+  ;;    point it reaches is n*(n+1)/2=113*114/2=6441.
+
   ;; puzzle 2
   (let [[_ x-max] x-limits [y-min _] y-limits]
     (->>
