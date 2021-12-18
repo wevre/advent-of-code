@@ -33,7 +33,7 @@
      (when-not (or (nil? z) (zip/end? z))
        (if (pred z) z (recur (move z)))))))
 
-;; Reducing snailfish numbers.
+;; Reducing actions.
 
 (defn incr-neighbor
   "Increase a regular number neighbor of `loc` by amount `v`, searching in
@@ -59,19 +59,27 @@
         v' [(int (math/floor v)) (int (math/ceil v))]]
     (-> loc (zip/replace v') zip/root)))
 
-(defn apply-one-action [sfn]
-  (condp find-loc (zip/vector-zip sfn)
-    explodable? :>> explode
-    splitable? :>> split
-    sfn))
+;; Adding and reducing snailfish numbers.
+
+;; Wrap snailfish numbers in a map that includes a flag indicating if we took
+;; any edit actions. That is the signal that explosions and splits are all done.
+
+(defn apply-one-action [{sfn :sfn}]
+  (let [mark-edited (fn [f] (fn [loc] {:edit? true :sfn (f loc)}))]
+    (condp find-loc (zip/vector-zip sfn)
+      explodable? :>> (mark-edited explode)
+      splitable? :>> (mark-edited split)
+      {:edit? false :sfn sfn})))
 
 (defn add-sfn [a b]
-  (->> [a b]
+  (->> {:edit? true :sfn [a b]}
        (iterate apply-one-action)
-       (reduce #(if (= %1 %2) (reduced %1) %2))))
+       (drop-while :edit?)
+       first
+       :sfn))
 
 (defn magnitude [sfn]
-  (postwalk #(if (number? %) % (reduce + (map * % [3 2]))) sfn))
+  (if (number? sfn) sfn (reduce + (map * (map magnitude sfn) [3 2]))))
 
 (comment
   (def example-1 "[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]
@@ -114,10 +122,11 @@
   )
 
 (comment
-  (->> [[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]
+  (->> {:sfn [[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]}
        (iterate apply-one-action)
        (drop 7)
-       first)
+       first
+       :sfn)
 
   (add-sfn [[[[4,3],4],4],[7,[[8,4],9]]] [1 1])
 
