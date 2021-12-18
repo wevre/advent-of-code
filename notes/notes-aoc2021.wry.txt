@@ -111,3 +111,25 @@
    The above logic gives a simple range to test: 0 <= x <= target-max-x and
    target-min-y <= y <= -target-min-y. You could shave a few milliseconds by
    tightening the lower bound for x, but why bother?
+
+:section Day 18
+
+   Zippers! We can query a zipper location for its `path` to see how deep it is
+   nested, and the `prev` and `next` functions can find left and right
+   neighbors.
+
+   I read the instructions incorrectly and first wrote logic to find the first
+   node that was either explodable or splitable and do that. But the
+   instructions say otherwise, although I think they could have been clearer:
+
+      1. START
+
+      2. If there are _any_ explodable nodes anywhere in the number, explode the
+      left-most and start over.
+
+      3. Else, if there are _any_ splitable nodes, explode the left-most and
+      start over.
+
+   I feel like I pulled out all the big guns this time: edn/read-string (which
+   did all the work of parsing the input--hooray that commas are whitespace in
+   clojure!), zippers, and postwalk.
