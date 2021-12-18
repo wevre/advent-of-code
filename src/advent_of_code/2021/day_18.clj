@@ -2,6 +2,7 @@
   (:require [clojure.zip :as zip]
             [clojure.string :as str]
             [clojure.edn :as edn]
+            [clojure.java.math :as math]
             [clojure.walk :refer [postwalk]]))
 
 ;; --- Day 18: Snailfish ---
@@ -9,6 +10,11 @@
 
 (defn parse-input [s]
   (->> s str/split-lines (map edn/read-string)))
+
+;; Finding nodes of interest in the zipper.
+
+(defn regular-number? [loc]
+  (number? (zip/node loc)))
 
 (defn regular-pair? [loc]
   (let [x (zip/node loc)]
@@ -20,16 +26,14 @@
 (defn splitable? [loc]
   (let [x (zip/node loc)] (and (number? x) (<= 10 x))))
 
-(defn reg-neighbor
-  "Find nearest neighbor of `loc` that is a regular number. Direction to search
-   provided by `f` which should be one of `zip/prev` or `zip/next`. Return loc
-   of neighbor or nil."
-  [loc f]
-  (loop [z (f loc)]
-    (cond
-      (or (nil? z) (zip/end? z)) nil
-      (number? (zip/node z)) z
-      :else (recur (f z)))))
+(defn find-loc
+  ([pred loc] (find-loc pred loc zip/next))
+  ([pred loc move]
+   (loop [z (move loc)]
+     (when-not (or (nil? z) (zip/end? z))
+       (if (pred z) z (recur (move z)))))))
+
+;; Reducing snailfish numbers.
 
 (defn incr-neighbor
   "Increase a regular number neighbor of `loc` by amount `v`, searching in
@@ -37,47 +41,34 @@
    the loc of original node (by searching in the opposite direction). If no
    neighbor found, return original `loc`."
   [loc dir v]
-  (let [[f f'] (if (= :next dir) [zip/next zip/prev] [zip/prev zip/next])]
-    (if-let [z (reg-neighbor loc f)]
-      (-> z (zip/edit + v) (reg-neighbor f'))
+  (let [neighbor (partial find-loc regular-number?)
+        [f f'] (if (= :next dir) [zip/next zip/prev] [zip/prev zip/next])]
+    (if-let [z (neighbor loc f)]
+      (-> z (zip/edit + v) (neighbor f'))
       loc)))
 
-(defn explode
-  "Returns sfn (vector) after exploding node at `loc`."
-  [loc]
+(defn explode [loc]
   (let [[r l] (zip/node loc)]
     (-> (zip/replace loc 0)
         (incr-neighbor :prev r)
         (incr-neighbor :next l)
         zip/root)))
 
-(defn split
-  "Return sfn after splitting node at `loc`."
-  [loc]
-  (let [v (zip/node loc)
-        v' [(int (Math/floor (/ v 2))) (int (Math/ceil (/ v 2)))]]
+(defn split [loc]
+  (let [v (/ (zip/node loc) 2)
+        v' [(int (math/floor v)) (int (math/ceil v))]]
     (-> loc (zip/replace v') zip/root)))
 
-(defn apply-one-action
-  "Find first node in `sfn` that satisfies `pred` and edit it with `f`. Return
-   a map with updated sfn and flag indicating if an edit occurred."
-  [sfn pred f]
-   (loop [z (zip/vector-zip sfn)]
-     (cond
-       (zip/end? z) {:edit? false :sfn (zip/root z)}
-       (pred z) {:edit? true :sfn (f z)}
-       :else (recur (zip/next z)))))
+(defn apply-one-action [sfn]
+  (condp find-loc (zip/vector-zip sfn)
+    explodable? :>> explode
+    splitable? :>> split
+    sfn))
 
-(defn reduce-sfn [sfn]
-  (let [{:keys [edit? sfn]} (apply-one-action sfn explodable? explode)]
-    (if edit?
-      (recur sfn)
-      (let [{:keys [edit? sfn]} (apply-one-action sfn splitable? split)]
-        (if edit?
-          (recur sfn)
-          sfn)))))
-
-(defn add-sfn [a b] (reduce-sfn [a b]))
+(defn add-sfn [a b]
+  (->> [a b]
+       (iterate apply-one-action)
+       (reduce #(if (= %1 %2) (reduced %1) %2))))
 
 (defn magnitude [sfn]
   (postwalk #(if (number? %) % (reduce + (map * % [3 2]))) sfn))
@@ -109,10 +100,12 @@
 
   (->> (parse-input example-2) (reduce add-sfn) magnitude)   ;=> 4140
 
+  ;; part 1
   (time
    (->> (slurp "input/2021/18-pairs.txt")
         parse-input (reduce add-sfn) magnitude))   ;=>4137
 
+  ;; part 2
   (time
    (let [sfns (parse-input (slurp "input/2021/18-pairs.txt"))]
      (->> (for [a sfns b sfns :when (not= a b)] (add-sfn a b))
@@ -122,12 +115,16 @@
 
 (comment
   (->> [[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]
-       reduce-sfn)
+       (iterate apply-one-action)
+       (drop 7)
+       first)
+
+  (add-sfn [[[[4,3],4],4],[7,[[8,4],9]]] [1 1])
 
   (->> [[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]
        (zip/vector-zip)
-       zip/next zip/next zip/next zip/next #_zip/next #_zip/next #_zip/next
-       ((juxt regular-pair? zip/node zip/path #(count (zip/path %))))
+       zip/next zip/next zip/next zip/next zip/next #_zip/next #_zip/next
+       ((juxt regular-pair? zip/branch? zip/node zip/path #(count (zip/path %))))
        #_#_zip/next zip/next
        #_zip/path)
   )

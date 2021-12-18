@@ -15,8 +15,8 @@
    turns before it won. That would have been a solution I could have used for
    both parts, maybe go back and redo it that way.
 
-   [] I love my solutions for days 5 and 6 and haven't seen anything else out
-   there that is better.
+   [] Create a test subfolder and test source files and some of the comments in
+   the code can be moved into test files.
 
 :section Day 8
 
@@ -140,3 +140,7 @@
    I feel like I pulled out all the big guns this time: edn/read-string (which
    did all the work of parsing the input--hooray that commas are whitespace in
    clojure!), zippers, and postwalk.
+
+   My original `reduce-sfn` was ungainly, it was basically the initial tip of a
+   pyramid of doom. I liked zelark's approach which used `condp` which I'm not
+   as familiar with, so I refactored mine to also use `condp`.
