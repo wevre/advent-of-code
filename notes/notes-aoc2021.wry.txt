@@ -130,6 +130,13 @@
       3. Else, if there are _any_ splitable nodes, explode the left-most and
       start over.
 
+   Thought: does exploding ever _increase_ the depth of the nodes it touches? I
+   don't think it does. So maybe you could change the second step above to "If
+   there are any explodable nodes do them all and start over." But I have a
+   general function `apply-one-action` that I can use to do a single explode or
+   split, and if I changed my logic to do all explosions together, I wouldn't be
+   able to use that function.
+
    I feel like I pulled out all the big guns this time: edn/read-string (which
    did all the work of parsing the input--hooray that commas are whitespace in
    clojure!), zippers, and postwalk.

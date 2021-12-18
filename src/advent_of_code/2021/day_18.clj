@@ -58,7 +58,7 @@
         v' [(int (Math/floor (/ v 2))) (int (Math/ceil (/ v 2)))]]
     (-> loc (zip/replace v') zip/root)))
 
-(defn reduce-with
+(defn apply-one-action
   "Find first node in `sfn` that satisfies `pred` and edit it with `f`. Return
    a map with updated sfn and flag indicating if an edit occurred."
   [sfn pred f]
@@ -69,10 +69,10 @@
        :else (recur (zip/next z)))))
 
 (defn reduce-sfn [sfn]
-  (let [{:keys [edit? sfn]} (reduce-with sfn explodable? explode)]
+  (let [{:keys [edit? sfn]} (apply-one-action sfn explodable? explode)]
     (if edit?
       (recur sfn)
-      (let [{:keys [edit? sfn]} (reduce-with sfn splitable? split)]
+      (let [{:keys [edit? sfn]} (apply-one-action sfn splitable? split)]
         (if edit?
           (recur sfn)
           sfn)))))
