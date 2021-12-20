@@ -2,6 +2,7 @@
   (:require [clojure.set]))
 
 ;; --- Day 3: Perfectly Spherical Houses in a Vacuum ---
+;; https://adventofcode.com/2015/day/3
 
 (defn visited [input]
   (->> input
@@ -14,7 +15,7 @@
 
 (comment
   (let [input (slurp "input/2015/3-houses.txt")] (puzzle1 input))
-  
+
   (let [input ">"] (puzzle1 input))
   (let [input "^>v<"] (puzzle1 input))
   (let [input "^v^v^v^v^v"] (puzzle1 input)))
@@ -28,7 +29,7 @@
 
 (comment
   (let [input (slurp "input/2015/3-houses.txt")] (puzzle2 input))
-  
+
   (let [input "^v"] (puzzle2 input))
   (let [input "^>v<"] (puzzle2 input))
   (let [input "^v^v^v^v^v"] (puzzle2 input)))
