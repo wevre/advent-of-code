@@ -144,3 +144,25 @@
    My original `reduce-sfn` was ungainly, it was basically the initial tip of a
    pyramid of doom. I liked zelark's approach which used `condp` which I'm not
    as familiar with, so I refactored mine to also use `condp`.
+
+:section Day 20
+
+   The `parse-input` function is unusually large, because I made the decision to
+   keep track of min/max x and y (actually, rows and cols) while parsing the
+   input. Later I expand those extrema at each step of the image enhancement.
+
+   In the sample data, index 0 of the algorithm is (.), so all the dark pixels
+   outside the image stay dark at each step. But in the puzzle data, index 0 is
+   (#) so the surround toggles between light and dark. I didn't try and simulate
+   that (how? by including extra cells around the actual puzzle, expanding and
+   toggling those at each step? You would still need to have a 'default' pixel
+   for anything beyond what you were modeling.) I just had a default
+   'background' value and an associated function to toggle it between 0 and 1.
+   For the sample puzzle I redefined the toggle function to be `identity`.
+
+   I guess what I'm trying to get to in the above paragraph is you have to
+   'know' something about the input data in order to run the solution correctly.
+   I could, I suppose, have written some logic to check the first and last index
+   of the algorithm to determine whether it toggled or not, but I didn't do
+   that, you just have to manually look and then choose the correct `toggle`
+   function. I'm okay doing that with a redef.
