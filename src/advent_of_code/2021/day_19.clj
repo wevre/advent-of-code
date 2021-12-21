@@ -72,5 +72,5 @@
                    (map :offset))]
      (->> (for [a locs b locs :when (not= a b)]
             (->> (map - a b) (map math/abs) (reduce +)))
-          (apply max))))
+          (reduce max))))
   )
