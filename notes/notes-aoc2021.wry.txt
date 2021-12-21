@@ -166,3 +166,14 @@
    of the algorithm to determine whether it toggled or not, but I didn't do
    that, you just have to manually look and then choose the correct `toggle`
    function. I'm okay doing that with a redef.
+
+:section Day 21
+
+   At any point, there are 21 ways (universes, I suppose) that the next player
+   could roll the dice, but there are only 7 sums of those three dice. You could
+   only worry about those seven paths, and multiply the outcomes by the
+   probability, but you can also just use memoization, which I think will also
+   come in handy with the positions, which cycle around and repeat. I wonder is
+   there a way with memoization to see how often the same combination of
+   parameters is hit? I suppose, there are (1..10) x (1..10) x (0..29) x
+   (0..29) combinations of parameters: 90,000 combinations.
