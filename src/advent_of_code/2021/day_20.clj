@@ -33,13 +33,14 @@
     (assoc input :algo algo)))
 
 (comment
-  (let [{:keys [image algo extrema]} (parse-input (slurp "input/2021/20-image.txt"))]
+  (let [{:keys [image algo extrema]}
+        (parse-input (slurp "input/2021/20-image.txt"))]
     (println "image algo extrema" (count image) (count algo) extrema))
   )
 
 ;; Image enhancement.
 
-(def toggle-bg #(- 1 %))   ; Toggle infinite background between light and dark.
+(def bg-pixels (cycle [0 1]))   ; Toggle background between dark and light.
 
 (defn neighbors [[r c]] (for [dr [-1 0 1] dc [-1 0 1]] [(+ r dr) (+ c dc)]))
 
@@ -48,26 +49,26 @@
         index (Integer/parseInt (apply str nearby) 2)]
   (get algo index)))
 
-(defn enhance [algo]
+(defn enhance [algo bgs]
   (fn enhance
-    ([{:keys [image extrema bg]}] (enhance image extrema bg))
-    ([image extrema bg]
+    ([{:keys [image extrema]}] (enhance image extrema bgs))
+    ([image extrema [bg & bgs]]
      (let [output (into {}
                         (for [loc (points extrema)]
                           [loc (pixel loc image algo bg)]))]
        (lazy-seq
-        (cons image (enhance output (expand-extrema extrema) (toggle-bg bg))))))))
+        (cons image (enhance output (expand-extrema extrema) bgs)))))))
 
 (defn solve [n input]
-  (->> (assoc input :bg 0)
-       ((enhance (:algo input)))
+  (->> input
+       ((enhance (:algo input) bg-pixels))
        (drop n)
        first
        vals
        (reduce +)))
 
 (comment
-  (with-redefs [toggle-bg identity]   ; No toggling on the sample puzzle.
+  (with-redefs [bg-pixels (repeat 0)]   ; No toggling on the sample puzzle.
     (solve 2 (parse-input (slurp "input/2021/20-image-test.txt"))))
 
   ;; part 1
