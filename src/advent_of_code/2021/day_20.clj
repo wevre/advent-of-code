@@ -1,6 +1,8 @@
 (ns advent-of-code.2021.day-20
   (:require [clojure.string :as str]))
 
+(defn update-extrema [[x-min x-max] x] [(min x-min x) (max x-max x)])
+
 (defn parse-input [s]
   (let [pixel {\. 0, \# 1}
         [algo image] (str/split s #"\n\n")
@@ -9,20 +11,18 @@
                    (map-indexed vector)
                    (mapcat (fn [[r l]]
                              (map-indexed (fn [c p] [[r c] (pixel p)]) l))))
-        input (reduce (fn [acc [[r c] p :as pix]]
+        input (reduce (fn [acc [[r c] _p :as pix]]
                         (-> acc
                             (update :image conj pix)
-                            (update :min-x min r)
-                            (update :max-x max r)
-                            (update :min-y min c)
-                            (update :max-y max c)))
-                      {:image {} :min-x ##Inf :max-x ##-Inf :min-y ##Inf :max-y ##-Inf}
+                            (update :r-extrema update-extrema r)
+                            (update :c-extrema update-extrema c)))
+                      {:image {} :r-extrema [##Inf ##-Inf] :c-extrema [##Inf ##-Inf]}
                       image)]
     (assoc input :algo algo)))
 
 (comment
-  (let [{:keys [image algo min-x max-x min-y max-y]} (parse-input (slurp "input/2021/20-image.txt"))]
-    (println "image algo min-x max-x min-y max-y" (count image) (count algo) min-x max-x min-y max-y))
+  (let [{:keys [image algo r-extrema c-extrema]} (parse-input (slurp "input/2021/20-image.txt"))]
+    (println "image algo r-extrema c-extrema" (count image) (count algo) r-extrema c-extrema))
   )
 
 (def toggle-bg #(- 1 %))   ; Toggle infinite background between light and dark.
@@ -32,25 +32,27 @@
 (defn get-index [p image bg]
   (Integer/parseInt (apply str (for [ns (neighbors p)] (get image ns bg))) 2))
 
+(defn expand-extrema [[x-min x-max]] [(dec x-min) (inc x-max)])
+
+(defn range<-extrema [[x-min x-max]] (range (dec x-min) (+ 2 x-max)))
+
 (defn enhance [algo]
- (fn [{:keys [image min-x max-x min-y max-y bg] :as input}]
-   (let [output (for [r (range (dec min-x) (+ 2 max-x))
-                      c (range (dec min-y) (+ 2 max-y))]
-                  [[r c] (get algo (get-index [r c] image bg))])]
-     (-> input
-         (assoc :image (into {} output))
-         (update :min-x dec)
-         (update :max-x inc)
-         (update :min-y dec)
-         (update :max-y inc)
-         (update :bg toggle-bg)))))
+  (fn enhance
+    ([{:keys [image r-extrema c-extrema bg]}] (enhance image r-extrema c-extrema bg))
+    ([image r-extrema c-extrema bg]
+     (let [output (into {} (for [r (range<-extrema r-extrema)
+                                 c (range<-extrema c-extrema)]
+                             [[r c] (get algo (get-index [r c] image bg))]))]
+       (lazy-seq (cons image (enhance output
+                                      (expand-extrema r-extrema)
+                                      (expand-extrema c-extrema)
+                                      (toggle-bg bg))))))))
 
 (defn solve [n input]
   (->> (assoc input :bg 0)
-       (iterate (enhance (:algo input)))
+       ((enhance (:algo input)))
        (drop n)
        first
-       :image
        vals
        (reduce +)))
 
