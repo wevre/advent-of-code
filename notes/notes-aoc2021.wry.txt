@@ -177,5 +177,5 @@
    there a way with memoization to see how often the same combination of
    parameters is hit? I suppose, there are (1..10) x (1..10) x (0..29) x
    (0..29) combinations of parameters: 90,000 combinations. That seems like a
-   lot, but the number of universes is over 1.25 quatrillion (1.25e15), so yeah,
+   lot, but the number of universes is over 1.25 quadrillion (1.25e15), so yeah,
    the same combinations must repeat a few times or so.
