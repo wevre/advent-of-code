@@ -7,7 +7,7 @@
 
 (defn deterministic
   "The scores switch each step, most recent turn in first position."
-  ([p1 p2] (deterministic p1 p2 0 0 (map #(inc (mod % 100)) (range))))
+  ([p1 p2] (deterministic p1 p2 0 0 (cycle (range 1 101))))
   ([p1 p2 sc1 sc2 [r1 r2 r3 & dice]]
    (lazy-seq
     (let [p1 (wrap-10 (+ p1 r1 r2 r3))
