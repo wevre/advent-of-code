@@ -1,7 +1,7 @@
 (ns advent-of-code.2021.day-21)
 
-(def start-1 6)
-(def start-2 8)
+(def p1 6)
+(def p2 8)
 
 (defn wrap-10 [x] (inc (mod (dec x) 10)))
 
@@ -30,10 +30,10 @@
 (comment
   ;; part 1
   (let [[rolls [[_win lose] & _rest]]
-        (split-with #(< (first %) 1000) (deterministic start-1 start-2))]
+        (split-with #(< (first %) 1000) (deterministic p1 p2))]
     (* 3 (inc (count rolls)) lose))
 
   ;; part 2
   (time
-   (apply max (quantum start-1 start-2)))
+   (apply max (quantum p1 p2)))
   )
