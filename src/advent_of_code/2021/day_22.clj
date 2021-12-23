@@ -60,12 +60,12 @@
 
 (comment
   ;; part 1
-  (let [input (parse-input (slurp "input/2021/22-cubes.txt"))]
-    (solve input [[-50 50] [-50 50] [-50 50]]))
+  (let [input (parse-input (slurp "input/2021/22-cubes-test.txt"))]
+    (time (solve (take 15 input) [[-50 50] [-50 50] [-50 50]])))
 
-  ;; part 2
+  ;; part 2 -- 575ms
   (let [input (parse-input (slurp "input/2021/22-cubes.txt"))]
-    (solve input))
+    (time (solve input)))
   )
 
 (comment
