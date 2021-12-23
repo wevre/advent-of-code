@@ -38,8 +38,7 @@
      (reduce (fn [[a & cs] axis] (concat (split-axis axis a b) cs)) [a] [0 1 2]))))
 
 (defn cube-size [cube]
-  (->> (map (fn [[a b]] (inc (- b a))) cube)
-       (reduce *)))
+  (reduce * (map (fn [[a b]] (inc (- b a))) cube)))
 
 ;;; Solving.
 

@@ -7,8 +7,8 @@
 ;;; I did this to see how to implement pos/neg volumes, like many did. But it
 ;;; turns out to be _much_ slower than my original solution which split cubes.
 ;;; Why? Maybe because this approach only adds cubes, to the tune of n*(n+1)/2
-;;; so it grows kind of large? The other one is more like pruning: absorbed
-;;; cubes are dropped along the way.
+;;; so it grows kind of large? The other one does some pruning: absorbed cubes
+;;; are dropped along the way.
 
 ;;; Don't know if this proves it, but this negacube approach generates 34,661
 ;;; cubes to be added up in the end, whereas the split approach only 3,948.
@@ -49,8 +49,7 @@
      (->> input
           #_(take 20)
           reboot
-          count
-          #_#_
+          #_count
           (map volume)
           (reduce +)))))
 
