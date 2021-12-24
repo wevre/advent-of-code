@@ -125,12 +125,13 @@
   (time
    (let [burrow {:hall {0 nil 1 nil 3 nil 5 nil 7 nil 9 nil 10 nil}
                  :rooms {:A [:A :B] :B [:C :D] :C [:C :A] :D [:D :B]}}]
-     (organize burrow)))   ; 13066
+     (organize burrow)))   ;=> 13066
 
   ;; part 2 -- ~9s
   (time
    (with-redefs [room-capacity 4]
      (let [burrow {:hall {0 nil 1 nil 3 nil 5 nil 7 nil 9 nil 10 nil}
                    :rooms {:A [:A :D :D :B] :B [:C :C :B :D] :C [:C :B :A :A] :D [:D :A :C :B]}}]
-       (organize burrow))))
+       (organize burrow))))   ;=> 47328
+
   )
