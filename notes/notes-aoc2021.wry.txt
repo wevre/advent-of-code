@@ -210,3 +210,12 @@
    all this is this formula:
 
       if dig == z%26 + B then z = z/A else z = z/A*26 + dig + C
+
+   There are 7 sets where B is small enough (including some sets where it is
+   negative) that you can get the right digit to hit the 'divide' branch of that
+   'if'. If you are getting those divides, then the first digit ends up (after
+   the even number of multiplications and divisions) affecting the final digit.
+   Or, rather, the C parameter of the first set and the B parameter of the last
+   set determine together the valid ranges for the first digit. I worked this
+   all out in a spreadsheet to figure out what was going on, and ended up just
+   solving it right there in Excel.
