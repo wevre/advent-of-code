@@ -133,5 +133,4 @@
      (let [burrow {:hall {0 nil 1 nil 3 nil 5 nil 7 nil 9 nil 10 nil}
                    :rooms {:A [:A :D :D :B] :B [:C :C :B :D] :C [:C :B :A :A] :D [:D :A :C :B]}}]
        (organize burrow))))   ;=> 47328
-
   )

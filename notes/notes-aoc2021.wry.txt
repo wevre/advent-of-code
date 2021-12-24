@@ -179,3 +179,34 @@
    (0..29) combinations of parameters: 90,000 combinations. That seems like a
    lot, but the number of universes is over 1.25 quadrillion (1.25e15), so yeah,
    the same combinations must repeat a few times or so.
+
+:section Day 24
+
+   The big hint here is the warning "You'll need to figure out what MONAD does
+   some other way". So, looking at the instructions, there are 14 sets of nearly
+   identical commands, which look like this:
+
+   ```
+         inp w    ;; w = dig
+         mul x 0  ;;
+         add x z  ;; x = z
+         mod x 26 ;; x = z%26
+         div z A  ;; z = z / A          <-- PARAM A
+         add x B ;; x = z%26+B          <-- PARAM B
+         eql x w  ;; if dig == z%26+B then x = 1 else x = 0
+         eql x 0  ;; if dig == z%26+B then x = 0 else x = 1
+         mul y 0  ;;
+         add y 25 ;; y = 25
+         mul y x  ;; if dig == z%26+B then y = 0 else y = 25
+         add y 1  ;; if dig == z%26+B then y = 1 else y = 26
+         mul z y  ;; if dig == z%26+B then z = z/A else z = z/A * 26
+         mul y 0  ;;
+         add y w  ;; y = dig
+         add y C  ;; y = dig + C        <-- PARAM C
+         mul y x  ;; if dig == z%26+B then y = 0 else y = dig + C
+         add z y  ;; if dig == z%26+B then z = z/A else z = z/A*26 + dig + C
+
+   The unique parameters are on lines 5, 6, and 16 of each set. The result of
+   all this is this formula:
+
+      if dig == z%26 + B then z = z/A else z = z/A*26 + dig + C
