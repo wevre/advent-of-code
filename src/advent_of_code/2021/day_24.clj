@@ -42,7 +42,7 @@
   "Apply function f to each digits valid range."
   [f input]
   (let [ranges (valid-ranges (get-params input))]
-    (apply str (for [c (range 14)] (apply f (ranges c))))))
+    (apply str (for [dig (range 14)] (apply f (ranges dig))))))
 
 (comment
   ;; part 1
