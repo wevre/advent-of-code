@@ -17,18 +17,18 @@
 
 (defn valid-ranges
   "Examine params, find the mult/divide pairs that affect output and return
-  valid ranges of digits, as a vector of `[min max]`, for each column."
+  valid ranges of digits, as a vector of `[min max]`, mapped to each column."
   [params]
-  (loop [[[a b c] & params] params col 0 stack [] res {}]
-    (case a
-      26 (let [{c-col :col c :c} (peek stack)
-               delta (+ c b)   ; `c` from mult column, `b` from divide column.
-               res (-> res
-                       (assoc c-col [(max 1 (- 1 delta)) (min 9 (- 9 delta))])
-                       (assoc col [(max 1 (+ 1 delta)) (min 9 (+ 9 delta))]))]
-           (recur params (inc col) (pop stack) res))
-      1 (recur params (inc col) (conj stack {:col col :c c}) res)
-      res)))
+  (->
+   (loop [[[a b c] & params] params col 0 stack [] res {}]
+     (case a
+       26 (let [{c-col :col c :c} (peek stack)
+                delta (+ c b)   ; `c` from mult column, `b` from divide column.
+                res (-> res (assoc c-col (- delta)) (assoc col (+ delta)))]
+            (recur params (inc col) (pop stack) res))
+       1 (recur params (inc col) (conj stack {:col col :c c}) res)
+       res))
+   (update-vals #(vector (max 1 (+ 1 %)) (min 9 (+ 9 %))))))
 
 (defn get-params
   "Read in MONAD, extract crucial parameters for each digit."
@@ -41,15 +41,15 @@
 (defn solve
   "Apply function f to each digits valid range."
   [f input]
-  (let [ranges (valid-ranges (get-params input))]
-    (apply str (for [dig (range 14)] (apply f (ranges dig))))))
+  (let [ranges (update-vals (valid-ranges (get-params input)) #(apply f %))]
+    (apply str (map ranges (range 14)))))
 
 (comment
   ;; part 1
-  (solve max (parse-input (slurp "input/2021/24-alu.txt")))
+  (solve max (parse-input (slurp "input/2021/24-alu.txt")))   ;=> 12996997829399
 
   ;; part 2
-  (solve min (parse-input (slurp "input/2021/24-alu.txt")))
+  (solve min (parse-input (slurp "input/2021/24-alu.txt")))   ;=> 11841231117189
   )
 
 ;;; Defines ALU that can confirm a model number.
