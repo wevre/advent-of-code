@@ -3,7 +3,11 @@
             [clojure.edn :as edn]
             [clojure.walk :refer [postwalk]]))
 
-;; read in the input and create a machine to execute it.
+;;;; --- Day 24: Arithmetic Logic Unit ---
+;;;; https://adventofcode.com/2021/day/24
+
+(def instr-per-digit 18)
+(def param-rows #{4 5 15})
 
 (defn parse-input [s]
   (->> (str/split-lines s)
@@ -11,22 +15,48 @@
        (map edn/read-string)
        (postwalk #(if (symbol? %) (keyword %) %))))
 
-(comment
-  (let [input (parse-input (slurp "input/2021/24-alu.txt"))]
-    (pprint
-     (->> input
-          (partition 18)
-          (map vec)
-          (map #(select-keys % [4 5 15]))))
-    #_
-    (pprint
-     (->> (frequencies input)
-          (remove #(#{14 28} (val %)))))))
+(defn valid-ranges
+  "Examine params, find the mult/divide pairs that affect output and return
+  valid ranges of digits, as a vector of `[min max]`, for each column."
+  [params]
+  (loop [[[a b c] & params] params col 0 stack [] res {}]
+    (case a
+      26 (let [{c-col :col c :c} (peek stack)
+               delta (+ c b)   ; `c` from mult column, `b` from divide column.
+               res (-> res
+                       (assoc c-col [(max 1 (- 1 delta)) (min 9 (- 9 delta))])
+                       (assoc col [(max 1 (+ 1 delta)) (min 9 (+ 9 delta))]))]
+           (recur params (inc col) (pop stack) res))
+      1 (recur params (inc col) (conj stack {:col col :c c}) res)
+      res)))
 
+(defn get-params
+  "Read in MONAD, extract crucial parameters for each digit."
+  [input]
+  (->> input
+       (map-indexed vector)
+       (keep (fn [[i [_op _a b]]] (when (param-rows (mod i instr-per-digit)) b)))
+       (partition 3)))
+
+(defn solve
+  "Apply function f to each digits valid range."
+  [f input]
+  (let [ranges (valid-ranges (get-params input))]
+    (apply str (for [c (range 14)] (apply f (ranges c))))))
+
+(comment
+  ;; part 1
+  (solve max (parse-input (slurp "input/2021/24-alu.txt")))
+
+  ;; part 2
+  (solve min (parse-input (slurp "input/2021/24-alu.txt")))
+  )
+
+;;; Defines ALU that can confirm a model number.
 
 (defn alu [code]
   (fn [input]
-    (let [input (->> (Long/toString input 9) seq (map #(inc (Character/digit % 10))))]
+    (let [input (->> input seq (map #(inc (Character/digit % 10))))]
       (loop [{input :input :as state} {:w 0 :x 0 :y 0 :z 0 :input input} [[op a b] & code] code]
         (let [b (state b b)]
           (case op
@@ -38,49 +68,14 @@
             :eql (recur (update state a #(if (= %1 %2) 1 0) b) code)
             state))))))
 
-(defn monad [input]
-  (->> input
-   (map #(Character/digit % 10))
-   (map inc)))
-
-(defn solve [monad nums]
-  (loop [[num & nums] nums]
-    (if (zero? (:z (monad num)))
-      num
-      (recur nums))))
-
 (comment
 
   (time
    (let [input (parse-input (slurp "input/2021/24-alu.txt"))
          monad (alu input)]
-     (->> (iterate dec 9r88888888888888)
-          (map monad)
-          (take 1)
-          first #_#_
-          (drop-while #(not= 0 (:z %)))
-          first)))
+     (:z (monad "12996997829399"))))
 
   (require '[clojure.pprint :refer [pprint]])
 
-  (pprint
-   (->> (iterate dec 9r88888888888888)
-        (map #(Long/toString % 9))
-        (take 20)))
-
-  (parse-input (slurp "input/2021/24-alu.txt"))
-
-  (let [input (parse-input "inp w
-add z w
-mod z 2
-div w 2
-add y w
-mod y 2
-div w 2
-add x w
-mod x 2
-div w 2
-mod w 2
-")
-        alu (alu input)]
-    (alu '(7))))
+  ;; 24-alu-alt.txt input has solutions 74929995999389 and 11118151637112
+)
