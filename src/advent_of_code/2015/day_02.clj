@@ -1,9 +1,8 @@
-(ns advent-of-code.2015.day-2
-  (:require [clojure.string :as str]
-            [clojure.edn :as edn]))
+(ns advent-of-code.2015.day-02
+  (:require [clojure.string :as str]))
 
-;; --- Day 2: I Was Told There Would Be No Math ---
-;; https://adventofcode.com/2015/day/2
+;;;; --- Day 2: I Was Told There Would Be No Math ---
+;;;; https://adventofcode.com/2015/day/2
 
 (defn parse-input [s]
   (for [l (str/split-lines s)]
