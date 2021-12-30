@@ -4,6 +4,8 @@
 ;;;; --- Day 22: Wizard Simulator 20XX ---
 ;;;; https://adventofcode.com/2015/day/22
 
+;;; Initial state
+
 (def init {:boss {:hit-points 55 :damage 8}
            :player {:hit-points 50 :mana 500 :armor 0
                     :shield () :poison () :recharge ()}})
@@ -14,17 +16,40 @@
 
 (def hard 0)
 
-(defn apply-effects [state]
-  (let [armor (or (first (get-in state [:player :shield])) 0)
-        damage (or (first (get-in state [:player :poison])) 0)
-        mana (or (first (get-in state [:player :recharge])) 0)]
+;;; Spells and effects
+
+(defn apply-effect [state [queue keys f]]
+  (let [amt (or (first (get-in state [:player queue])) 0)]
     (-> state
-        (assoc-in [:player :armor] armor)
-        (update-in [:boss :hit-points] - damage)
-        (update-in [:player :mana] + mana)
-        (update-in [:player :shield] rest)
-        (update-in [:player :poison] rest)
-        (update-in [:player :recharge] rest))))
+        (update-in keys f amt)
+        (update-in [:player queue] rest))))
+
+(defn apply-effects [state]
+  (reduce apply-effect
+          state
+          [[:shield   [:player :armor]    (fn [_old new] new)]
+           [:poison   [:boss :hit-points] -]
+           [:recharge [:player :mana]     +]]))
+
+(defn cast-hit-point-spell [state mana boss player]
+  (-> state
+      (update-in [:player :mana] - mana)
+      (update-in [:boss :hit-points] - boss)
+      (update-in [:player :hit-points] + player)))
+
+
+(defn cast-lingering-spell [state mana kind cnt amt]
+  (-> state
+      (update-in [:player :mana] - mana)
+      (assoc-in [:player kind] (repeat cnt amt))))
+
+(def spell-book [[:missile  cast-hit-point-spell 53 4 0]
+                 [:drain    cast-hit-point-spell 73 2 2]
+                 [:shield   cast-lingering-spell 113 :shield 6 7]
+                 [:poison   cast-lingering-spell 173 :poison 6 3]
+                 [:recharge cast-lingering-spell 229 :recharge 5 101]])
+
+;;; Possible turns
 
 (defn boss-turn [state]
   (let [state (apply-effects state)
@@ -35,48 +60,26 @@
       state
       (update-in state [:player :hit-points] - attack))))
 
-(defn cast-missile [state]
-  (-> state
-      (update-in [:player :mana] - 53)
-      (update-in [:boss :hit-points] - 4)))
-
-(defn cast-drain [state]
-  (-> state
-      (update-in [:player :mana] - 73)
-      (update-in [:boss :hit-points] - 2)
-      (update-in [:player :hit-points] + 2)))
-
-(defn cast-shield [state]
-  (-> state
-      (update-in [:player :mana] - 113)
-      (assoc-in [:player :shield] (repeat 6 7))))
-
-(defn cast-poison [state]
-  (-> state
-      (update-in [:player :mana] - 173)
-      (assoc-in [:player :poison] (repeat 6 3))))
-
-(defn cast-recharge [state]
-  (-> state
-      (update-in [:player :mana] - 229)
-      (assoc-in [:player :recharge] (repeat 5 101))))
-
 (defn turns [state]
-  (let [state (apply-effects state)
-        state (update-in state [:player :hit-points] - hard)
-        mana (get-in state [:player :mana])]
+  (let [state (-> state apply-effects (update-in [:player :hit-points] - hard))
+        mana-avail (get-in state [:player :mana])]
     (cond
       (or (wins? state) (loses? state)) [{:turn state :cost 0}]
-      (< mana 53) [{:turn (assoc-in state [:player :hit-points] 0) :cost 0}]
-      :else (->> [[53  cast-missile  :missile]
-                  [73  cast-drain    :drain]
-                  [113 cast-shield   :shield]
-                  [173 cast-poison   :poison]
-                  [229 cast-recharge :recharge]]
-                 (keep (fn [[c f a]] (when (<= c mana)
-                                       {:turn (boss-turn (f state))
-                                        :cost c
-                                        :action a})))))))
+      (< mana-avail 53) [{:turn (assoc-in state [:player :hit-points] 0) :cost 0}]
+      :else (keep (fn [[action spell mana & args]]
+                         (when (<= mana mana-avail)
+                           {:turn (boss-turn (apply spell state mana args))
+                            :cost mana
+                            :action action}))
+                  spell-book))))
+
+;;; Finding lowest cost (mana)
+
+;; NOTE: if we wanted to know the lowest-mana sequence of turns we could modify
+;; so that instead of storing only the accumulating cost (as the value) in the
+;; priority-map, we could store a map of {:cost 0 :prior node} which points back
+;; to the node that got us here. Then on the `wins?` condition we unwind and
+;; return the path.
 
 (defn update-costs [node-cost]
   (fn [costs {:keys [turn cost]}]
