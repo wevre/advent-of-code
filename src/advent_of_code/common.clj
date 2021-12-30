@@ -12,5 +12,8 @@
         (into {}))))
 
 (defn parse-longs [s]
-  (->> (re-seq #"\d+" s)
-       (map parse-long)))
+  (map parse-long (re-seq #"-?\d+" s)))
+
+(defn range-inc
+  ([end] (range-inc 0 end))
+  ([start end] (range start (inc end))))

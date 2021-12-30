@@ -3,17 +3,25 @@
             [clojure.edn :as edn]
             [clojure.walk :as walk]))
 
-;; --- Day 12: JSAbacusFramework.io ---
+;;;; --- Day 12: JSAbacusFramework.io ---
+;;;; https://adventofcode.com/2015/day/12
 
-(defn puzzle [de-map input]
-  (->> (str/escape input {\: \ })
-       edn/read-string
+(defn parse-input [s]
+  (edn/read-string (str/escape s {\: \ })))
+
+(defn solve [input de-map]
+  (->> input
        (walk/postwalk #(if (map? %) (de-map %) %))
        flatten
        (filter number?)
        (reduce +)))
 
 (comment
-  (let [input (slurp "input/2015/12-json.txt")]
-    [(puzzle #(seq %) input)
-     (puzzle #(when (not-any? #{"red"} (vals %)) (seq %)) input)]))
+  ;; part 1
+  (let [input (parse-input (slurp "input/2015/12-json.txt"))]
+    (solve input #(seq %)))   ;=> 111754
+
+  ;; part 2
+  (let [input (parse-input (slurp "input/2015/12-json.txt"))]
+    (solve input #(when (not-any? #{"red"} (vals %)) (seq %))))   ;=> 65402
+  )

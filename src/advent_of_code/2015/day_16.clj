@@ -2,18 +2,19 @@
   (:require [clojure.string :as str]
             [clojure.edn :as edn]))
 
-;; --- Day 16: Aunt Sue ---
+;;;; --- Day 16: Aunt Sue ---
+;;;; https://adventofcode.com/2015/day/16
+
+(defn parse-input [s]
+  (->> (str/split-lines s)
+       (map #(edn/read-string (str "{" (str/escape % {\: \ }) "}")))))
 
 (defn filter-aunts [aunts [op x k]]
   (filter #(or (not (% k)) ((resolve op) x (% k))) aunts))
 
-(defn puzzle [rules input]
-  (let [aunts (map #(edn/read-string (str "{" (str/escape % {\: \ }) "}"))
-                   (str/split-lines input))]
-    ('Sue (first (reduce filter-aunts aunts rules)))))
-
 (comment
-  (let [input (slurp "input/2015/16-aunts.txt")
+  ;; part 1
+  (let [aunts (parse-input (slurp "input/2015/16-aunts.txt"))
         rules '((= 3 children)
                 (= 7 cats)
                 (= 2 samoyeds)
@@ -24,9 +25,9 @@
                 (= 3 trees)
                 (= 2 cars)
                 (= 1 perfumes))]
-    (puzzle rules input))
-  
-  (let [input (slurp "input/2015/16-aunts.txt")
+    ('Sue (first (reduce filter-aunts aunts rules))))   ;=> 40
+
+  (let [aunts (parse-input (slurp "input/2015/16-aunts.txt"))
         rules '((= 3 children)
                 (< 7 cats)
                 (= 2 samoyeds)
@@ -37,4 +38,5 @@
                 (< 3 trees)
                 (= 2 cars)
                 (= 1 perfumes))]
-    (puzzle rules input)))
+    ('Sue (first (reduce filter-aunts aunts rules))))   ;=> 241
+  )

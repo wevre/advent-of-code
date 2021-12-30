@@ -20,20 +20,16 @@
           (= a 'NOT) (recur ls (assoc env d (list bit-not b)))
           :else (recur ls (assoc env e (list (op<-sym b) a c))))))))
 
-(defn fix [f] (fn g [& args] (apply f g args)))
-
 (defn evaluator [env]
-  (fix
-   (memoize
-     ;; This is our actual evaluate function. In order for memoize to work, this
-     ;; function is provided, as its first parameter, the function it should
-     ;; call to continue evaluating (which happens to be itself).
-    (fn [f sym]
-      (let [v (get env sym sym)]
-        (cond
-          (integer? v) v
-          (symbol? v) (f v)
-          :else (apply (first v) (map f (rest v)))))))))
+  (let [fix (fn [f] (fn g [& args] (apply f g args)))]
+    (fix
+     (memoize
+      (fn [f sym]
+        (let [v (get env sym sym)]
+          (cond
+            (integer? v) v
+            (symbol? v) (f v)
+            :else (apply (first v) (map f (rest v))))))))))
 
 (comment
   ;; part 1 -- 6ms

@@ -1,5 +1,5 @@
 (ns advent-of-code.2015.day-04
-  (:require [digest :refer [md5]]
+  (:require [clj-commons.digest :refer [md5]]
             [clojure.string :as str]))
 
 ;;;; --- Day 4: The Ideal Stocking Stuffer ---

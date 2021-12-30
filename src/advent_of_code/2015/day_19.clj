@@ -2,43 +2,44 @@
   (:require [clojure.string :as str]
             [clojure.edn :as edn]))
 
-;; --- Day 19: Medicine for Rudolph ---
+;;;; --- Day 19: Medicine for Rudolph ---
+;;;; https://adventofcode.com/2015/day/19
 
-(defn parse-rules [lines]
-  (->> (str/split-lines lines)
+(defn parse-rules [s]
+  (->> (str/split-lines s)
        (map #(edn/read-string (str "(" % ")")))
        (map (fn [[a _ b]] {(str a) [(str b)]}))
        (apply merge-with into)))
 
-(defn expansions [m [s & r]]
-  (if (nil? s)
-    ()
-    (into (map #(cons % r) (m s [s])) (map #(cons s %) (expansions m r)))))
+(defn parse-input [s]
+  (let [[rules molecule] (str/split s #"\n\n")
+        rules (parse-rules rules)
+        molecule (re-seq #"[A-Z][a-z]?|[a-z]" molecule)]
+    {:rules rules :molecule molecule}))
 
-(defn puzzle1 [input]
-  (let [[lines s] (str/split input #"\n\n")
-        rules (parse-rules lines)
-        ss (re-seq (re-pattern (str (str/join "|" (keys rules)) "|.+?")) s)]
-    (count (disj (into #{} (map #(apply str %) (expansions rules ss))) s))))
-
-(comment
-  (let [input (slurp "input/2015/19-molecules.txt")]
-    (puzzle1 input))
-
-  (let [input "H => HO
-H => OH
-O => HH
-
-HOH"]
-    (puzzle1 input)))
-
-; See discussion on Reddit for Day 19 solutions.
-
-(defn puzzle2 [input]
-  (let [[_ s] (str/split input #"\n\n")
-        ss (re-seq #"[A-Z][a-z]?|[a-z]" s)
-        freqs (frequencies ss)]
-    (- (count ss) (freqs "Ar") (freqs "Rn") (* 2 (freqs "Y")) 1)))
+(defn expansions [rules]
+ (fn expansions [[s & r]]
+   (if (nil? s)
+     ()
+     (into (map #(cons % r) (rules s [s])) (map #(cons s %) (expansions r))))))
 
 (comment
-  (let [input (slurp "input/2015/19-molecules.txt")] (puzzle2 input)))
+  ;; part 1
+  (let [{:keys [rules molecule]} (parse-input (slurp "input/2015/19-molecules.txt"))]
+    (->> (map #(apply str %) ((expansions rules) molecule))
+         set
+         count
+         dec))   ;=> 518
+  )
+
+;; See discussion on Reddit for Day 19 solutions.
+;; https://www.reddit.com/r/adventofcode/comments/3xflz8/day_19_solutions/
+
+(comment
+  ;; part 2
+  (let [input (slurp "input/2015/19-molecules.txt")
+        [_ s] (str/split input #"\n\n")
+        mol (re-seq #"[A-Z][a-z]?|[a-z]" s)
+        freqs (frequencies mol)]
+    (- (count mol) (freqs "Ar") (freqs "Rn") (* 2 (freqs "Y")) 1))   ;=> 200
+  )

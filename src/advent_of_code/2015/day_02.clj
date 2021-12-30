@@ -1,14 +1,12 @@
 (ns advent-of-code.2015.day-02
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [advent-of-code.common :refer [parse-longs]]))
 
 ;;;; --- Day 2: I Was Told There Would Be No Math ---
 ;;;; https://adventofcode.com/2015/day/2
 
 (defn parse-input [s]
-  (for [l (str/split-lines s)]
-    (->> (re-seq #"\d+" l)
-         (map parse-long)
-         sort)))
+  (for [l (str/split-lines s)] (sort (parse-longs l))))
 
 (defn calc-wrapper [[x y z]] (+ (* 3 x y) (* 2 x z) (* 2 y z)))
 

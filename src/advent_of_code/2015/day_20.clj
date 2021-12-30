@@ -13,12 +13,12 @@
 (def target 33100000)
 
 (defn solve [elf-limit per-elf]
-  (let [houses (long-array house-count 10)
-        elf-range (if elf-limit (range elf-limit) (range))]
-    (loop [elf 2]
+  (let [houses (long-array house-count 0)]
+    (loop [elf 1]
       (if (< elf house-count)
         (do
-          (doseq [house (map #(* (inc %) elf) elf-range)
+          (doseq [house (cond->> (iterate #(+ % elf) elf)
+                          elf-limit (take elf-limit))
                   :while (< house house-count)
                   :let [val (+ (aget houses (dec house)) (* per-elf elf))]]
             (aset houses (dec house) val))
@@ -39,7 +39,9 @@
 
 ;;; Use Euler's recurrence for sums of divisors, with pentagonal numbers.
 
-;; I love this code, it is very math-nerd-ical. But it is also slow.
+;; I love this code, it is very math-nerd-ical. But it is also slow. And if you
+;; don't build up from lower numbers, attempting to use the pentagonal numbers
+;; on a really large number will blow the stack.
 
 (defn make-second-order [x d]
   (map first (iterate (fn [[a b]] [(+ a b) (+ b d)]) [x (+ x d)])))
@@ -57,6 +59,9 @@
   )
 
 (comment
+
+  (sigma 800)
+
   ;; part 1  -- over 9 minutes
   (time
    (->> (map sigma (range))

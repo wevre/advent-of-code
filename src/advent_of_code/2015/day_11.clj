@@ -1,6 +1,7 @@
 (ns advent-of-code.2015.day-11)
 
-;; --- Day 11: Corporate Policy ---
+;;;; --- Day 11: Corporate Policy ---
+;;;; https://adventofcode.com/2015/day/11
 
 (defn inc-pswd [p]
   (persistent!
@@ -25,7 +26,7 @@
    (< 1 (num-pairs p))
    (straight? p)))
 
-(defn puzzle [input]
+(defn next-password [input]
   (->> (mapv int input)
        (iterate inc-pswd)
        (drop 1)
@@ -35,6 +36,11 @@
        (apply str)))
 
 (comment
-  (let [input "hepxcrrq"
-        pswd (puzzle input)]
-    [pswd (puzzle pswd)]))
+  ;; part 1 -- 930ms
+  (time
+   (next-password "hepxcrrq"))  ;=>"hepxxyzz"
+
+  ;; part 2 -- 2.2s
+  (time
+   (next-password "hepxxyzz"))  ;=>"heqaabcc"
+  )

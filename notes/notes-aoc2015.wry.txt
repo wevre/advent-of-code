@@ -1,0 +1,135 @@
+:project Advent of code 2015
+   :created 2021-12-25
+   :author Mike Weaver
+
+:section Introduction
+   These are my notes and thoughts on the AoC puzzles of 2015.
+
+:section Day 7
+
+   I set myself up for an interesting problem. I wanted to write my evaluate
+   function so that it would be called like this: `((evaluate env) sym)`. In
+   other words, it would take `env`, close over it, and return a function that
+   you could then use to evaluate a symbol.
+
+   ```
+      (defn evaluate [env]
+        (fn f [sym]
+          (let [v (get env sym sym)]
+            (cond
+            (integer? v) v
+            (symbol? v) (f v)
+            :else (apply (first v) (map f (rest v)))))))
+
+   This is a form of dependency injection. This inner function `e` has access to
+   `env` without needing to pass it down into recursive calls to itself. I like
+   that. And it should probably be called `make-evaluate` or `evaluator`, since
+   it doesn't evaluate per se, it returns a function to evaluate.
+
+   How do you memoize that?
+
+   Typically the pattern with memoize is
+
+   ```
+      (def my-fn
+        (memoize
+         (fn [] ...)))
+
+   Because `def` is a special form, the inner function code can refer to the
+   outer `my-fn` var to do recursive calls. This allows for these kind of
+   mind-bending constructs:
+
+   ```
+      (def fib-seq (lazy-cat [0 1] (map + (rest fib-seq) fib-seq)))
+
+   Okay, back to memoizing. We can't use the normal `def` memoize pattern
+   because we aren't defining a memoized function. We are defining a function
+   that _returns_ (hopefully) a memoized function. This means we will be
+   constructing the memoized function locally (closing over `env`) and returning
+   it. And that is the challenge: memoizing a locally-defined (or 'anonymous'),
+   recursive function.
+
+   Unlike the special form `def`, when you create an anonymous function with
+   `fn`, you don't have access to the var it will be referred to in the local
+   scope (that's sort of the whole point of being anonymous), which you need in
+   order to ensure that you are calling the _memoized_ version of the function.
+   (And similarly you can't use `letfn` because there is no place to slip in the
+   memoize.)
+
+   ```
+      (let [my-fn (memoize
+                   (fn g [args]
+                     ...   ; in the body, can't refer to `my-fn`
+                     ...   ; could refer to `g`, but `g` is not memoized.
+                     ))])
+
+   One way to resolve this is to provide the anonymous function with a function
+   for it to call when it needs to do recursion.
+
+   ```
+      (let [my-fn (fn [recur-fn args]
+                    ...   ; we can't refer to `my-fn`, use `recur-fn` instead.
+                    (recur-fn recur-fn args))])
+
+   Just as it is doing inside itself, when we call `my-fn` we will also pass
+   `my-fn` as its first parameter. So our `evaluator` function becomes:
+
+   ```
+      (defn evaluator-f [env]
+      (memoize
+         (fn [f sym]
+         (let [v (get env sym sym)]
+            (cond
+               (integer? v) v
+               (symbol? v) (f f v)
+               :else (apply (first v) (map (partial f f) (rest v))))))))
+
+   and we call it like this, for example:
+
+   ```
+      (let [evaluate (evaluator-f env)]
+        (evaluate evaluate 'a))
+
+
+   This works and meets our goals. We have the dependency injection of `env` and
+   we have a memoized `evaluate` function. But in taking these steps forward, we
+   have taken one step back. We can no longer call `evaluate` with the single
+   `sym` parameter. We have to include the `recur-fn` with every call.
+
+   This is where Y-combinators come into play. They allow for recursion in
+   languages where recursion isn't possible (because, for example, we _only_
+   have anonymous functions). They use the trick of passing in the `recur-fn`,
+   but it is abstracted out into a helper, fixed-point combinator function. The
+   result is we still have to define our core function with the `recur-fn`
+   parameter, but we can leave it out in all the calls.
+
+   Here is the `fix` function (which is also the Y-combinator, or maybe more
+   correctly the Z-combinator):
+
+   ```
+      (defn fix [f] (fn g [& args] (apply f g args)))
+
+   And now our evaluator becomes:
+
+   ```
+      (defn evaluator [env]
+        (fix
+         (memoize
+         (fn [f sym]
+            (let [v (get env sym sym)]
+            (cond
+               (integer? v) v
+               (symbol? v) (f v)
+               :else (apply (first v) (map f (rest v)))))))))
+
+   Note that we use the `recur-fn` function (here called `f`) as in the
+   original, without needed to pass it an extra function. This version is almost
+   identical to the original above, except `f` is a parameter (instead of being
+   the `name`) and we have to `fix` the function before we can use it. But we
+   gain the ability to memoize along the way. Pretty cool.
+
+   Here are two articles that explain these combinators.
+
+   https://eli.thegreenplace.net/2016/some-notes-on-the-y-combinator/
+
+   https://quanttype.net/posts/2020-09-20-local-memoized-recursive-functions.html

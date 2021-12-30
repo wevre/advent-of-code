@@ -1,24 +1,27 @@
 (ns advent-of-code.2015.day-17
-  (:require [clojure.edn :as edn]
+  (:require [advent-of-code.common :refer [parse-longs]]
             [clojure.math.combinatorics :as combo]))
 
-;; --- Day 17: No Such Thing as Too Much ---
+;;;; --- Day 17: No Such Thing as Too Much ---
+;;;; https://adventofcode.com/2015/day/17
 
 (defn containers [vol input]
-  (->> (map edn/read-string (re-seq #"\d+" input))
+  (->> input
        (map-indexed vector)
        (combo/subsets)
        (filter #(= vol (apply + (map second %))))))
 
-(defn puzzle1 [vol input]
-  (count (containers vol input)))
-
 (comment
-  (let [input (slurp "input/2015/17-containers.txt")] (puzzle1 150 input)))
+  ;; part 1
+  (let [input (parse-longs (slurp "input/2015/17-containers.txt"))]
+    (count (containers 150 input)))   ;=> 1638
 
-(defn puzzle2 [vol input]
-  (count (second (first (sort (group-by count (containers vol input)))))))
-
-(comment
-  (time (let [input (slurp "input/2015/17-containers.txt")] 
-          (puzzle2 150 input))))
+  ;; part 2
+  (let [input (parse-longs (slurp "input/2015/17-containers.txt"))]
+    (->> (containers 150 input)
+         (group-by count)
+         sort
+         first
+         second
+         count))   ;=> 17
+  )

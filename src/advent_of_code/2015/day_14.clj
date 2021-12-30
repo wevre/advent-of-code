@@ -1,42 +1,37 @@
 (ns advent-of-code.2015.day-14
   (:require [clojure.string :as str]
-            [clojure.edn :as edn]))
+            [advent-of-code.common :refer [parse-longs]]))
 
-;; --- Day 14: Reindeer Olympics ---
+;;;; --- Day 14: Reindeer Olympics ---
+;;;; https://adventofcode.com/2015/day/14
 
-(defn distance [seconds [speed fly rest]]
-  (let [[q r] ((juxt quot rem) seconds (+ fly rest))]
-    (* speed (+ (* fly q) (min r fly)))))
+(defn parse-input [s]
+  (for [line (str/split-lines s)] (parse-longs line)))
 
-(defn puzzle1 [seconds input]
-  (->> (str/split-lines input)
-       (map #(map edn/read-string (re-seq #"\d+" %)))
-       (map (partial distance seconds))
-       (reduce max)))
+(defn distance [seconds]
+  (fn [[speed fly rest]]
+    (let [[q r] ((juxt quot rem) seconds (+ fly rest))]
+      (* speed (+ (* fly q) (min r fly))))))
+
+(def time-limit 2503)
+
+(defn winners [reindeer]
+  (fn [seconds]
+    (let [flown (group-by (distance seconds) reindeer)]
+      (get flown (apply max (keys flown))))))
 
 (comment
-  (let [input (slurp "input/2015/14-reindeer.txt")] (puzzle1 2503 input))
-  
-  (let [input "Comet flies 14 km/s for 10 seconds, rests for 127 
-Dancer flies 16 km/s for 11 seconds, rests for 162"]
-    (puzzle1 1000 input)))
+  ;; part 1
+  (let [input (parse-input (slurp "input/2015/14-reindeer.txt"))]
+    (->> input (map (distance time-limit)) (reduce max)))   ;=> 2696
 
-(defn winners [seconds reindeer]
-  (let [flown (group-by #(distance seconds %) reindeer)]
-    (get flown (apply max (keys flown)))))
-
-(defn puzzle2 [seconds input]
-  (let [reindeer (->> (str/split-lines input)
-                      (map #(map edn/read-string (re-seq #"\d+" %))))]
-    (->> (range 1 (inc seconds))
-         (mapcat #(winners % reindeer))
+  ;; part 2
+  (let [input (parse-input (slurp "input/2015/14-reindeer.txt"))]
+    (->> (range)
+         (drop 1)
+         (take time-limit)
+         (mapcat (winners input))
          frequencies
          vals
-         (reduce max))))
-
-(comment
-  (let [input (slurp "input/2015/14-reindeer.txt")] (puzzle2 2503 input))
-  
-  (let [input "Comet flies 14 km/s for 10 seconds, rests for 127 
-Dancer flies 16 km/s for 11 seconds, rests for 162"]
-    (puzzle2 1000 input)))
+         (reduce max)))   ;=> 1084
+  )

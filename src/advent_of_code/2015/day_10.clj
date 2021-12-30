@@ -1,6 +1,7 @@
 (ns advent-of-code.2015.day-10)
 
-;; --- Day 10: Elves Look, Elves Say ---
+;;;; --- Day 10: Elves Look, Elves Say ---
+;;;; https://adventofcode.com/2015/day/10
 
 (defn look-and-say [x]
   (->> x
@@ -8,9 +9,20 @@
        (mapcat (juxt count first))
        (apply str)))
 
-(defn puzzle [cnt input]
-  (count (nth (iterate look-and-say input) cnt)))
+(defn solve [n input]
+  (->> (iterate look-and-say input)
+       (drop n)
+       first
+       count))
+
+(def input "1113222113")
 
 (comment
-  (let [input "1113222113"]
-    [(puzzle 40 input) (puzzle 50 input)]))
+  ;; part 1 -- 458ms
+  (time
+   (solve 40 input))   ;=> 252594
+
+  ;; part 2 -- 6.4s
+  (time
+   (solve 50 input))   ;=> 3579328
+  )
