@@ -18,6 +18,9 @@
    [] Create a test subfolder and test source files and some of the comments in
    the code can be moved into test files.
 
+   [] I think I can also make some 'alt' branches where I can stash alternate
+   approaches.
+
 :section Day 8
 
    I modified my original solution (which used some rules to determine

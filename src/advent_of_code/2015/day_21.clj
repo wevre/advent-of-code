@@ -32,10 +32,10 @@
                     {:cost 80  :damage 0 :armor 3}])
 
 (defn wins? [player enemy]
-  (let [enemy-damage (max 1 (- (:damage enemy) (:armor player)))
-        player-damage (max 1 (- (:damage player) (:armor enemy)))
-        turns (int (math/ceil (/ (:hit-points enemy) player-damage)))]
-    (< (* (dec turns) enemy-damage) (:hit-points player))))
+  (let [enemy-attack (max 1 (- (:damage enemy) (:armor player)))
+        player-attack (max 1 (- (:damage player) (:armor enemy)))
+        turns (int (math/ceil (/ (:hit-points enemy) player-attack)))]
+    (< (* (dec turns) enemy-attack) (:hit-points player))))
 
 (defn trials [hit-points]
   (for [w weapons
