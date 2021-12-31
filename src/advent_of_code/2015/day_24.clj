@@ -1,57 +1,59 @@
 (ns advent-of-code.2015.day-24-v2
-  (:require [clojure.edn :as edn]))
+  (:require [clojure.math.combinatorics :as combo]
+            [advent-of-code.common :refer [parse-longs]]))
 
-;; --- Day 24: It Hangs in the Balance ---
+;;;; --- Day 24: It Hangs in the Balance ---
+;;;; https://adventofcode.com/2015/day/24
 
-(defn entangled [targ xs]
-  (let [valid-remain? (fn [xs] (or (empty? xs) (seq (entangled targ xs))))
-        step
-        (fn step [res acc n [f & r]]
-          (cond
-            (neg? n) res
-            (< 0 (count res) (count acc)) res
-            (zero? n) (if (and (or (empty? res)
-                                   (< (count acc) (count res))
-                                   (< (reduce * acc) (reduce * res)))
-                               (valid-remain? (remove (set acc) xs)))
-                        acc
-                        res)
-            (nil? f) res
-            :else
-            (let [res (step res (conj acc f) (- n f) r)]
-              (recur res acc n r))))]
-    (step () () targ xs)))
+;;; Based on reading redditor suggestions.
 
-(defn puzzle [groups input]
-  (let [packages (map edn/read-string (re-seq #"\d+" input))
-        targ (/ (apply + packages) groups)
-        res (entangled targ (reverse packages))]
-    [(reduce * res) res]))
-
-(comment
-  (time (let [input (slurp "input/2015/24-packages.txt")]
-          [(puzzle 3 input) (puzzle 4 input)]))
-
-  (let [input "1\n2\n3\n4\n5\n7\n8\n9\n10\n11"]
-    [(puzzle 3 input) (puzzle 4 input)]))
-
-;; This approach follows an algorithm laid out by a reddit poster. I think it
-;; is faster than the above (and probably clearer about what it is doing).
-;; I also think could do a quick reduce before the `loop` and determine what the
-;; smallest group size n is, then start loop at i=n rather than i=1.
 (defn entangled
   "Find smallest subset with lowest entanglement such that remaining ps _also_
    can form a valid subset."
-  [targ ps]
-  (loop [i 1]
-    (cond
-      (empty? ps) ()
-      (< (count ps) i) nil
-      :else
-      (if-let [r (->> (combo/combinations ps i)
-                      (filter #(= targ (reduce + %)))
-                      (sort-by #(reduce * %))
-                      (filter #(entangled targ (remove (set %) ps)))
-                      seq)]
-        (first r)
-        (recur (inc i))))))
+  [targ]
+  (fn entangled
+    ([ps] (entangled 1 ps))
+    ([i ps]
+     (if (< (count ps) i)
+       nil
+       (if-let [r (->> (combo/combinations ps i)
+                       (filter #(= targ (reduce + %)))
+                       (sort-by #(reduce * %))
+                       #_(filter #(entangled* targ (remove (set %) ps)))
+                       seq)]
+         (first r)
+         (recur (inc i) ps))))))
+
+(comment
+  ;; part 1
+  (let [input (parse-longs (slurp "input/2015/24-packages.txt"))
+        targ (/ (reduce + input) 3)]
+    (->> ((entangled targ) input) (reduce *)))   ;=> 10723906903
+
+  ;; part 2
+  (let [input (parse-longs (slurp "input/2015/24-packages.txt"))
+        targ (/ (reduce + input) 4)]
+    (->> ((entangled targ) input) (reduce *)))   ;=> 74850409
+  )
+
+;;; I love this solution but I gave up waiting for it to complete.
+
+(defn partitions [input]
+  (for [p (combo/partitions input :min 3 :max 3)
+        :when (apply = (map #(reduce + %) p))]
+    (sort p)))
+
+(comment
+  (let [input #_[1 2 3 4 5 7 8 9 10 11] (parse-longs (slurp "input/2015/24-packages.txt"))]
+    (->> (partitions input)
+         (reduce (fn [[a _ _ :as p1] [b _ _ :as p2]]
+                   (cond
+                     (< (count a) (count b)) p1
+                     (> (count a) (count b)) p2
+                     :else (if (< (reduce * a) (reduce * b)) p1 p2))))
+         first
+         (reduce *)))
+
+  (->> (partitions [1 2 3 4 5 7 8 9 10 11])
+       (reduce (fn [acc [a _b _c]] (min acc (reduce * a))) ##Inf))
+  )
