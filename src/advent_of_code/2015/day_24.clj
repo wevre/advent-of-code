@@ -19,7 +19,9 @@
        (if-let [r (->> (combo/combinations ps i)
                        (filter #(= targ (reduce + %)))
                        (sort-by #(reduce * %))
-                       #_(filter #(entangled* targ (remove (set %) ps)))
+                       ;; Ensures remaining partitions are also valid.
+                       ;; But can still find solutions without it.
+                       #_(filter #(entangled targ (remove (set %) ps)))
                        seq)]
          (first r)
          (recur (inc i) ps))))))
