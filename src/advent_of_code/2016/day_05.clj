@@ -22,7 +22,7 @@
         (map #(subs % 5 6))
         (apply str)))   ;=> "f97c354d"
 
-  ;; part 2
+  ;; part 2  -- 41s
   (time
    (->> interesting
         (reduce (fn [pswd hash]
