@@ -67,6 +67,9 @@
    guts of it. But for solving day 23, zelark used them and it made lots of
    sense.
 
+   * functions `min-key` and `max-key` can find the keys whose values are lowest
+   or highest according to a supplied function.
+
 :section Puzzles to review
 
    Day 7 is all about logic programming, which I have never done. So I'm going

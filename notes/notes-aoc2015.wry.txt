@@ -90,7 +90,6 @@
       (let [evaluate (evaluator-f env)]
         (evaluate evaluate 'a))
 
-
    This works and meets our goals. We have the dependency injection of `env` and
    we have a memoized `evaluate` function. But in taking these steps forward, we
    have taken one step back. We can no longer call `evaluate` with the single
@@ -133,3 +132,60 @@
    https://eli.thegreenplace.net/2016/some-notes-on-the-y-combinator/
 
    https://quanttype.net/posts/2020-09-20-local-memoized-recursive-functions.html
+
+:section Day 12
+
+   We could use cheshire to read in the json input.
+
+:section Day 15
+
+   I could refactor this and separate the task of finding weights, then a
+   separate function for turning those into scores (with, perhaps, a filter in
+   between to make sure calories = 500). I think that would make the code more
+   readable.
+
+:section Day 17
+
+   I love me some `reduce` action. For a solution, I thought it might be faster
+   to generate the subsets with combinatorics, then reduce over them, checking
+   that the target sum is met, and also keeping track of a :minimum (the number
+   of containers needed) and a :ways (how many subsets have this number of
+   minimum containers). The logic isn't that complicated and I thought, hey, one
+   pass through the data, should be faster, right? Turns out it is not. In
+   addition to not being any faster than the general, API-based approach (which
+   is what I have now), it buried a 'complicated' reducing function in the
+   middle of the code, so it was too clever for its own good. At least I tested
+   and found out that the simpler cleaner way is just as fast.
+
+   I did find an algorithm for generating subsets, which I need to explore
+   because I don't understand it just from reading the code.
+
+   ```
+      ;; from https://github.com/AxlLind/AdventOfCode2015/blob/main/src/17.clj
+      (defn powerset [base-set]
+        (defn sets [xs x] (concat xs (map #(cons x %) xs)))   ; `let` ??
+        (reduce sets [()] base-set))
+
+:section Day 20
+
+   Wow this one was interesting. I implemented using a (mutable) (!) java array
+   and brute force delivering presents. It's slow.
+
+   There is a very elegant solution for part 1 using Euler's recurrence for sums
+   of divisors. It isn't faster and it tends to blow the stack if you don't load
+   up the memoized cache in a particular order. Dang.
+
+   Another approach is to use divisors, but I think I shied away from that
+   because I thought it would be too slow. But I should probably try it just to
+   see what I can find. Having a 'find-the-divisors' approach is probably a good
+   solution to have in your took kit.
+
+:section Day 24
+
+   I refactored my prior solution to take more advantage of lazy sequences. This
+   means I don't need to do sorting, and I can stop as soon as I find a solution
+   because I know it will be the lowest cound of packages in the combo.
+
+   The one flaw, but with my input numbers (and, it seems, everyone else's also)
+   it doesn't affect anything, is I don't check that my found combination leaves
+   behind presents that can also be further formed into valid combinations.
