@@ -11,14 +11,14 @@
 (defn distance [seconds]
   (fn [[speed fly rest]]
     (let [[q r] ((juxt quot rem) seconds (+ fly rest))]
-      (* speed (+ (* fly q) (min r fly))))))
+      (* speed (+ (* q fly) (min r fly))))))
 
 (def time-limit 2503)
 
 (defn winners [reindeer]
   (fn [seconds]
     (let [flown (group-by (distance seconds) reindeer)]
-      (get flown (apply max (keys flown))))))
+      (get flown (reduce max (keys flown))))))
 
 (comment
   ;; part 1
@@ -27,10 +27,8 @@
 
   ;; part 2
   (let [input (parse-input (slurp "input/2015/14-reindeer.txt"))]
-    (->> (range)
-         (drop 1)
-         (take time-limit)
-         (mapcat (winners input))
+    (->> (take time-limit (iterate inc 1))
+         (mapcat (winners input))   ; Find winners at each second.
          frequencies
          vals
          (reduce max)))   ;=> 1084
