@@ -37,11 +37,14 @@
    (solve 50 11))   ; 786240
   )
 
+;;; Check out this alternate solution that finds divisors. How fast is it?
+;; https://github.com/AxlLind/AdventOfCode2015/blob/main/src/20.clj
+
 ;;; Use Euler's recurrence for sums of divisors, with pentagonal numbers.
 
 ;; I love this code, it is very math-nerd-ical. But it is also slow. And if you
-;; don't build up from lower numbers, attempting to use the pentagonal numbers
-;; on a really large number will blow the stack.
+;; don't build up the memoized cache from lower numbers, attempting to use the
+;; pentagonal numbers on a really large number will blow the stack.
 
 (defn make-second-order [x d]
   (map first (iterate (fn [[a b]] [(+ a b) (+ b d)]) [x (+ x d)])))
