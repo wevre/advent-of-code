@@ -3,13 +3,10 @@
 ;;;; --- Day 11: Corporate Policy ---
 ;;;; https://adventofcode.com/2015/day/11
 
-(defn inc-pswd [p]
-  (persistent!
-   (loop [i (dec (count p)) p (transient p)]
-     (case (p i)
-       122 (recur (dec i) (assoc! p i 97))
-       (104 107 110) (assoc! p i (+ 2 (p i)))
-       (assoc! p i (inc (p i)))))))
+(defn next-paswd [s]
+  (if (= \z (last s))
+    (apply str (concat (next-paswd (butlast s)) '(\a)))
+    (apply str (concat (butlast s) (-> s last int inc char list)))))
 
 (defn num-pairs [p]
   (->> (partition-by identity p)
@@ -18,29 +15,26 @@
        count))
 
 (defn straight? [p]
-  (some (fn [[a b c]] (= 1 (- b a) (- c b))) (partition 3 1 p)))
+  (some #(let [[a b c] (map int %)] (= (inc a) b (dec c))) (partition 3 1 p)))
 
 (defn valid-pswd? [p]
   (and
-   (not-any? #{105 108 110} p)
+   (not-any? #{\i \l \o} p)
    (< 1 (num-pairs p))
    (straight? p)))
 
 (defn next-password [input]
-  (->> (mapv int input)
-       (iterate inc-pswd)
+  (->> (iterate next-paswd input)
        (drop 1)
        (filter valid-pswd?)
-       first
-       (map char)
-       (apply str)))
+       first))
 
 (comment
-  ;; part 1 -- 930ms
+  ;; part 1 -- 1.8s
   (time
    (next-password "hepxcrrq"))  ;=>"hepxxyzz"
 
-  ;; part 2 -- 2.2s
+  ;; part 2 -- 4.5s
   (time
    (next-password "hepxxyzz"))  ;=>"heqaabcc"
   )
