@@ -144,6 +144,8 @@
    between to make sure calories = 500). I think that would make the code more
    readable.
 
+   Done.
+
 :section Day 17
 
    I love me some `reduce` action. For a solution, I thought it might be faster
