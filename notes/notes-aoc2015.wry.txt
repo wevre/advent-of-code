@@ -159,15 +159,6 @@
    middle of the code, so it was too clever for its own good. At least I tested
    and found out that the simpler cleaner way is just as fast.
 
-   I did find an algorithm for generating subsets, which I need to explore
-   because I don't understand it just from reading the code.
-
-   ```
-      ;; from https://github.com/AxlLind/AdventOfCode2015/blob/main/src/17.clj
-      (defn powerset [base-set]
-        (defn sets [xs x] (concat xs (map #(cons x %) xs)))   ; `let` ??
-        (reduce sets [()] base-set))
-
 :section Day 20
 
    Wow this one was interesting. I implemented using a (mutable) (!) java array
