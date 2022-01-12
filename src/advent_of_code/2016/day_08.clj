@@ -1,6 +1,5 @@
 (ns advent-of-code.2016.day-08
-  (:require [clojure.string :as str]
-            [advent-of-code.common :refer [range-inc]]))
+  (:require [clojure.string :as str]))
 
 ;;;; --- Day 8: Two-Factor Authentication ---
 ;;;; https://adventofcode.com/2016/day/8

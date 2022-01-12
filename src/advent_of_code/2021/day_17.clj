@@ -1,4 +1,5 @@
-(ns advent-of-code.2021.day-17)
+(ns advent-of-code.2021.day-17
+  (:require [advent-of-code.common :refer [range-inc]]))
 
 ;; --- Day 17: Trick Shot ---
 ;; https://adventofcode.com/2021/day/17
@@ -29,7 +30,7 @@
   (with-redefs [x-limits [20 30] y-limits [-10 -5]]
     (let [[_ x-max] x-limits [y-min _] y-limits]
       (->>
-       (for [x-vel (range (inc x-max)) y-vel (range y-min (inc (- y-min)))]
+       (for [x-vel (range-inc x-max) y-vel (range-inc y-min (- y-min))]
          (->> (trajectory [x-vel y-vel])
               (take-while still-in-range?)
               (filter on-target?)))
@@ -45,7 +46,7 @@
   ;; puzzle 2
   (let [[_ x-max] x-limits [y-min _] y-limits]
     (->>
-     (for [x-vel (range (inc x-max)) y-vel (range y-min (inc (- y-min)))]
+     (for [x-vel (range-inc x-max) y-vel (range-inc y-min (- y-min))]
        (->> (trajectory [x-vel y-vel])
             (take-while still-in-range?)
             (filter on-target?)))

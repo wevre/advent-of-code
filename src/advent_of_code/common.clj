@@ -15,6 +15,11 @@
   (map parse-long (re-seq #"-?\d+" s)))
 
 (defn range-inc
+  ([end] (range (inc end)))
+  ([start end] (range start (inc end)))
+  ([start end step] (range start (inc end) step)))
+
+(defn range-x
   "Return range from `start` to `end`, inclusive. `end` need not be greater than
    `start`. Adapted from zelark (so it works even if start == end)."
   ([end] (range-inc 0 end))
@@ -25,4 +30,4 @@
      :else (repeat start))))
 
 (defn points-along [[x1 y1] [x2 y2]]
-  (map vector (range-inc x1 x2) (range-inc y1 y2)))
+  (map vector (range-x x1 x2) (range-x y1 y2)))

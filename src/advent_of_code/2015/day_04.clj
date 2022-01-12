@@ -6,9 +6,9 @@
 ;;;; https://adventofcode.com/2015/day/4
 
 (defn solve [secret prefix]
-  (->> (iterate (fn [[i _]] [(inc i) (md5 (str secret (inc i)))]) [0 ""])
-       (filter (fn [[_ hash]] (str/starts-with? hash prefix)))
-       ffirst))
+  (->> (map #(vector % (md5 (str secret %))) (drop 1 (range)))
+       (keep (fn [[i hash]] (when (str/starts-with? hash prefix) i)))
+       first))
 
 (def input "ckczppom")
 

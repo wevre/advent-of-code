@@ -1,6 +1,6 @@
 (ns advent-of-code.2015.day-15
   (:require [clojure.string :as str]
-            [advent-of-code.common :refer [parse-longs]]))
+            [advent-of-code.common :refer [parse-longs range-inc]]))
 
 ;;;; --- Day 15: Science for Hungry People ---
 ;;;; https://adventofcode.com/2015/day/15
@@ -9,9 +9,9 @@
   (apply mapv vector (map parse-longs (str/split-lines s))))
 
 (defn weights [tsps props]
-  (for [i (range tsps)
-        j (range (- tsps i))
-        k (range (- tsps i j))
+  (for [i (range-inc (- tsps 3))
+        j (range-inc (- tsps i))
+        k (range-inc (- tsps i j))
         :let [l (- tsps i j k)]
         :when (= tsps (+ i j k l))]
     (map #(reduce + (map * % [i j k l])) props)))
