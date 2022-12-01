@@ -59,18 +59,18 @@
       {:beacons (:beacons base) :offsets offsets :fail fail})))
 
 (comment
-  ;; part 1
+  ;; part 1 -- 29s
   (time
    (->> (solve (parse-input (slurp "input/2021/19-scanners.txt")))
         :beacons
-        count))
+        count))   ;=> 436
 
-  ;; part 2
+  ;; part 2 -- 29s
   (time
    (let [locs (->> (solve (parse-input (slurp "input/2021/19-scanners.txt")))
                    :offsets
                    (map :offset))]
      (->> (for [a locs b locs :when (not= a b)]
             (->> (map - a b) (map math/abs) (reduce +)))
-          (reduce max))))
+          (reduce max))))   ;=> 10918
   )
