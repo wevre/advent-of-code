@@ -14,7 +14,7 @@
 (defn parse-input [s]
   (let [[rules molecule] (str/split s #"\n\n")
         rules (parse-rules rules)
-        molecule (re-seq #"[A-Z][a-z]?|[a-z]" molecule)](map)
+        molecule (re-seq #"[A-Z][a-z]?|[a-z]" molecule)]
     {:rules rules :molecule molecule}))
 
 (defn expansions [rules]
