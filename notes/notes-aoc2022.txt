@@ -1,0 +1,31 @@
+:project Advent of Code 2022
+   :created 2022-12-03
+   :author Mike Weaver
+
+:section Day 01
+
+   My first original approach was straightforward. I came back after day 02 and
+   did some refactoring to simplify and isolate what was unique to the two
+   puzzles, which boils down to how many of the top elves you add up: 1 or 3.
+
+:section Day 02
+
+   My first approach was based on mapping out the nine possible combinations of
+   codes for each puzzle and the associated outcome, which worked just fine, but
+   had some things I wanted to change. For one, I sort of over-engineered my
+   approach, thinking that puzzle 2 might be more complicated than it turned out
+   to be. So my 'map-codes-to-results' could be made simpler by mapping directly
+   to the final score. But rather than go that route, I felt my approach sort of
+   lacked something resembling the actual game logic of rock-paper-scissors. So
+   after day 03 I did some refactoring and again isolated the unique aspects of
+   the two parts.
+
+:section Day 03
+
+   This was perhaps the easiest of the days so far, in my opinion. The basic
+   task was to take groups of strings, find the single character that was
+   common to each string in the group, and then convert that character to a
+   priority value. For puzzle 1, the groups came from splitting each input
+   string in half; for puzzle 2, from taking inputs strings 3 at a time. So
+   although it doesn't exist, what is needed is a version of `partition` that
+   can take a value of 3 for puzzle 2, and 0.5 (ha!) for puzzle 1.

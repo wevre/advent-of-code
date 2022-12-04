@@ -1,41 +1,48 @@
 (ns advent-of-code.2022.day-02-rock-paper-scissors
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [clojure.set :as set]))
 
-(defn puzzle [strategy input]
-  (->> input str/split-lines (map strategy) (map vals) flatten (reduce +)))
+(def rules {:rock {:beats :scissors :points 1}
+            :paper {:beats :rock :points 2}
+            :scissors {:beats :paper :points 3}})
 
-(def rock 1)
-(def paper 2)
-(def scissors 3)
-(def lose 0)
-(def draw 3)
-(def win 6)
+(defn score [& {:keys [p2 outcome]}]
+  (+ (get-in rules [p2 :points])
+     (case outcome :lose 0 :draw 3 :win 6)))
 
-(def strategy1 {"A X" {:shape rock     :outcome draw}
-                "A Y" {:shape paper    :outcome win}
-                "A Z" {:shape scissors :outcome lose}
-                "B X" {:shape rock     :outcome lose}
-                "B Y" {:shape paper    :outcome draw}
-                "B Z" {:shape scissors :outcome win}
-                "C X" {:shape rock     :outcome win}
-                "C Y" {:shape paper    :outcome lose}
-                "C Z" {:shape scissors :outcome draw}})
+(def map1 {"A" :rock "B" :paper "C" :scissors "X" :rock "Y" :paper "Z" :scissors})
 
-(def strategy2 {"A X" {:shape scissors :outcome lose}
-                "A Y" {:shape rock     :outcome draw}
-                "A Z" {:shape paper    :outcome win}
-                "B X" {:shape rock     :outcome lose}
-                "B Y" {:shape paper    :outcome draw}
-                "B Z" {:shape scissors :outcome win}
-                "C X" {:shape paper    :outcome lose}
-                "C Y" {:shape scissors :outcome draw}
-                "C Z" {:shape rock     :outcome win}})
+(def map2 {"A" :rock "B" :paper "C" :scissors "X" :lose "Y" :draw "Z" :win})
+
+(defn results1 [codes]
+  (let [[p1 p2] (map map1 codes)
+        outcome (cond
+                  (= p1 p2) :draw
+                  (= p1 (get-in rules [p2 :beats])) :win
+                  :else :lose)]
+    {:p1 p1 :p2 p2 :outcome outcome}))
+
+(defn results2 [codes]
+  (let [[p1 outcome] (map map2 codes)
+        beats (set/map-invert (update-vals rules :beats))
+        p2 (case outcome
+             :lose (get-in rules [p1 :beats])
+             :draw p1
+             :win (beats p1))]
+    {:p1 p1 :p2 p2 :outcome outcome}))
+
+(defn puzzle [results-fn input]
+  (->> input
+       str/split-lines
+       (map #(str/split % #"\s"))
+       (map results-fn)
+       (map score)
+       (apply +)))
 
 (comment
-  (puzzle strategy1 (slurp "input/2022/02-rock-paper-scissors.txt"))   ;=> 15632
+  ;; puzzle 1
+  (puzzle results1 (slurp "input/2022/02-rock-paper-scissors.txt"))   ; => 15632
 
-  (puzzle strategy2 (slurp "input/2022/02-rock-paper-scissors.txt"))   ;=> 14416
-
-  (puzzle strategy2 "A Y\nB X\nC Z")
-
+  ;; puzzle 2
+  (puzzle results2 (slurp "input/2022/02-rock-paper-scissors.txt"))   ; => 14416
   )
