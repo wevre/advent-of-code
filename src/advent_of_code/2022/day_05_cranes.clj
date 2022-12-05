@@ -1,21 +1,18 @@
 (ns advent-of-code.2022.day-05-cranes
   (:require [advent-of-code.common :as common]
-            [clojure.string :as str]))
-
-(defn parse-line [w]
-  (fn [l]
-    (let [spec (str "%-" w "s")]
-      (transduce (comp (drop 1) (take-nth 4)) conj (format spec l)))))
+            [advent-of-code.common.file :as file]))
 
 (defn parse-drawing
   "Return a map of stack num to (seq of) crates."
   [lines]
-  (let [width (transduce (map count) max 0 lines)]
+  (let [width (transduce (map count) max 0 lines)
+        pad (fn [s] (format (str "%-" width "s") s))]
     (->> lines
+         (map pad)
+         (map #(transduce (comp (drop 1) (take-nth 4)) conj %))
          drop-last
-         reverse
-         (map (parse-line width))
          (apply map vector)
+         (map reverse)
          (map #(remove #{\space} %))
          (map vector (drop 1 (range)))
          (into {}))))
@@ -24,9 +21,9 @@
   "Parses stack drawing then applies moves, using sort-fn to simulate
    CrateMover 9000 (reverse) or CrateMover 9001 (identity)."
   [sort-fn input]
-  (let [[stacks moves] (str/split input #"\n\n")
-        stacks (parse-drawing (str/split stacks #"\n"))
-        moves (->> moves str/split-lines (map common/parse-longs))]
+  (let [[stacks moves] (file/split-grouped-lines input)
+        stacks (parse-drawing stacks)
+        moves (map common/parse-longs moves)]
     (reduce (fn [stacks [n from to]]
               (-> stacks
                   (update to concat (sort-fn (take-last n (get stacks from))))
