@@ -7,26 +7,29 @@
     (let [spec (str "%-" w "s")]
       (transduce (comp (drop 1) (take-nth 4)) conj (format spec l)))))
 
-(defn parse-stacks
-  "Return a map of stack to vector of crates."
+(defn parse-drawing
+  "Return a map of stack num to (seq of) crates."
   [lines]
-  (let [str-width (->> lines (map count) (apply max))]
+  (let [width (transduce (map count) max 0 lines)]
     (->> lines
          drop-last
          reverse
-         (map (parse-line str-width))
+         (map (parse-line width))
          (apply map vector)
          (map #(vec (remove #{\space} %)))
          (map vector (drop 1 (range)))
          (into {}))))
 
-(defn parse [sorter input]
+(defn parse
+  "Parses stack drawing then applies moves, using sort-fn to simulate
+   CrateMover 9000 (reverse) or CrateMover 9001 (identity)."
+  [sort-fn input]
   (let [[stacks moves] (str/split input #"\n\n")
-        stacks (parse-stacks (str/split stacks #"\n"))
+        stacks (parse-drawing (str/split stacks #"\n"))
         moves (->> moves str/split-lines (map common/parse-longs))]
     (reduce (fn [stacks [n from to]]
               (-> stacks
-                  (update to concat (sorter (take-last n (get stacks from))))
+                  (update to concat (sort-fn (take-last n (get stacks from))))
                   (update from (partial drop-last n))))
             stacks
             moves)))
