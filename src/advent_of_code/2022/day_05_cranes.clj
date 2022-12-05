@@ -16,7 +16,7 @@
          reverse
          (map (parse-line width))
          (apply map vector)
-         (map #(vec (remove #{\space} %)))
+         (map #(remove #{\space} %))
          (map vector (drop 1 (range)))
          (into {}))))
 
