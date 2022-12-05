@@ -1,5 +1,6 @@
 (ns advent-of-code.common
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [clojure.walk :as walk]))
 
 (defn locmap<-digits
   ([s] (locmap<-digits s identity))
@@ -13,6 +14,25 @@
 
 (defn parse-longs [s]
   (map parse-long (re-seq #"-?\d+" s)))
+
+(defn split-grouped-lines [input]
+  (->> input
+       str/split-lines
+       (partition-by empty?)
+       (take-nth 2)))
+
+(defn transpose
+  ([ll] (transpose nil ll))
+  ([pad ll]
+   (->> ll
+        (map #(concat % (repeat ::end)))
+        (apply map vector)
+        (take-while #(not-every? #{::end} %))
+        (walk/postwalk-replace {::end pad}))))
+
+(comment
+  (transpose \space [[1 2 3] [4 5 ] [7 8 9]]))
+
 
 (defn range-inc
   ([end] (range (inc end)))
