@@ -35,7 +35,7 @@
             moves)))
 
 (defn topmost [ss]
-  (transduce (comp (map inc) (map ss) (map last)) str (range (count ss))))
+  (transduce (comp (map second) (map last)) str (sort ss)))
 
 (comment
   ;; puzzle 1
