@@ -1,4 +1,4 @@
-(ns advent-of-code.2020.day-8
+(ns advent-of-code.2020.day-8-handheld
   (:require [clojure.string :as str]))
 
 ;; --- Day 8: Handheld Halting ---
@@ -37,7 +37,7 @@
 (comment
   (let [input (slurp "input/2020/handheld.txt")]
     (puzzle1 input))
-  
+
   (let [input "nop +0
 acc +1
 jmp +4
@@ -79,7 +79,7 @@ acc +1
 jmp -4
 acc +6"]
     (puzzle2 input))
-  
+
   (let [input (slurp "input/2020/handheld.txt")]
     (puzzle2 input))
   )

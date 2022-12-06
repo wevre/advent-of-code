@@ -1,34 +1,40 @@
 (ns advent-of-code.common.dijkstra
   (:require [clojure.data.priority-map :refer [priority-map-keyfn]]))
 
-(defprotocol ICost
-  (lowest-cost [this base other])
-  (total-cost [this]))
-
-(defrecord Cost [cost heur]
-  ICost
-  (lowest-cost [this base other]
-               (let [new-cost (+ (.cost base) (.cost other))]
-                 (if (and this (< (.cost this) new-cost))
-                   this
-                   (->Cost new-cost (.heur other)))))
-  (total-cost [_] (+ cost heur)))
-
 (defprotocol IState
-  (node [this])
-  (cost [this])
-  (next-states [this]))
+  (state-key [this] "Unique identifier for state")
+  (cost [this] "Cost associated with state")
+  (next-states [this] "States reached directly from current state")
+  (end? [this] "State is end state?"))
 
-(defn update-costs [base]
-  (fn [pmap state]
-    (update pmap (node state) lowest-cost base (cost state))))
+(defprotocol INode
+  (state [this] "State stored at this node.")
+  (path-cost [this] "Cost to reach this node.")
+  (prev-node [this]))
 
-(defn find-lowest-cost [start end?]
-  (loop [costs (priority-map-keyfn total-cost (node start) (cost start))
-         visited #{}]
-    (let [[node cost] (peek costs)]
-      (if (end? node)
-        cost
-        (let [states (remove #(visited (node %)) (next-states node))]
-          (recur (reduce (update-costs cost) (pop costs) states)
-                 (conj visited node)))))))
+(defrecord Node [state path-cost prev-node]
+  INode
+  (state [_this] state)
+  (path-cost [_this] path-cost)
+  (prev-node [_this] prev-node))
+
+(defn update-costs [node]
+  (let [base-cost (+ (path-cost node) (cost (state node)))]
+    (fn [costs state]
+      (update costs (state-key state)
+              (fn [curr-node]
+                (if (or (not curr-node) (< base-cost (path-cost curr-node)))
+                  (->Node state base-cost node)
+                  curr-node))))))
+
+(defn find-lowest-cost [start]
+  (let [cost-fn (fn [node] (+ (path-cost node) (cost (state node))))]
+    (loop [costs (priority-map-keyfn cost-fn (state-key start) (->Node start 0 nil))
+           visited #{}]
+      (let [[s-key node] (peek costs)
+            state (state node)]
+        (if (end? state)
+          node
+          (let [states (remove #(visited (state-key %)) (next-states state))]
+            (recur (reduce (update-costs node) (pop costs) states)
+                   (conj visited s-key))))))))
