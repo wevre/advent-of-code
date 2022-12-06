@@ -62,19 +62,20 @@
                      (empty? (get-in info [:F 3])))))
 
 (defn solve [state]
-  (let [node (dijkstra/find-lowest-cost (->State state))]
+  (let [{:keys [node costs visited]} (dijkstra/find-lowest-cost (->State state))]
+    (println "size of visited: " (count visited))
+    (println "size of priority map 'costs': " (count costs))
     (loop [i 0 node node]
       (if node
-        (recur (inc i) (.prev-node node))
+        (recur (inc i) (dijkstra/prev-node node))
         (dec i)))))
 
 (comment
-  ;; puzzle 1 -- about 12 seconds
+  ;; puzzle 1 -- about 12 seconds -- over 157,000 moves considered
   (time
    (solve init))   ; => 47
 
-  ;; puzzle 2 -- over 12 minutes!
+  ;; puzzle 2 -- over 12 minutes! -- over 6,028,000 routes considered
   (time
    (solve (update-in init [:F 1] into #{[:E :G] [:E :M] [:D :G] [:D :M]})))   ; => 71
-
   )

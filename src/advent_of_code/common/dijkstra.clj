@@ -34,7 +34,7 @@
       (let [[s-key node] (peek costs)
             state (state node)]
         (if (end? state)
-          node
+          {:node node :costs costs :visited visited}
           (let [states (remove #(visited (state-key %)) (next-states state))]
             (recur (reduce (update-costs node) (pop costs) states)
                    (conj visited s-key))))))))
