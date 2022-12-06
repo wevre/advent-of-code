@@ -1,4 +1,4 @@
-(ns advent-of-code.2020.day-2
+(ns advent-of-code.2020.day-02
   (:require [clojure.edn :as edn]))
 
 ;; --- Day 2: Password Philosophy ---

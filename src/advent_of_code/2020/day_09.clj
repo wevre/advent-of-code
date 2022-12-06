@@ -1,4 +1,4 @@
-(ns advent-of-code.2020.day-9
+(ns advent-of-code.2020.day-09
   (:require [clojure.string :as str]))
 
 ;; --- Day 9: Encoding Error ---
@@ -19,9 +19,9 @@
        first
        last))
 
-(defn find-range-sum-to 
-  "Returns a sequence of numbers that add to target. Accordians its way 
-   through `nums`, expanding on the right when too small, shrinking on the left 
+(defn find-range-sum-to
+  "Returns a sequence of numbers that add to target. Accordians its way
+   through `nums`, expanding on the right when too small, shrinking on the left
    when too large."
   [targ nums]
   (loop [i 0 j 0 sum 0]

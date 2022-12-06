@@ -1,4 +1,4 @@
-(ns advent-of-code.2020.day-8-handheld
+(ns advent-of-code.2020.day-08-handheld
   (:require [clojure.string :as str]))
 
 ;; --- Day 8: Handheld Halting ---

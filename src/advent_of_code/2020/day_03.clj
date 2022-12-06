@@ -1,4 +1,4 @@
-(ns advent-of-code.2020.day-3
+(ns advent-of-code.2020.day-03
   (:require [clojure.string :as str]))
 
 ;; --- Day 3: Toboggan Trajectory ---
@@ -7,7 +7,7 @@
   (->> (take-nth d lines)
        (keep-indexed (fn [n line] (#{\#} (nth line (* n r)))))
        count))
-  
+
 (defn puzzle [slopes input]
   (let [input (map cycle (str/split-lines input))]
     (reduce * (map #(find-trees % input) slopes))))

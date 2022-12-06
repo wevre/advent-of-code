@@ -1,4 +1,4 @@
-(ns advent-of-code.2020.day-7
+(ns advent-of-code.2020.day-07
   (:require [clojure.core.logic :as l]
             [clojure.core.logic.pldb :as pldb]
             [clojure.core.logic.fd :as fd]

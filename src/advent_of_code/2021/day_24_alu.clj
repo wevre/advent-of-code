@@ -1,4 +1,4 @@
-(ns advent-of-code.2021.day-24
+(ns advent-of-code.2021.day-24-alu
   (:require [clojure.string :as str]
             [clojure.edn :as edn]
             [clojure.walk :refer [postwalk]]))
