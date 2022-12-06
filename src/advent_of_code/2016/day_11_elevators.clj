@@ -1,4 +1,4 @@
-(ns advent-of-code.2016.day-11
+(ns advent-of-code.2016.day-11-elevators
   (:require [advent-of-code.common.dijkstra :as dijkstra]
             [clojure.math.combinatorics :as combo]
             [clojure.set :as set]))

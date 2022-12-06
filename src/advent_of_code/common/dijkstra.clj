@@ -31,10 +31,10 @@
   (let [cost-fn (fn [node] (+ (path-cost node) (cost (state node))))]
     (loop [costs (priority-map-keyfn cost-fn (state-key start) (->Node start 0 nil))
            visited #{}]
-      (let [[s-key node] (peek costs)
-            state (state node)]
-        (if (end? state)
-          {:node node :costs costs :visited visited}
-          (let [states (remove #(visited (state-key %)) (next-states state))]
-            (recur (reduce (update-costs node) (pop costs) states)
-                   (conj visited s-key))))))))
+      (when-let [[s-key node] (peek costs)]
+        (let [state (state node)]
+          (if (end? state)
+            {:node node :costs costs :visited visited}
+            (let [states (remove #(visited (state-key %)) (next-states state))]
+              (recur (reduce (update-costs node) (pop costs) states)
+                     (conj visited s-key)))))))))
