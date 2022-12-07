@@ -1,27 +1,26 @@
 (ns advent-of-code.2022.day-07-directories
-  (:require [clojure.edn :as edn]
+  (:require [clojure.core.match :as m]
             [clojure.string :as str]
             [clojure.zip :as zip]))
 
-(defn outer [loc] (if-not (zip/up loc) loc (recur (zip/up loc))))
+(defn zip-outer [loc] (if-not (zip/up loc) loc (recur (zip/up loc))))
 
-(defn to-sibling [loc ch]
+(defn zip-sibling [loc ch]
   (if (= ch (:dir (zip/node loc))) loc (recur (zip/right loc) ch)))
 
 (defn build-tree [instr]
   (loop [z (zip/zipper :dir :children #(assoc %1 :children %2) {:dir "/"})
-         [[op1 op2 op3 :as cmd] & rest] instr]
-    (if (not cmd)
+         [cmd & rest] instr]
+    (if-not cmd
       (zip/root z)
       (recur
-       (cond
-         (= 'cd op2) (cond
-                       (= '/ op3) (outer z)
-                       (= '.. op3) (zip/up z)
-                       :else (to-sibling (zip/down z) (str op3)))
-         (= 'dir op1) (zip/append-child z {:dir (str op2) :children []})
-         (number? op1) (zip/append-child z {:file (str op2) :size op1})
-         :else z)
+       (m/match cmd
+         ["$" "ls"] z
+         ["$" "cd" "/"] (zip-outer z)
+         ["$" "cd" ".."] (zip/up z)
+         ["$" "cd" dir] (zip-sibling (zip/down z) dir)
+         ["dir" dir] (zip/append-child z {:dir dir :children []})
+         [size name] (zip/append-child z {:file name :size (parse-long size)}))
        rest))))
 
 (defn find-sizes
@@ -35,7 +34,7 @@
 (defn parse [input]
   (->> input
        str/split-lines
-       (map #(edn/read-string (str "[" % "]")))
+       (map #(str/split % #" "))
        build-tree))
 
 (comment
