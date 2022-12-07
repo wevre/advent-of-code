@@ -1,6 +1,7 @@
 (ns advent-of-code.2022.day-07-directories
   (:require [clojure.core.match :as m]
             [clojure.string :as str]
+            [clojure.walk :as walk]
             [clojure.zip :as zip]))
 
 (defn build-tree [instr]
@@ -21,28 +22,26 @@
          [size name] (zip/append-child z {:file name :size (parse-long size)}))
        rest))))
 
-(defn size-tree [node]
-  (if (:dir node)
-    (map size-tree (:children node))
-    (:size node)))
-
 (defn find-sizes [root]
-  (->> (size-tree root)
+  (->> root
+       (walk/postwalk (fn [x] (cond
+                                (and (map? x) (:dir x)) (:children x)
+                                (and (map? x) (:file x)) (:size x)
+                                :else x)))
        (tree-seq seq? identity)
        (keep #(when (seq? %) (apply + (flatten %))))))
 
 (defn parse [input]
-  (->> input str/split-lines (map #(str/split % #" ")) build-tree))
+  (->> input str/split-lines (map #(str/split % #" ")) build-tree find-sizes))
 
 (comment
   ;; puzzle 1
   (->> (parse (slurp "input/2022/07-directories.txt"))
-       find-sizes
        (filter #(< % 100000))
        (apply +))   ; => 1432936
 
   ;; puzzle 2
-  (let [sizes (find-sizes (parse (slurp "input/2022/07-directories.txt")))
+  (let [sizes (parse (slurp "input/2022/07-directories.txt"))
         total-size (apply max sizes)
         unused (- 70000000 total-size)
         need (- 30000000 unused)]
