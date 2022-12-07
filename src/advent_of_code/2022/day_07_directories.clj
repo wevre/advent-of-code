@@ -8,11 +8,9 @@
 (defn to-sibling [loc ch]
   (if (= ch (:dir (zip/node loc))) loc (recur (zip/right loc) ch)))
 
-(defn make-tree [root]
-  (zip/zipper :dir :children (fn [n c] (assoc n :children c)) root))
-
 (defn build-tree [instr]
-  (loop [z (make-tree {:dir "/"}) [[op1 op2 op3 :as cmd] & rest] instr]
+  (loop [z (zip/zipper :dir :children #(assoc %1 :children %2) {:dir "/"})
+         [[op1 op2 op3 :as cmd] & rest] instr]
     (if (not cmd)
       (zip/root z)
       (recur
@@ -48,8 +46,7 @@
        (apply +))   ; => 1432936
 
   ;; puzzle 2
-  (let [tree (parse (slurp "input/2022/07-directories.txt"))
-        sizes (find-sizes tree)
+  (let [sizes (find-sizes (parse (slurp "input/2022/07-directories.txt")))
         total-size (last sizes)
         unused (- 70000000 total-size)
         need (- 30000000 unused)]
