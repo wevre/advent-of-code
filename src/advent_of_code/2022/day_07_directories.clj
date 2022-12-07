@@ -1,8 +1,7 @@
 (ns advent-of-code.2022.day-07-directories
   (:require [clojure.edn :as edn]
             [clojure.string :as str]
-            [clojure.zip :as zip]
-            [clojure.walk :as walk]))
+            [clojure.zip :as zip]))
 
 (defn outer [loc] (if-not (zip/up loc) loc (recur (zip/up loc))))
 
@@ -27,70 +26,35 @@
          :else z)
        rest))))
 
-(defn add-dir-size [root]
-  (walk/postwalk (fn [x]
-                   (if (and (map? x) (:dir x))
-                     (assoc x :size (->> x :children (map :size) (apply +)))
-                     x))
-                 root))
-
-(defn find-dir-sizes [root]
-  (loop [z (make-tree root) dirs []]
-    (if (zip/end? z)
-      dirs
-      (let [{:keys [dir size]} (zip/node z)]
-        (recur (zip/next z) (cond-> dirs dir (conj size)))))))
+(defn find-sizes
+  ([root] (-> (find-sizes [[] 0] root) first))
+  ([[out sum] node]
+   (if (:dir node)
+     (let [[ro rs] (reduce find-sizes [out 0] (:children node))]
+       [(conj ro rs) (+ sum rs)])
+     [out (+ sum (:size node))])))
 
 (defn parse [input]
   (->> input
        str/split-lines
        (map #(edn/read-string (str "[" % "]")))
-       build-tree
-       add-dir-size))
+       build-tree))
 
 (comment
   ;; puzzle 1
   (->> (parse (slurp "input/2022/07-directories.txt"))
-       find-dir-sizes
+       find-sizes
        (filter #(< % 100000))
        (apply +))   ; => 1432936
 
   ;; puzzle 2
   (let [tree (parse (slurp "input/2022/07-directories.txt"))
-        total-size (:size tree)
+        sizes (find-sizes tree)
+        total-size (last sizes)
         unused (- 70000000 total-size)
         need (- 30000000 unused)]
-    (->> tree
-         find-dir-sizes
+    (->> sizes
          (filter #(>= % need))
          sort
-         first))
-
-  ;; sample puzzle
-  (let [instr '([$ cd /]
-                [$ ls]
-                [dir a]
-                [14848514 b.txt]
-                [8504156 c.dat]
-                [dir d]
-                [$ cd a]
-                [$ ls]
-                [dir e]
-                [29116 f]
-                [2557 g]
-                [62596 h.lst]
-                [$ cd e]
-                [$ ls]
-                [584 i]
-                [$ cd ..]
-                [$ cd ..]
-                [$ cd d]
-                [$ ls]
-                [4060174 j]
-                [8033020 d.log]
-                [5626152 d.ext]
-                [7214296 k])]
-    (-> (build-tree instr)
-        add-dir-size
-        find-dirs))
+         first))   ; => 272298
   )
