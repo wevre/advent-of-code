@@ -3,11 +3,6 @@
             [clojure.string :as str]
             [clojure.zip :as zip]))
 
-(defn zip-outer [loc] (if-not (zip/up loc) loc (recur (zip/up loc))))
-
-(defn zip-sibling [loc ch]
-  (if (= ch (:dir (zip/node loc))) loc (recur (zip/right loc) ch)))
-
 (defn build-tree [instr]
   (loop [z (zip/zipper :dir :children #(assoc %1 :children %2) {:dir "/"})
          [cmd & rest] instr]
@@ -16,26 +11,28 @@
       (recur
        (m/match cmd
          ["$" "ls"] z
-         ["$" "cd" "/"] (zip-outer z)
+         ["$" "cd" "/"] (->> z (iterate zip/up) (take-while identity) last)
          ["$" "cd" ".."] (zip/up z)
-         ["$" "cd" dir] (zip-sibling (zip/down z) dir)
+         ["$" "cd" dir] (->> (zip/down z)
+                             (iterate zip/right)
+                             (filter #(= dir (:dir (zip/node %))))
+                             first)
          ["dir" dir] (zip/append-child z {:dir dir :children []})
          [size name] (zip/append-child z {:file name :size (parse-long size)}))
        rest))))
 
-(defn find-sizes
-  ([root] (-> (find-sizes [[] 0] root) first))
-  ([[out sum] node]
-   (if (:dir node)
-     (let [[ro rs] (reduce find-sizes [out 0] (:children node))]
-       [(conj ro rs) (+ sum rs)])
-     [out (+ sum (:size node))])))
+(defn size-tree [node]
+  (if (:dir node)
+    (map size-tree (:children node))
+    (:size node)))
+
+(defn find-sizes [root]
+  (->> (size-tree root)
+       (tree-seq seq? identity)
+       (keep #(when (seq? %) (apply + (flatten %))))))
 
 (defn parse [input]
-  (->> input
-       str/split-lines
-       (map #(str/split % #" "))
-       build-tree))
+  (->> input str/split-lines (map #(str/split % #" ")) build-tree))
 
 (comment
   ;; puzzle 1
@@ -46,7 +43,7 @@
 
   ;; puzzle 2
   (let [sizes (find-sizes (parse (slurp "input/2022/07-directories.txt")))
-        total-size (last sizes)
+        total-size (apply max sizes)
         unused (- 70000000 total-size)
         need (- 30000000 unused)]
     (->> sizes
