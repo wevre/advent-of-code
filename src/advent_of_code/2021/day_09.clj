@@ -4,7 +4,7 @@
 ;; --- Day 9: Smoke Basin ---
 ;; https://adventofcode.com/2021/day/9
 
-(def input (locmap<-digits (slurp "input/2021/9-heights.txt")))
+(def input (:locmap (locmap<-digits (slurp "input/2021/9-heights.txt"))))
 
 (defn neighbors [[r c]]
   (for [[dr dc] [[0 -1] [0 1] [-1 0] [1 0]]]

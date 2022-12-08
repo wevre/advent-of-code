@@ -4,7 +4,7 @@
 ;; --- Day 11: Dumbo Octopus ---
 ;; https://adventofcode.com/2021/day/11
 
-(def input (locmap<-digits (slurp "input/2021/11-octopi.txt")))
+(def input (:locmap (locmap<-digits (slurp "input/2021/11-octopi.txt"))))
 
 (defn neighbors [[r c]]
   (for [dr [-1 0 1] dc [-1 0 1] :when (not= 0 dr dc)]
