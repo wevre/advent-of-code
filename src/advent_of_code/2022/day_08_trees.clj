@@ -1,7 +1,7 @@
 (ns advent-of-code.2022.day-08-trees
   (:require [advent-of-code.common :as common]))
 
-(defn skip-at [n coll] [(reverse (take n coll)) (drop (inc n) coll)])
+(defn flank-at [n coll] [(reverse (take n coll)) (drop (inc n) coll)])
 
 (defn take-upto
   "From https://github.com/weavejester/medley"
@@ -15,8 +15,8 @@
   (let [{:keys [locmap] [wid hei] :size} (common/locmap<-digits input)
         height<- (fn [pos] (locmap pos))]
     (for [r (range wid) c (range hei)
-          :let [[left right] (skip-at r (map #(height<- [% c]) (range wid)))
-                [above below] (skip-at c (map #(height<- [r %]) (range hei)))
+          :let [[left right] (flank-at r (map #(height<- [% c]) (range wid)))
+                [above below] (flank-at c (map #(height<- [r %]) (range hei)))
                 h (get locmap [r c])]]
       {:pos [r c]
        :height h
