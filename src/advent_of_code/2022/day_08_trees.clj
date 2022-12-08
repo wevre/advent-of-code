@@ -3,34 +3,42 @@
 
 (defn skip-at [n coll] [(reverse (take n coll)) (drop (inc n) coll)])
 
-(defn unblocked [h coll]
-  (let [[a b] (split-with #(< % h) coll)]
-    (+ (count a) (count (take 1 b)))))
+(defn take-upto
+  "From https://github.com/weavejester/medley"
+  [pred coll]
+  (lazy-seq
+   (when-let [s (seq coll)]
+     (let [x (first s)]
+       (cons x (when-not (pred x) (take-upto pred (rest s))))))))
 
 (defn survey [input]
-  (let [{:keys [locmap] [w h] :size} (common/locmap<-digits input)
-        height (fn [pos] (locmap pos))]
-    (for [r (range w) c (range h)
-          :let [[left right] (skip-at r (map #(height [% c]) (range w)))
-                [above below] (skip-at c (map #(height [r %]) (range h)))
-                hei (get locmap [r c])]]
-      {:pos [r c] :height hei #_#_:search [left right above below]
-       :visible? (or (every? #(> hei %) left)
-                     (every? #(> hei %) right)
-                     (every? #(> hei %) above)
-                     (every? #(> hei %) below))
+  (let [{:keys [locmap] [wid hei] :size} (common/locmap<-digits input)
+        height<- (fn [pos] (locmap pos))]
+    (for [r (range wid) c (range hei)
+          :let [[left right] (skip-at r (map #(height<- [% c]) (range wid)))
+                [above below] (skip-at c (map #(height<- [r %]) (range hei)))
+                h (get locmap [r c])]]
+      {:pos [r c]
+       :height h
+       #_#_:search [left right above below]
+       :visible? (->> [left right above below]
+                      (map (fn [c] (every? #(> h %) c)))
+                      (some true?))
        :scenic (->> [left right above below]
-                    (map #(unblocked hei %))
+                    (map (fn [d] (take-upto #(<= h %) d)))
+                    (map count)
                     (apply *))})))
 
 (comment
   ;; puzzle 1
-  (->> (survey (slurp "input/2022/08-trees.txt"))
+  (->> #_(survey "30373\n25512\n65332\n33549\n35390")
+       (survey (slurp "input/2022/08-trees.txt"))
        (filter :visible?)
        count)   ; => 1719
 
   ;; puzzle 2
-  (->> (survey (slurp "input/2022/08-trees.txt"))
+  (->> #_(survey "30373\n25512\n65332\n33549\n35390")
+       (survey (slurp "input/2022/08-trees.txt"))
        (map :scenic)
        (apply max))   ; => 590824
   )
