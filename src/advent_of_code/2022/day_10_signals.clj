@@ -6,7 +6,8 @@
   (->> input
        str/split-lines
        (map #(edn/read-string (str "[" % "]")))
-       (mapcat #(if (= 'addx (first %)) [0 (second %)] [0]))
+       #_(mapcat #(if (= 'addx (first %)) [0 (second %)] [0]))
+       (mapcat #(assoc % 0 0))   ; borrowed trick from @tschady
        (reductions + 1)))
 
 (comment
