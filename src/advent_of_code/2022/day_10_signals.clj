@@ -21,7 +21,8 @@
   ;; puzzle 2
   (->> (parse (slurp "input/2022/10-signals.txt"))
        (map vector (cycle (range 40)))
-       (map #(if (<= -1 (apply - %) 1) \# \.))
+       (map #(apply - %))
+       (map #({-1 \# 0 \# +1 \#} % \.))
        (partition 40)
        (map str/join))   ; => RLEZFLGE
   )
