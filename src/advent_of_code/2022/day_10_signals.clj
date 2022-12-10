@@ -22,5 +22,5 @@
        (map vector (cycle (range 40)))
        (map #(if (<= -1 (apply - %) 1) \# \.))
        (partition 40)
-       (map #(apply str %)))   ; => RLEZFLGE
+       (map str/join))   ; => RLEZFLGE
   )
