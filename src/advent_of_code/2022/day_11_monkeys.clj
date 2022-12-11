@@ -21,7 +21,7 @@
        (map parse-simian)
        (into {})))
 
-(defn round [worry]
+(defn round [worry cnt]
   (fn [state]
     (let [rf (fn [state i]
                (let [{:keys [items op div t-to f-to]} (get state i)
@@ -35,11 +35,11 @@
                      (update-in [i :count] + (count items))
                      (update-in [t-to :items] into t-items)
                      (update-in [f-to :items] into f-items))))]
-      (reduce rf state (range 8)))))
+      (reduce rf state (range cnt)))))
 
 (defn monkey-business [state n worry]
   (->> state
-       (iterate (round worry))
+       (iterate (round worry (count state)))
        (drop n)
        first
        vals
