@@ -1,7 +1,6 @@
 (ns advent-of-code.2022.day-11-monkeys
   (:require [advent-of-code.common :as common]
-            [clojure.edn :as edn]
-            [clojure.java.math :as math]))
+            [clojure.edn :as edn]))
 
 (def evaluate
   (memoize
@@ -10,7 +9,7 @@
 
 (defn parse-simian [[a b c & d]]
   (let [i (parse-long (re-find #"\d+" a))
-        items (into [] (map bigint (common/parse-longs b)))
+        items (into [] (common/parse-longs b))
         [s1 op s2] (edn/read-string (str "(" (re-find #"old.*$" c) ")"))
         [div t-to f-to] (map #(parse-long (re-find #"\d+" %)) d)]
     [i {:items items :op (list op s1 s2) :div div :t-to t-to :f-to f-to
@@ -50,12 +49,9 @@
        (apply *)))
 
 (comment
-
-  (evaluate 52 (edn/read-string "(* old old)"))
-
   ;; puzzle 1
   (let [state (parse (slurp "input/2022/11-monkeys.txt"))
-        worry (fn [v] (bigint (math/floor (/ v 3))))]
+        worry (fn [v] (quot v 3))]
     (monkey-business state 20 worry))   ; => 58786
 
   ;; puzzle 2
