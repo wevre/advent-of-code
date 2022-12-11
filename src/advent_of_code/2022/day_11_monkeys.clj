@@ -13,7 +13,7 @@
         [s1 op s2] (edn/read-string (str "(" (re-find #"old.*$" c) ")"))
         [div m1 m2] (map #(parse-long (re-find #"\d+" %)) d)]
     [i {:items items
-        :op (fn [x] (apply (resolve op) (map #(if (= % 'old) x %) [s1 s2])))
+        :op (fn [x] (apply (resolve op) (map #({'old x} % %) [s1 s2])))
         :whom #(if (zero? (mod % div)) m1 m2)
         :div div
         :count 0}]))
