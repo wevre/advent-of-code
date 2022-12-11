@@ -2,14 +2,10 @@
   (:require [advent-of-code.common :as common]
             [clojure.edn :as edn]))
 
-(defn evaluate [[op & args]]
-  (fn [old]
-    (apply (resolve op) (map #(if (= % 'old) old %) args))))
-
 ;; NOTE: I like @zelark's approach to capture `throw-to` as a function created
 ;; when parsing the monkey, instead of storing the two recipients. BTW: can't
-;; call it by the most natural choice, 'throw', because it's a special form. I
-;; actually ended up calling it 'whom' because I think it's funny.
+;; call it by the most natural choice, 'throw', because `throw` is a special
+;; form. I actually ended up calling it 'whom' because I think it's funny.
 
 (defn parse-simian [[a b c & d]]
   (let [i (parse-long (re-find #"\d+" a))
@@ -17,13 +13,13 @@
         [s1 op s2] (edn/read-string (str "(" (re-find #"old.*$" c) ")"))
         [div m1 m2] (map #(parse-long (re-find #"\d+" %)) d)]
     [i {:items items
-        :op (evaluate [op s1 s2])
+        :op (fn [x] (apply (resolve op) (map #(if (= % 'old) x %) [s1 s2])))
         :whom #(if (zero? (mod % div)) m1 m2)
         :div div
         :count 0}]))
 
 (defn parse [input]
-  (->> input throw
+  (->> input
        common/split-grouped-lines
        (map parse-simian)
        (into {})))
