@@ -22,6 +22,8 @@
 ;;    Really need to go to bed! This is last tweak. Refactor `heights-fn` to
 ;;    take as single arg the diff between to-height and curr-height. Simplifies
 ;;    the call site for `solve`.
+;; 2022-12-12 07:09
+;;    Speaking of call sites, changed signature of `solve` to use keyword args.
 
 (defrecord State [pos end-fn height-fn heights]
   dijkstra/IState
@@ -53,7 +55,7 @@
             [{} {}]
             locmap)))
 
-(defn solve [end-fn height-fn start heights]
+(defn solve [start heights & {:keys [end-fn height-fn]}]
   (->> (->State start end-fn height-fn heights)
        dijkstra/find-lowest-cost
        :node
@@ -65,13 +67,19 @@
 (comment
   ;; sample puzzle
   (let [[info heights] (parse "Sabqponm\nabcryxxl\naccszExk\nacctuvwj\nabdefghi")]
-    (solve #(= % (:end info)) #(<= % 1) (:start info) heights))   ; => 31
+    (solve (:start info) heights
+           :end-fn #(= % (:end info))
+           :height-fn #(<= % 1) ))   ; => 31
 
   ;; puzzle 1
   (let [[info heights] (parse (slurp "input/2022/12-elevations.txt"))]
-    (solve #(= % (:end info)) #(<= % 1) (:start info) heights))   ; => 339
+    (solve (:start info) heights
+           :end-fn #(= % (:end info))
+           :height-fn #(<= % 1) ))   ; => 339
 
   ;; puzzle 2
   (let [[info heights] (parse (slurp "input/2022/12-elevations.txt"))]
-    (solve #(= 0 (get heights %)) #(>= % -1) (:end info) heights))   ; => 332
+    (solve (:end info) heights
+           :end-fn #(= 0 (get heights %))
+           :height-fn #(>= % -1)))   ; => 332
   )
