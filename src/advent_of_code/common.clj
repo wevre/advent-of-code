@@ -10,9 +10,12 @@
               (str/split-lines)
               (map-indexed vector)
               (mapcat (fn [[r l]]
-                        (map-indexed (fn [c v] [[r c] (f (Character/digit v 10))]) l)))
+                        (map-indexed (fn [c v]
+                                       [[r c] (f (Character/digit v 10))]) l)))
               (into {}))
-         size (reduce (fn [[rm cm] [r c]] [(max rm (inc r)) (max cm (inc c))]) [0 0] (keys lmap))]
+         size (reduce (fn [[rm cm] [r c]] [(max rm (inc r)) (max cm (inc c))])
+                      [0 0]
+                      (keys lmap))]
      {:locmap lmap :size size})))
 
 (defn locmap<-
@@ -22,10 +25,11 @@
          (->> s
               (str/split-lines)
               (map-indexed vector)
-              (mapcat (fn [[r l]]
-                        (map-indexed (fn [c v] [[r c] (f v)]) l)))
+              (mapcat (fn [[r l]] (map-indexed (fn [c v] [[r c] (f v)]) l)))
               (into {}))
-         size (reduce (fn [[rm cm] [r c]] [(max rm (inc r)) (max cm (inc c))]) [0 0] (keys lmap))]
+         size (reduce (fn [[rm cm] [r c]] [(max rm (inc r)) (max cm (inc c))])
+                      [0 0]
+                      (keys lmap))]
      {:locmap lmap :size size})))
 
 (defn parse-longs [s]
@@ -48,7 +52,6 @@
 
 (comment
   (transpose \space [[1 2 3] [4 5 ] [7 8 9]]))
-
 
 (defn range-inc
   ([end] (range (inc end)))
