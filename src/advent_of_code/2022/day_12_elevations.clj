@@ -9,23 +9,23 @@
 ;;    Decided to not put locations, size, start and end all in same map.
 ;; 2022-12-11 11:21
 ;;    Don't need to check if [x y] is valid coord, lookup will be nil.
+;; 2022-12-11 11:33
+;;    Don't need to destructure x and y everywhere.
 
 (defrecord State [pos info heights]
   dijkstra/IState
   (state-key [_this] pos)
 
   (cost [_this]
-    (let [[x y] pos [tx ty] (:end info)]
-      (+ (math/abs (- tx x)) (math/abs (- ty y)))))
+    (->> (map - pos (:end info)) (map math/abs) (apply +)))
 
   (next-states [_this]
-    (let [[x y] pos
-          curr-height (get heights pos)]
-      (for [[∆x ∆y] [[-1 0] [1 0] [0 1] [0 -1]]
-            :let [x (+ x ∆x) y (+ y ∆y)
-                  to-height (get heights [x y])]
+    (let [curr-height (get heights pos)]
+      (for [∆ [[-1 0] [1 0] [0 1] [0 -1]]
+            :let [next-pos (map + pos ∆)
+                  to-height (get heights next-pos)]
             :when (and to-height (<= (- to-height curr-height) 1))]
-        (->State [x y] info heights))))
+        (->State next-pos info heights))))
 
   (end? [_this] (= pos (:end info))))
 
