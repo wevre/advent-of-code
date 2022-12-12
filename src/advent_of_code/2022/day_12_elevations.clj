@@ -1,7 +1,6 @@
 (ns advent-of-code.2022.day-12-elevations
   (:require [advent-of-code.common :as common]
-            [advent-of-code.common.dijkstra :as dijkstra]
-            [clojure.java.math :as math]))
+            [advent-of-code.common.dijkstra :as dijkstra]))
 
 ;; 2022-12-11 10:55
 ;;    Solutions
@@ -11,23 +10,26 @@
 ;;    Don't need to check if [x y] is valid coord, lookup will be nil.
 ;; 2022-12-11 11:33
 ;;    Don't need to destructure x and y everywhere.
+;; 2022-12-12 00:14
+;;    Was on way to bed and had brilliant idea. Instead of brute-force searching
+;;    from every possible trailhead, just reverse the search (and do it only one
+;;    time) from the original end point. Less cumbersome code, and faster, too.
 
-(defrecord State [pos info heights]
+(defrecord State [pos end-fn height-fn heights]
   dijkstra/IState
   (state-key [_this] pos)
 
-  (cost [_this]
-    (->> (map - pos (:end info)) (map math/abs) (apply +)))
+  (cost [_this] 1)
 
   (next-states [_this]
     (let [curr-height (get heights pos)]
       (for [∆ [[-1 0] [1 0] [0 1] [0 -1]]
-            :let [next-pos (map + pos ∆)
+            :let [next-pos (mapv + pos ∆)
                   to-height (get heights next-pos)]
-            :when (and to-height (<= (- to-height curr-height) 1))]
-        (->State next-pos info heights))))
+            :when (and to-height (height-fn curr-height to-height))]
+        (->State next-pos end-fn height-fn heights))))
 
-  (end? [_this] (= pos (:end info))))
+  (end? [_this] (end-fn pos)))
 
 (defn parse
   "Return two maps, `[info heights]`, with integer heights keyed by `[x y]`
@@ -43,8 +45,8 @@
             [{} {}]
             locmap)))
 
-(defn solve [[{:keys [start] :as info} heights]]
-  (->> (->State start info heights)
+(defn solve [end-fn height-fn start heights]
+  (->> (->State start end-fn height-fn heights)
        dijkstra/find-lowest-cost
        :node
        (iterate dijkstra/prev-node)
@@ -54,19 +56,14 @@
 
 (comment
   ;; sample puzzle
-  (-> (parse "Sabqponm\nabcryxxl\naccszExk\nacctuvwj\nabdefghi")
-      solve)  ; => 31
+  (let [[info heights] (parse "Sabqponm\nabcryxxl\naccszExk\nacctuvwj\nabdefghi")]
+    (solve #(= % (:end info)) #(<= (- %2 %1) 1) (:start info) heights))   ; => 31
 
   ;; puzzle 1
-  (solve (parse (slurp "input/2022/12-elevations.txt")))   ; => 339
+  (let [[info heights] (parse (slurp "input/2022/12-elevations.txt"))]
+    (solve #(= % (:end info)) #(<= (- %2 %1) 1) (:start info) heights))   ; => 339
 
   ;; puzzle 2
-  (let [[info heights] (parse (slurp "input/2022/12-elevations.txt"))
-        trailheads (keep (fn [[k v]] (when (zero? v) k)) heights)]
-    (->> trailheads
-         (map (fn [start] [(assoc info :start start) heights]))
-         (map solve)
-         (filter #(< 0 %))
-         sort
-         first))   ; => 332
+  (let [[info heights] (parse (slurp "input/2022/12-elevations.txt"))]
+    (solve #(= 0 (get heights %)) #(>= (- %2 %1) -1) (:end info) heights))   ; => 332
   )
