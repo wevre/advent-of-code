@@ -7,7 +7,7 @@
 ;;    Solutions
 ;; 2022-12-11 11:09
 ;;    Decided to not put locations, size, start and end all in same map.
-;; 2022-12-11 11:19
+;; 2022-12-11 11:21
 ;;    Don't need to check if [x y] is valid coord, lookup will be nil.
 
 (defrecord State [pos info heights]
@@ -30,17 +30,17 @@
   (end? [_this] (= pos (:end info))))
 
 (defn parse
-  "Return two maps, `[info heights]` with integer heights keyed by `[x y]`
-   position and `info` contains useful entries: `:start`, `:end`, and `:size`.
+  "Return two maps, `[info heights]`, with integer heights keyed by `[x y]`
+   position and `info` contains useful entries: `:start`, `:end`.
    "
   [input]
-  (let [{:keys [locmap size]} (common/locmap<- input)]
+  (let [{:keys [locmap]} (common/locmap<- input)]
     (reduce (fn [[info heights] [k v]]
               (cond
                 (= v \S) [(assoc info :start k) (assoc heights k 0)]
                 (= v \E) [(assoc info :end k) (assoc heights k 25)]
                 :else [info (assoc heights k (- (int v) (int \a)))]))
-            [{:size size} {}]
+            [{} {}]
             locmap)))
 
 (defn solve [[{:keys [start] :as info} heights]]
