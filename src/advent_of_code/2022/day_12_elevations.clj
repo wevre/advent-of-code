@@ -18,6 +18,10 @@
 ;;    Was on way to bed and had brilliant idea. Instead of brute-force searching
 ;;    from every possible trailhead, just reverse the search (and do it only one
 ;;    time) from the original end point. Less cumbersome code, and faster, too.
+;; 2022-12-12 00:46
+;;    Really need to go to bed! This is last tweak. Refactor `heights-fn` to
+;;    take as single arg the diff between to-height and curr-height. Simplifies
+;;    the call site for `solve`.
 
 (defrecord State [pos end-fn height-fn heights]
   dijkstra/IState
@@ -30,7 +34,7 @@
       (for [∆ [[-1 0] [1 0] [0 1] [0 -1]]
             :let [next-pos (mapv + pos ∆)
                   to-height (get heights next-pos)]
-            :when (and to-height (height-fn curr-height to-height))]
+            :when (and to-height (height-fn (- to-height curr-height)))]
         (->State next-pos end-fn height-fn heights))))
 
   (end? [_this] (end-fn pos)))
@@ -61,13 +65,13 @@
 (comment
   ;; sample puzzle
   (let [[info heights] (parse "Sabqponm\nabcryxxl\naccszExk\nacctuvwj\nabdefghi")]
-    (solve #(= % (:end info)) #(<= (- %2 %1) 1) (:start info) heights))   ; => 31
+    (solve #(= % (:end info)) #(<= % 1) (:start info) heights))   ; => 31
 
   ;; puzzle 1
   (let [[info heights] (parse (slurp "input/2022/12-elevations.txt"))]
-    (solve #(= % (:end info)) #(<= (- %2 %1) 1) (:start info) heights))   ; => 339
+    (solve #(= % (:end info)) #(<= % 1) (:start info) heights))   ; => 339
 
   ;; puzzle 2
   (let [[info heights] (parse (slurp "input/2022/12-elevations.txt"))]
-    (solve #(= 0 (get heights %)) #(>= (- %2 %1) -1) (:end info) heights))   ; => 332
+    (solve #(= 0 (get heights %)) #(>= % -1) (:end info) heights))   ; => 332
   )
