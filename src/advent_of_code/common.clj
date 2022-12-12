@@ -15,6 +15,19 @@
          size (reduce (fn [[rm cm] [r c]] [(max rm (inc r)) (max cm (inc c))]) [0 0] (keys lmap))]
      {:locmap lmap :size size})))
 
+(defn locmap<-
+  ([s] (locmap<- identity s))
+  ([f s]
+   (let [lmap
+         (->> s
+              (str/split-lines)
+              (map-indexed vector)
+              (mapcat (fn [[r l]]
+                        (map-indexed (fn [c v] [[r c] (f v)]) l)))
+              (into {}))
+         size (reduce (fn [[rm cm] [r c]] [(max rm (inc r)) (max cm (inc c))]) [0 0] (keys lmap))]
+     {:locmap lmap :size size})))
+
 (defn parse-longs [s]
   (map parse-long (re-seq #"-?\d+" s)))
 
