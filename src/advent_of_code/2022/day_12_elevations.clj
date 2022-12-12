@@ -7,6 +7,8 @@
 ;;    Solutions
 ;; 2022-12-11 11:09
 ;;    Decided to not put locations, size, start and end all in same map.
+;; 2022-12-11 11:19
+;;    Don't need to check if [x y] is valid coord, lookup will be nil.
 
 (defrecord State [pos info heights]
   dijkstra/IState
@@ -18,13 +20,11 @@
 
   (next-states [_this]
     (let [[x y] pos
-          curr-height (get heights pos)
-          [cols rows] (:size info)]
+          curr-height (get heights pos)]
       (for [[∆x ∆y] [[-1 0] [1 0] [0 1] [0 -1]]
             :let [x (+ x ∆x) y (+ y ∆y)
                   to-height (get heights [x y])]
-            :when (and (<= 0 x) (< x cols) (<= 0 y) (< y rows)
-                       (<= (- to-height curr-height) 1))]
+            :when (and to-height (<= (- to-height curr-height) 1))]
         (->State [x y] info heights))))
 
   (end? [_this] (= pos (:end info))))
