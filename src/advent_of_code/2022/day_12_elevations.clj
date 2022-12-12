@@ -9,7 +9,11 @@
 ;; 2022-12-11 11:21
 ;;    Don't need to check if [x y] is valid coord, lookup will be nil.
 ;; 2022-12-11 11:33
-;;    Don't need to destructure x and y everywhere.
+;;    Don't need to destructure x and y everywhere. Note: be careful that output
+;;    of something like `(mapv - p1 p2)` is still a vector (use `mapv` instead
+;;    of `map`; in a threading macro end with `vec` or `(into [])`) because
+;;    `heights` map uses _vectors_ of [x y] as keys. If those inadvertently turn
+;;    into generic seqs along the way, they won't work as lookup keys anymore.
 ;; 2022-12-12 00:14
 ;;    Was on way to bed and had brilliant idea. Instead of brute-force searching
 ;;    from every possible trailhead, just reverse the search (and do it only one
