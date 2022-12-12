@@ -31,24 +31,22 @@
   (end? [_this] (= pos *target*)))
 
 (defn find-path [start]
-  (when-let [{:keys [node]} (dijkstra/find-lowest-cost (->State start))]
-    (loop [i 0 node node]
-      (if node
-        (recur (inc i) (dijkstra/prev-node node))
-        (dec i)))))
+  (when-let [{:keys [node]} (dijkstra/lowest-cost (->State start))]
+    (->> node dijkstra/path butlast count)))
 
 (comment
   ;; puzzle 1
   (find-path [1 1])   ; => 96
 
-  ;; puzzle 2
-  (->>
-   (for [x (common/range-x 52) y (common/range-x 52)
-         :when (not (wall? (binary x y)))]
-     (binding [*target* [x y]] (find-path [1 1])))
-   (remove nil?)
-   (filter #(<= % 50))
-   count)   ; => 141
+  ;; puzzle 2 -- about 13s
+  (time
+   (->>
+    (for [x (common/range-x 52) y (common/range-x 52)
+          :when (not (wall? (binary x y)))]
+      (binding [*target* [x y]] (find-path [1 1])))
+    (remove nil?)
+    (filter #(<= % 50))
+    count))   ; => 141
 
   (binding [*input* 10 *target* [7 4]]
     (find-path [1 1]))

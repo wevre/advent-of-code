@@ -56,13 +56,8 @@
             locmap)))
 
 (defn solve [start heights & {:keys [end-fn height-fn]}]
-  (->> (->State start end-fn height-fn heights)
-       dijkstra/find-lowest-cost
-       :node
-       (iterate dijkstra/prev-node)
-       (take-while identity)
-       count
-       dec))
+  (let [node (dijkstra/lowest-cost (->State start end-fn height-fn heights))]
+    (->> node :node dijkstra/path butlast count)))
 
 (comment
   ;; sample puzzle
