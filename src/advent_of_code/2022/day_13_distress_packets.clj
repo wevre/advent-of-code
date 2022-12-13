@@ -1,6 +1,5 @@
 (ns advent-of-code.2022.day-13-distress-packets
-  (:require [clojure.edn :as edn]
-            [clojure.string :as str]))
+  (:require [clojure.edn :as edn]))
 
 ;; 2022-12-12 10:46
 ;;    Initial, crude solutions.
@@ -9,13 +8,20 @@
 ;;    did improve parsing somewhat. It is a legit comparator and just like the
 ;;    docs say, those are tricky to get right.
 ;; 2022-12-13 00:48
-;;    Don't need to map-index followed by keep, just use keep-indexed. Also, my
-;;    comparison of the `first` of a and b followed by comparison of `rest` of a
-;;    and b can be accomplished with `map`ping packet-compare over a and b and
-;;    searching the resulting sequence for first non-zero value. Saw that in a
-;;    few others solutions. Also remembered that I used that approach in a
-;;    natural sort comparator that I wrote long ago
-;;    (https://github.com/wevre/natural-compare).
+;;    Don't need to `map-index` followed by `keep`, just use `keep-indexed`.
+;;    Also, my comparison of the `first` of a and b followed by comparison of
+;;    `rest` of a and b can be accomplished with `map`ping comparison over a and
+;;    b and searching the resulting sequence for first non-zero value. Saw that
+;;    in a few others solutions which reminded me that I had done the same
+;;    approach in a natural sort comparator I wrote a couple of years ago
+;;    (https://github.com/wevre/natural-compare). I actually played around for a
+;;    while with flattened input, using another trick from that natural sort
+;;    where I pad the end with -1 so that shorter vectors sort first. But the
+;;    empty vectors just don't play nice, so I don't think there is a way to get
+;;    around descending into each packet.
+;; 2022-12-13 01:03
+;;    @nbardiuk shared a good insight: don't have to split lines and read-string
+;;    each line, just wrap the entire input inside [] and read it in.
 
 (defn packet-compare [a b]
   (cond
@@ -27,7 +33,7 @@
         (- (count a) (count b)))))
 
 (defn parse [input]
-  (->> input str/split-lines (keep edn/read-string)))
+  (edn/read-string (str "[" input "]")))
 
 (def dividers #{[[2]] [[6]]})
 
