@@ -1,54 +1,46 @@
 (ns advent-of-code.2022.day-13-distress-packets
-  (:require [advent-of-code.common :as common]
-            [clojure.edn :as edn]))
+  (:require [clojure.edn :as edn]
+            [clojure.string :as str]))
 
 ;; 2022-12-12 10:46
 ;;    Initial, crude solutions.
+;; 2022-12-12 11:54
+;;    Still not convinced that my comparator is as simple as it can be, but I
+;;    did improve parsing somewhat.
 
+(defn packet-compare [a b]
+  (cond
+    (and (nil? a) (nil? b)) 0
+    (nil? a) -1
+    (nil? b) +1
+    (and (number? a) (number? b)) (compare a b)
 
-(defn packet-compare
-  ([a b] (packet-compare 20 a b))
-  ([n a b]
-   (if (<= n 0)
-     0
-     (cond
-       (and (nil? a) (nil? b)) 0
-       (nil? a) -1
-       (nil? b) +1
-       (and (number? a) (number? b)) (compare a b)
-       (and (vector? a) (vector? b)) (let [test (packet-compare (dec n) (first a) (first b))]
-                                       (if (zero? test)
-                                         (recur (- n 2) (vec (rest a)) (vec (rest b)))
-                                         test))
-       (number? a) (recur (dec n) [a] b)
-       :else (recur (dec n) a [b])))))
+    (and (seqable? a) (seqable? b))
+    (let [[a1 & ar] a [b1 & br] b test (packet-compare a1 b1)]
+      (or (when-not (and a1 b1 (zero? test)) test) (recur ar br)))
 
-(defn right-order? [[s1 s2]]
-  (->> (map edn/read-string [s1 s2])
-       (apply packet-compare 20 )
-       ))
+    (number? a) (recur [a] b)
+    :else (recur a [b])))
 
+(defn parse [input]
+  (->> input str/split-lines (keep edn/read-string)))
+
+(def dividers #{[[2]] [[6]]})
 
 (comment
-  (let [input (->> (slurp "input/2022/13-distress-packets.txt")
-                   common/split-grouped-lines
-                   (map right-order?)
-                   (map vector (drop 1 (range)))
-                   (keep (fn [[a b]] (when (< b 0) a)))
-                   (apply +)
-                   )]
-    input)
+  ;; puzzle 1
+  (->> (parse (slurp "input/2022/13-distress-packets.txt"))
+       (partition 2)
+       (map #(apply packet-compare %))
+       (map vector (drop 1 (range)))
+       (keep (fn [[a b]] (when (< b 0) a)))
+       (apply +))   ; => 5905
 
-  (let [input (->> (slurp "input/2022/13-distress-packets.txt")
-                   common/split-grouped-lines
-                   (apply concat)
-                   (map edn/read-string)
-                   (concat [[[2]] [[6]]])
-                   (sort packet-compare)
-                   (map vector (drop 1 (range)))
-                   (keep (fn [[a b]] (when (#{[[2]] [[6]]} b) a)))
-                   (apply *))]
-    input)
-
-  (flatten [[2 [3]]])
-  (seqable? [] #_(first [1 2 3])))
+  ;; puzzle 2
+  (->> (parse (slurp "input/2022/13-distress-packets.txt"))
+       (concat dividers)
+       (sort packet-compare)
+       (map vector (drop 1 (range)))
+       (keep (fn [[a b]] (when (dividers b) a)))
+       (apply *))   ; => 21691
+  )
