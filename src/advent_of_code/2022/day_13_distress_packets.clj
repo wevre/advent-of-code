@@ -28,9 +28,8 @@
     (and (number? a) (number? b)) (compare a b)
     (number? a) (recur [a] b)
     (number? b) (recur a [b])
-    :else
-    (or (->> (map packet-compare a b) (drop-while zero?) first)
-        (- (count a) (count b)))))
+    :else (or (->> (map packet-compare a b) (drop-while zero?) first)
+              (- (count a) (count b)))))
 
 (defn parse [input]
   (edn/read-string (str "[" input "]")))
