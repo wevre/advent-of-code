@@ -8,20 +8,23 @@
 ;;    Still not convinced that my comparator is as simple as it can be, but I
 ;;    did improve parsing somewhat. It is a legit comparator and just like the
 ;;    docs say, those are tricky to get right.
+;; 2022-12-13 00:48
+;;    Don't need to map-index followed by keep, just use keep-indexed. Also, my
+;;    comparison of the `first` of a and b followed by comparison of `rest` of a
+;;    and b can be accomplished with `map`ping packet-compare over a and b and
+;;    searching the resulting sequence for first non-zero value. Saw that in a
+;;    few others solutions. Also remembered that I used that approach in a
+;;    natural sort comparator that I wrote long ago
+;;    (https://github.com/wevre/natural-compare).
 
 (defn packet-compare [a b]
   (cond
-    (and (nil? a) (nil? b)) 0
-    (nil? a) -1
-    (nil? b) +1
     (and (number? a) (number? b)) (compare a b)
-
-    (and (seqable? a) (seqable? b))
-    (let [[a1 & ar] a [b1 & br] b test (packet-compare a1 b1)]
-      (or (when-not (and a1 b1 (zero? test)) test) (recur ar br)))
-
     (number? a) (recur [a] b)
-    :else (recur a [b])))
+    (number? b) (recur a [b])
+    :else
+    (or (->> (map packet-compare a b) (drop-while zero?) first)
+        (- (count a) (count b)))))
 
 (defn parse [input]
   (->> input str/split-lines (keep edn/read-string)))
@@ -33,15 +36,13 @@
   (->> (parse (slurp "input/2022/13-distress-packets.txt"))
        (partition 2)
        (map #(apply packet-compare %))
-       (map vector (drop 1 (range)))
-       (keep (fn [[a b]] (when (< b 0) a)))
+       (keep-indexed (fn [i c] (when (< c 0) (inc i))))
        (apply +))   ; => 5905
 
   ;; puzzle 2
   (->> (parse (slurp "input/2022/13-distress-packets.txt"))
        (concat dividers)
        (sort packet-compare)
-       (map vector (drop 1 (range)))
-       (keep (fn [[a b]] (when (dividers b) a)))
+       (keep-indexed (fn [i p] (when (dividers p) (inc i))))
        (apply *))   ; => 21691
   )
