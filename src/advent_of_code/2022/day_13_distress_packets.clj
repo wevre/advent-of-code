@@ -6,7 +6,8 @@
 ;;    Initial, crude solutions.
 ;; 2022-12-12 11:54
 ;;    Still not convinced that my comparator is as simple as it can be, but I
-;;    did improve parsing somewhat.
+;;    did improve parsing somewhat. It is a legit comparator and just like the
+;;    docs say, those are tricky to get right.
 
 (defn packet-compare [a b]
   (cond
