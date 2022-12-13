@@ -28,6 +28,12 @@
 ;;    above still stands that I just can't flatten away some of the more
 ;;    intricate nesting. I'm going to commit it, and then remove it and
 ;;    re-commit.
+;; 2022-12-13 09:29
+;;    A good reminder from @tschady that `next` returns nil, whereas `rest`
+;;    returns an empty list. That would have been useful on very first version
+;;    of my comparator, where I was using `rest` and getting overflows and had
+;;    to start checking for nil all over the place. Also useful because it's
+;;    okay to compare nil and a number, but not () and a number.
 
 (defn packet-compare [a b]
   (cond
@@ -47,7 +53,7 @@
   (->> (parse (slurp "input/2022/13-distress-packets.txt"))
        (partition 2)
        (map #(apply packet-compare %))
-       (keep-indexed (fn [i c] (when (< c 0) (inc i))))
+       (keep-indexed (fn [i c] (when (neg? c) (inc i))))
        (apply +))   ; => 5905
 
   ;; puzzle 2
