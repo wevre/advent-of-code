@@ -7,6 +7,9 @@
 ;;    This code isn't very inspiring. I'm too tired to be more clever here. My
 ;;    first attempt at Part 2 took over 10 minutes to run. Then I tried pmap and
 ;;    got it down to about 2.5 minutes. Still seems slow.
+;; 2022-12-15 00:37
+;;    I have an idea of a different way to do this, but I'll have to attempt it
+;;    after some sleep.
 
 (defn parse [input]
   (->> input
