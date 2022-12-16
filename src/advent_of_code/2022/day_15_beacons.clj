@@ -18,6 +18,8 @@
 ;; 2022-12-15 18:27
 ;;    Did some cleanup and some extensive commenting. Also using combinatorics I
 ;;    got the runtime for Part 2 down to 11 msecs. Whoa!
+;; 2022-12-15 18:52
+;;    New code for Part 1 that makes use of the approach I developed for Part 2.
 
 (defn xnaught
   "x-intercept of line with slope +1 passing through [x y]."
@@ -132,8 +134,7 @@
    only those elbows that are not inside any rects."
   [infos]
   (->> (combo/combinations infos 2)
-       (keep #(apply outside-elbows %))
-       (apply concat)
+       (mapcat #(apply outside-elbows %))
        distinct
        (filter (fn [elb] (every? #(outside? elb %) infos)))))
 
@@ -144,7 +145,24 @@
        (map #(partition 2 %))
        (map #(apply info<-sb %))))
 
+(defn reflect [y {[sx sy] :sensor [bx by] :beacon}]
+  (info<-sb [sx (- (* 2 y) sy)] [bx (- (* 2 y) by)]))
+
 (comment
+  ;; puzzle 1
+  (let [infos (parse (slurp "input/2022/15-beacons.txt"))
+        targ-row 2000000
+        [elb1 elb2] (->> infos
+                         (mapcat #(outside-elbows % (reflect targ-row %)))
+                         (map first)
+                         (apply (juxt min max)))
+        beacons-on-target (->> infos
+                               (map :beacon)
+                               (keep (fn [[x y]] (when (= targ-row y) x)))
+                               distinct
+                               count)]
+    (- (- elb2 elb1 1) beacons-on-target))   ; => 6124805
+
   ;; puzzle 2 -- 11 msecs
   (time
    (let [limit 4000000 #_20
@@ -153,66 +171,5 @@
           find-outside-beacons
           (filter (fn [[x y]] (and (<= 0 x limit) (<= 0 y limit))))
           (map (fn [[x y]] (+ y (* 4000000 x))))
-          first)))
-  )
-
-#_(defn parse [input]
-  (->> input
-       str/split-lines
-       (map common/parse-longs)))
-
-(defn overlap? [a b c d]
-  (and (<= c (inc b)) (>= d (dec a))))
-
-(defn combine [a b c d]
-  (when (overlap? a b c d)
-    [(min a c) (max b d)]))
-
-(defn no-beacons [[sx sy bx by] y-targ]
-  (let [mdist (+ (math/abs (- bx sx)) (math/abs (- by sy)))
-        vdist (math/abs (- y-targ sy))
-        hwid (- mdist vdist)]
-    (when (pos? hwid) [(- sx hwid) (+ sx hwid)])))
-
-(defn merge-spans [spans]
-  (reduce (fn [acc [minx maxx]]
-            (loop [[[a b :as n] & r] acc out [] minx minx maxx maxx]
-              (if-not n
-                (conj out [minx maxx])
-                (if-let [[minx maxx] (combine a b minx maxx)]
-                  (recur r out minx maxx)
-                  (recur r (conj out n) minx maxx)))))
-          []
-          spans))
-
-(def ^:dynamic *targ-row* 2000000)
-
-(def ^:dynamic *input* "input/2022/15-beacons.txt")
-
-(def ^:dynamic *max-coord* 4000000)
-
-(defn find-gaps [parsed max-x]
-  (fn [y]
-    (let [spans (->> parsed (keep #(no-beacons % y)) merge-spans)]
-      (when (some (fn [[lo hi]] (not (<= lo 0 max-x hi))) spans)
-        [y spans]))))
-
-(comment
-  ;; puzzle 1
-  (binding [*targ-row* *targ-row* #_10
-            *input* *input* #_"input/2022/15-beacons-sample.txt"]
-    (let [parsed (parse (slurp *input*))
-          spans (->> parsed
-                     (keep (fn [data] (no-beacons data *targ-row*)))
-                     merge-spans)
-          beacons (->> parsed
-                       (keep (fn [[_ _ bx by]]
-                               (when (some (fn [[lo hi]]
-                                             (and (= by *targ-row*)
-                                                  (<= lo bx hi)))
-                                           spans)
-                                 [bx by])))
-                       distinct)
-          lengths (->> spans (map (fn [[a b]] (+ 1 (- b a)))) (apply +))]
-      (- lengths (count beacons))))   ; => 6124805
+          first)))   ; => 12555527364986
   )
