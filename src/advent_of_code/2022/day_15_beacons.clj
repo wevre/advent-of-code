@@ -1,7 +1,8 @@
 (ns advent-of-code.2022.day-15-beacons
-  (:require [clojure.string :as str]
-            [advent-of-code.common :as common]
-            [clojure.java.math :as math]))
+  (:require [advent-of-code.common :as common]
+            [clojure.java.math :as math]
+            [clojure.math.combinatorics :as combo]
+            [clojure.string :as str]))
 
 ;; 2022-12-15 00:24
 ;;    This code isn't very inspiring. I'm too tired to be more clever here. My
@@ -14,6 +15,9 @@
 ;;    Did five runs down the ski hill, got lunch, attended a meeting at work and
 ;;    made sure my emails were caught up, then did a new approach for Part 2.
 ;;    Clocking in at 45 msecs, a 3000x improvement!
+;; 2022-12-15 18:27
+;;    Did some cleanup and some extensive commenting. Also using combinatorics I
+;;    got the runtime for Part 2 down to 11 msecs. Whoa!
 
 (defn xnaught
   "x-intercept of line with slope +1 passing through [x y]."
@@ -123,47 +127,36 @@
          (map (juxt identity #(m-dist % s1) #(m-dist % s2)))
          (keep (fn [[p da db]] (when (= (- d1 da) (- d2 db)) p))))))
 
-(defn find-beacon
+(defn find-outside-beacons
   "Find all the elbows between all the pairwise combinations of rects and keep
    only those elbows that are not inside any rects."
   [infos]
-  (loop [[info & rest] infos elbows #{} checked #{}]
-    ;; (1) Take new info and find all elbows from that info with existing rects.
-    ;; (2) combine new elbow with existing elbows and new info with existing rects.
-    ;; (3) Any elbows (new or old) that are _inside_ any rects (new or old) drop
-    ;; them. When we are all done, return elbows.
-    (if (not info)
-      elbows
-      (let [elbows (reduce #(into %1 (outside-elbows info %2)) elbows checked)
-            checked (conj checked info)
-            elbows (reduce (fn [acc elb]
-                             ;; if elb in question is outside of _every_ rect in
-                             ;; checked, then keep it
-                             (if (every? #(outside? elb %) checked)
-                               (conj acc elb)
-                               acc))
-                           #{}
-                           elbows)]
-        (recur rest elbows checked)))))
+  (->> (combo/combinations infos 2)
+       (keep #(apply outside-elbows %))
+       (apply concat)
+       distinct
+       (filter (fn [elb] (every? #(outside? elb %) infos)))))
+
+(defn parse [input]
+  (->> input
+       str/split-lines
+       (map common/parse-longs)
+       (map #(partition 2 %))
+       (map #(apply info<-sb %))))
 
 (comment
-  ;; puzzle 2
+  ;; puzzle 2 -- 11 msecs
   (time
    (let [limit 4000000 #_20
-         infos (->> (slurp "input/2022/15-beacons.txt")
-                    str/split-lines
-                    (map common/parse-longs)
-                    (map #(partition 2 %))
-                    (map #(apply info<-sb %1)))]
-     (->> (find-beacon infos)
+         infos (parse (slurp "input/2022/15-beacons.txt"))]
+     (->> infos
+          find-outside-beacons
           (filter (fn [[x y]] (and (<= 0 x limit) (<= 0 y limit))))
           (map (fn [[x y]] (+ y (* 4000000 x))))
           first)))
   )
 
-
-
-(defn parse [input]
+#_(defn parse [input]
   (->> input
        str/split-lines
        (map common/parse-longs)))
