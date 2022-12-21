@@ -46,4 +46,5 @@
   [node]
   (->> node
        (iterate ::prev)
+       (map #(dissoc % ::prev))
        (take-while identity)))

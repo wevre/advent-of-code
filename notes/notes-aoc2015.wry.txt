@@ -76,7 +76,7 @@
 
    ```
       (defn evaluator-f [env]
-      (memoize
+        (memoize
          (fn [f sym]
          (let [v (get env sym sym)]
             (cond

@@ -20,6 +20,13 @@
 ;;    got the runtime for Part 2 down to 11 msecs. Whoa!
 ;; 2022-12-15 18:52
 ;;    New code for Part 1 that makes use of the approach I developed for Part 2.
+;; 2022-12-16 09:37
+;;    This approach is probably more elaborate than it needs to be. Another,
+;;    perhaps simpler, approach would be to examine all the intersections of the
+;;    diagonal lines _just outside_ each rectangle. Where those lines intersect
+;;    for two rectangles would be the points that I'm calling 'elbows'. In the
+;;    end that alternate approach would probably be about the same about of
+;;    code, and probably run about the same amount of time.
 
 (defn xnaught
   "x-intercept of line with slope +1 passing through [x y]."
