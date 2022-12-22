@@ -70,3 +70,11 @@
 
 (defn points-along [[x1 y1] [x2 y2]]
   (map vector (range-x x1 x2) (range-x y1 y2)))
+
+(defn z-combinator
+  "Call with a function that you want to memoize and also call recursively. The
+   function provided will be passed a function as its first parameter, and it is
+   this passed-in function that must be called for recursion."
+  [g]
+  (let [fix (fn [f] (fn g [& args] (apply f g args)))]
+    (fix (memoize g))))
