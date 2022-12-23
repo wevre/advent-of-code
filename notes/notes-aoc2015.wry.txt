@@ -78,7 +78,7 @@
       (defn evaluator-f [env]
         (memoize
          (fn [f sym]
-         (let [v (get env sym sym)]
+           (let [v (get env sym sym)]
             (cond
                (integer? v) v
                (symbol? v) (f f v)
@@ -99,14 +99,14 @@
    languages where recursion isn't possible (because, for example, we _only_
    have anonymous functions). They use the trick of passing in the `recur-fn`,
    but it is abstracted out into a helper, fixed-point combinator function. The
-   result is we still have to define our core function with the `recur-fn`
-   parameter, but we can leave it out in all the calls.
+   result is we still have to define our core function with the additional
+   `recur-fn` parameter, but we can leave it out in all the calls.
 
    Here is the `fix` function (which is also the Y-combinator, or maybe more
    correctly the Z-combinator):
 
    ```
-      (defn fix [f] (fn g [& args] (apply f g args)))
+      (defn fix [f] (fn z [& args] (apply f z args)))
 
    And now our evaluator becomes:
 
@@ -122,10 +122,10 @@
                :else (apply (first v) (map f (rest v)))))))))
 
    Note that we use the `recur-fn` function (here called `f`) as in the
-   original, without needed to pass it an extra function. This version is almost
-   identical to the original above, except `f` is a parameter (instead of being
-   the `name`) and we have to `fix` the function before we can use it. But we
-   gain the ability to memoize along the way. Pretty cool.
+   original, without needing to pass it an extra function. This version is
+   almost identical to the original above, except `f` is a parameter (instead of
+   being the `name`) and we have to `fix` the function before we can use it. But
+   we gain the ability to memoize along the way. Pretty cool.
 
    Here are two articles that explain these combinators.
 

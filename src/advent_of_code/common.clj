@@ -72,9 +72,17 @@
   (map vector (range-x x1 x2) (range-x y1 y2)))
 
 (defn z-combinator
-  "Call with a function that you want to memoize and also call recursively. The
-   function provided will be passed a function as its first parameter, and it is
-   this passed-in function that must be called for recursion."
+  "Takes function `g` of n+1 parameters, the first being a memoized function to
+   be called recursively with the other n.
+
+   ```
+   (defn my-memoized-recursive-fn [args to close over]
+     (z-combinator
+      (fn [f arg1 ... argn]
+        ...
+        (f val1 ... valn)))
+   ```
+  "
   [g]
-  (let [fix (fn [f] (fn g [& args] (apply f g args)))]
+  (let [fix (fn [f] (fn z [& args] (apply f z args)))]
     (fix (memoize g))))
