@@ -31,13 +31,13 @@
    (fn g
      ([f loc valves elephant?] (g f minutes loc valves elephant?))
      ([f t loc valves elephant?]
-      (let [forks (fn [v]
-                    (let [t (- t (dists [loc v]) 1)]
-                      (when (>= t 0)
-                        (f t v (disj valves v) elephant?))))
-            init (if elephant? (f minutes "AA" valves false) 0)]
-        (+ (* t (get-in directory [loc :pressure]))
-           (transduce (keep forks) max init valves)))))))
+      (+ (* t (get-in directory [loc :pressure]))
+         (transduce (keep (fn [v]
+                            (let [t (- t (dists [loc v]) 1)]
+                              (when (>= t 0) (f t v (disj valves v) elephant?)))))
+                    max
+                    (if elephant? (f minutes "AA" valves false) 0)
+                    valves))))))
 
 (comment
   ;; puzzle 1 -- ~1s (about half of that is the F-W algorithm)
