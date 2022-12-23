@@ -23,33 +23,29 @@
       (reduced p)
       ∆p)))
 
-(defn prune [cnt h i blocks {:keys [mod-i ∆cnt ∆h]}]
-  (let [q (quot cnt ∆cnt)]
-    (if (and (= i mod-i) (< 0 q))
-      (let [cnt (- cnt (* q ∆cnt))
-            h (+ h (* q ∆h))
-            _ (println "pruning cnt" cnt "h" h "i" i mod-i)
-            _ (println "size of blocks" (count blocks))]
-        [cnt h (reduce (fn [m [k _]] (assoc m (add [0 (* q ∆h)] k) \@)) {} blocks) #_(update-keys blocks #(add [0 (* q ∆h)] %)) #_(into {} (for [x (range 7)] [[x h] \_]))])
-      [cnt h blocks])))
-
-(defn move [reset]
-  (fn [cnt loc blocks h shapes [[jet i] & jets]]
-    (let [shape (first shapes)]
-      (if-not (pos? cnt)
-        {:h h :blocks blocks}
-        (let [loc (-> loc (blow shape jet blocks) (fall shape blocks))]
-          (if (reduced? loc)
-            (let [loc (unreduced loc)
-                  ∆shape (map #(add loc %) (:blocks shape))
-                  h (reduce (fn [h [_ y]] (max h y)) h ∆shape)
-                  blocks (into blocks (map vector ∆shape (repeat (:name shape))))
-                  _ (when (= i (:mod-i reset)) (println "shape" (:name shape)))
-                  _ (when (and (= i (:mod-i reset)) (= (:loc-x reset) (first loc)) (= \- (:name shape))) (println "before i" i "cnt" cnt "h" h "loc" loc))
-                  [cnt h blocks] (prune cnt h i blocks reset)
-                  _ (when (and (= i (:mod-i reset)) (= (:loc-x reset) (first loc)) (= \- (:name shape))) (println "after i" i "cnt" cnt "h" h "blocks" (take 10 blocks)))]
-              (recur (dec cnt) [2 (+ h 4)] blocks h (rest shapes) jets))
-            (recur cnt loc blocks h shapes jets)))))))
+(defn move [{:keys [mod-i ∆cnt ∆h loc-x]} jets]
+  (let [prune (fn [[cnt h blocks :as vals] i loc shape]
+                (let [q (quot cnt ∆cnt)]
+                  (if (and (= i mod-i) (= (first loc) loc-x) (= \- (:name shape)) (< 0 q))
+                    (let [cnt (- cnt (* q ∆cnt))
+                          h (+ h (* q ∆h))]
+                      [cnt h (reduce (fn [m [k _]] (assoc m (add [0 (* q ∆h)] k) \@)) {} blocks)])
+                    vals)))]
+    (fn move
+      ([cnt] (move cnt [2 3] (into {} (for [x (range 7)] [[x -1] \_])) 0 (cycle shapes) (cycle (map vector jets (range)))))
+      ([cnt loc blocks h shapes [[jet i] & jets]]
+       (let [shape (first shapes)]
+         (if-not (pos? cnt)
+           {:h h :blocks blocks}
+           (let [loc (-> loc (blow shape jet blocks) (fall shape blocks))]
+             (if (reduced? loc)
+               (let [loc (unreduced loc)
+                     ∆shape (map #(add loc %) (:blocks shape))
+                     h (reduce (fn [h [_ y]] (max h y)) h ∆shape)
+                     blocks (into blocks (map vector ∆shape (repeat (:name shape))))
+                     [cnt h blocks] (prune [cnt h blocks] i loc shape)]
+                 (recur (dec cnt) [2 (+ h 4)] blocks h (rest shapes) jets))
+               (recur cnt loc blocks h shapes jets)))))))))
 
 (defn printout [h blocks]
   (doseq [y (range 30)
@@ -61,11 +57,7 @@
   (time
    (let [jets #_">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>" (slurp "input/2022/17-jet-pattern.txt")
          reset #_{:mod-i 37 :∆cnt 35 :∆h 53 :loc-x 1}      {:mod-i 104 :∆cnt 1735 :∆h 2781 :loc-x 0}
-         p [2 3]
-         blocks (into {} (for [x (range 7)] [[x -1] \_]))
-         shapes (cycle shapes)
-         jets (cycle (map vector jets (range)))
-         {:keys [h blocks]} ((move reset) 2022 p blocks 0 shapes jets)]
+         {:keys [h blocks]} ((move reset jets) 2022)]
      (println "tower height" (inc h))
      (printout (+ h 3) blocks)))   ; => 3206
 
@@ -73,11 +65,7 @@
   (time
    (let [jets #_">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>" (slurp "input/2022/17-jet-pattern.txt")
          reset #_{:mod-i 37 :∆cnt 35 :∆h 53 :loc-x 1}      {:mod-i 104 :∆cnt 1735 :∆h 2781 :loc-x 0}
-         p [2 3]
-         blocks (into {} (for [x (range 7)] [[x -1] \_]))
-         shapes (cycle shapes)
-         jets (cycle (map vector jets (range)))
-         {:keys [h blocks]} ((move reset) 1000000000000 p blocks 0 shapes jets)]
+         {:keys [h blocks]} ((move reset jets) 1000000000000)]
      (println "tower height" (inc h))
      (printout (+ h 3) blocks)))   ; => 1602881844347
   )
@@ -102,6 +90,6 @@
 ;;    can fast-forward shapes and heights until it comes closer to the desired
 ;;    n, and then we'll just do normal processing from that point forward.
 ;;
-;;   Something is not right with my choice of reset for the puzzle input. I need
-;;   to re-examine that. It works on the sample puzzle, because only pulling
-;;   2022 shapes we never hit a reset.
+;;    This code works great, but it is a bit ungainly. Not sure how much time I
+;;    to spent trying to clean it up. Maybe I could separate the placing of a
+;;    block into a separate function/loop.
