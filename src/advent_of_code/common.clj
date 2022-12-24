@@ -1,6 +1,7 @@
 (ns advent-of-code.common
   (:require [clojure.string :as str]
-            [clojure.walk :as walk]))
+            [clojure.walk :as walk])
+  (:import [clojure.lang PersistentQueue]))
 
 (defn locmap<-digits
   ([s] (locmap<-digits s identity))
@@ -86,3 +87,6 @@
   [g]
   (let [fix (fn [f] (fn z [& args] (apply f z args)))]
     (fix (memoize g))))
+
+;; another handy gem from @zelark
+(defn queue [& args] (into PersistentQueue/EMPTY args))

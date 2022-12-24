@@ -22,13 +22,12 @@
     (open-faces lava))   ; => 3412
   )
 
-;; NOTE: My input cubes range from [0 0 0] to [18 19 19], so an envelope from
+;; NOTE: My input ranges from [0 0 0] to [18 19 19], so an envelope from
 ;; [-1 -1 -1] to [19 20 20] completely encases.
 
 (defn flood [p cubes]
-  (loop [frontier (into clojure.lang.PersistentQueue/EMPTY [p]) cubes cubes]
+  (loop [frontier (common/queue p) cubes cubes]
     (if-let [p (peek frontier)]
-      ;; If position `p` is :air enqueue its neighbors and change it to :steam.
       (recur (cond-> (pop frontier) (#{:air} (cubes p)) (into (nighs p cubes)))
              (update cubes p #({:air :steam} % %)))
       cubes)))
@@ -39,6 +38,7 @@
    (repeat :air)))
 
 (comment
+  ;; puzzle 2
   (let [lava (parse #_sample (slurp "input/2022/18-droplets.txt"))
         air (->> (merge (build-world 20 21 21) lava)
                  (flood [-1 -1 -1])
