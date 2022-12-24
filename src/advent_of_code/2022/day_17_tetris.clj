@@ -53,7 +53,7 @@
     (println (str/join row))))
 
 (comment
-  ;; part 1 -- ~164msecs
+  ;; puzzle 1 -- ~164msecs
   (time
    (let [jets #_">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>" (slurp "input/2022/17-jet-pattern.txt")
          reset #_{:mod-i 37 :∆cnt 35 :∆h 53 :loc-x 1}      {:mod-i 104 :∆cnt 1735 :∆h 2781 :loc-x 0}
@@ -61,7 +61,7 @@
      (println "tower height" (inc h))
      (printout (+ h 3) blocks)))   ; => 3206
 
-  ;; part 2 -- ~175msecs
+  ;; puzzle 2 -- ~175msecs
   (time
    (let [jets #_">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>" (slurp "input/2022/17-jet-pattern.txt")
          reset #_{:mod-i 37 :∆cnt 35 :∆h 53 :loc-x 1}      {:mod-i 104 :∆cnt 1735 :∆h 2781 :loc-x 0}
