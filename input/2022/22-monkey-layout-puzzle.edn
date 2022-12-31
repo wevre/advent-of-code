@@ -1,0 +1,59 @@
+;;      0 1
+;;      2
+;;    3 4
+;;    5
+
+{0 {:layout [0 1]
+    :flat {:up    {:face 4 :row :cmpr :col :col  :dir :up}
+           :down  {:face 2 :row :cmpr :col :col  :dir :down}
+           :left  {:face 1 :row :row  :col :cmpc :dir :left}
+           :right {:face 1 :row :row  :col :cmpc :dir :right}}
+    :fold {:up    {:face 5 :row :col  :col :row  :dir :right}
+           :down  {:face 2 :row :cmpr :col :col  :dir :down}
+           :left  {:face 3 :row :cmpr :col :col  :dir :right}
+           :right {:face 1 :row :row  :col :cmpc :dir :right}}}
+ 1 {:layout [0 2]
+    :flat {:up    {:face 1 :row :cmpr :col :col  :dir :up}
+           :down  {:face 1 :row :cmpr :col :col  :dir :down}
+           :left  {:face 0 :row :row  :col :cmpc :dir :left}
+           :right {:face 0 :row :row  :col :cmpc :dir :right}}
+    :fold {:up    {:face 5 :row :cmpr :col :col  :dir :up}
+           :down  {:face 2 :row :col  :col :row  :dir :left}
+           :left  {:face 0 :row :row  :col :cmpc :dir :left}
+           :right {:face 4 :row :cmpr :col :col  :dir :left}}}
+ 2 {:layout [1 1]
+    :flat {:up    {:face 0 :row :cmpr :col :col  :dir :up}
+           :down  {:face 4 :row :cmpr :col :col  :dir :down}
+           :left  {:face 2 :row :row  :col :cmpc :dir :left}
+           :right {:face 2 :row :row  :col :cmpc :dir :right}}
+    :fold {:up    {:face 0 :row :cmpr :col :col  :dir :up}
+           :down  {:face 4 :row :cmpr :col :col  :dir :down}
+           :left  {:face 3 :row :col  :col :row  :dir :down}
+           :right {:face 1 :row :col  :col :row  :dir :up}}}
+ 3 {:layout [2 0]
+    :flat {:up    {:face 5 :row :cmpr :col :col  :dir :up}
+           :down  {:face 5 :row :cmpr :col :col  :dir :down}
+           :left  {:face 4 :row :row  :col :cmpc :dir :left}
+           :right {:face 4 :row :row  :col :cmpc :dir :right}}
+    :fold {:up    {:face 2 :row :col  :col :row  :dir :right}
+           :down  {:face 5 :row :cmpr :col :col  :dir :down}
+           :left  {:face 0 :row :cmpr :col :col  :dir :right}
+           :right {:face 4 :row :row  :col :cmpc :dir :right}}}
+ 4 {:layout [2 1]
+    :flat {:up    {:face 2 :row :cmpr :col :col  :dir :up}
+           :down  {:face 0 :row :cmpr :col :col  :dir :down}
+           :left  {:face 3 :row :row  :col :cmpc :dir :left}
+           :right {:face 3 :row :row  :col :cmpc :dir :right}}
+    :fold {:up    {:face 2 :row :cmpr :col :col  :dir :up}
+           :down  {:face 5 :row :col  :col :row  :dir :left}
+           :left  {:face 3 :row :row  :col :cmpc :dir :left}
+           :right {:face 1 :row :cmpr :col :col  :dir :left}}}
+ 5 {:layout [3 0]
+    :flat {:up    {:face 3 :row :cmpr :col :col  :dir :up}
+           :down  {:face 3 :row :cmpr :col :col  :dir :down}
+           :left  {:face 5 :row :row  :col :cmpc :dir :left}
+           :right {:face 5 :row :row  :col :cmpc :dir :right}}
+    :fold {:up    {:face 3 :row :cmpr :col :col  :dir :up}
+           :down  {:face 1 :row :cmpr :col :col  :dir :down}
+           :left  {:face 0 :row :col  :col :row  :dir :down}
+           :right {:face 4 :row :col  :col :row  :dir :up}}}}

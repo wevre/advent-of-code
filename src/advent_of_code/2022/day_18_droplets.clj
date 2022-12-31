@@ -1,7 +1,7 @@
 (ns advent-of-code.2022.day-18-droplets
   (:require [advent-of-code.common :as common]))
 
-(defn add [& ps] (apply mapv + ps))
+(defn- add [& ps] (apply mapv + ps))
 
 (def ∆3d [[0 0 -1] [0 0 +1] [0 -1 0] [0 +1 0] [-1 0 0] [+1 0 0]])
 
