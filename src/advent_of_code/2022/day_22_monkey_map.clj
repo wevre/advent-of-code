@@ -3,7 +3,8 @@
             [clojure.string :as str]
             [clojure.edn :as edn]))
 
-;; NOTE: What I'm calling 'board space' is the original columns and rows of the
+;; NOTE:
+;;    What I'm calling 'board space' is the original columns and rows of the
 ;;    input map, (although I'm indexing from 0, not 1 as in the problem
 ;;    description); 'layout' space is measured in coordinates of size `dim` from
 ;;    upper-left corner of map, giving location of faces; 'face' space is
@@ -114,5 +115,35 @@
 ;;    else actually did that. Yikes. I just looked at the puzzle data and
 ;;    created a layout map that captured how edges would come together and how
 ;;    the direction would change as you crossed over the edges. For the flat map
-;;    those transitions are simple (and identical for all six faces). For the
-;;    fold version of things it is a little more complicated.
+;;    those transitions are simple (and identical for all six faces) and I could
+;;    have done it more in logic rather than hard-coding it. But whatever. For
+;;    the fold version of things it is a little more complicated. And of course
+;;    it only works for my puzzle input. A different input would need its own
+;;    layout edn file with the proper transitions worked out.
+;;
+;;    Okay saw a discussion on reddit and the general solution wouldn't be _too_
+;;    hard (not that I'm going to do it). You can pick one of the faces to be
+;;    TOP, and then recursively identify FRONT, BOTTOM, BACK, LEFT, RIGHT. Then
+;;    transitions are a function of how you leave one face (north, south, east,
+;;    west) and enter the other. (Note that this poster decided to use one set
+;;    of names to identify faces, and cardinal directions for travel
+;;    directions.) For example, leaving one face on the north and entering the
+;;    next face on the south, means you maintain travel direction, and columns
+;;    stay the same, and rows flip. Leaving one face from north and entering
+;;    section on west would be a 90 degree rotation (flip rows and cols). And so
+;;    forth.
+;;
+;;    I thought about this some more, did some drawing, and there are really
+;;    only 4 types of transitions.
+;;
+;;    * N-W, S-E: row and column switch, like mirroring across y=x line.
+;;
+;;    * N-E, S-W: mirror across y=-x line, row<->comp-c, col<->comp-r
+;;
+;;    * N-S, E-E, W-W: mirror across y=0 line, row<->comp-r, col<->col
+;;
+;;    * E-W, N-N, S-S: mirror across x=0 line, row<->row, col<->comp-c
+;;
+;;    So my elaborate layout map could be simplified quite a bit, by just
+;;    capturing one of these four transitions instead of spelling out the
+;;    individual row/col functions.
