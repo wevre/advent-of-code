@@ -40,7 +40,7 @@
 (defn route [t {:as info :keys [start end]}]
   (let [nexts (nexter info)]
     (loop [t t locs #{start}]
-      (if (some #{end} locs)
+      (if (locs end)
         t
         (recur (inc t) (set (mapcat (partial nexts t) locs)))))))
 
