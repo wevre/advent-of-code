@@ -25,16 +25,16 @@
                     (update loc idx #(mod-1 (+ % (* s off)) wid))))
         clamp-r (clamper 0 rows)
         clamp-c (clamper 1 cols)
-        windy? (fn [t loc]
-                 (keep (fn [[b [f s]]] (get-in blizzards [b (f loc t s)]))
-                       {\> [clamp-c -1] \< [clamp-c +1]
-                        \v [clamp-r -1] \^ [clamp-r +1]}))]
+        clear? (fn [t loc]
+                 (empty?
+                  (keep (fn [[b [f s]]] (get-in blizzards [b (f loc t s)]))
+                        {\> [clamp-c -1] \< [clamp-c +1]
+                         \v [clamp-r -1] \^ [clamp-r +1]})))]
     (fn [t loc]
       (for [∆ [[0 0] [-1 0] [1 0] [0 -1] [0 1]]
             :let [[r c :as loc] (v/add loc ∆)]
             :when (or (= loc start) (= loc end)
-                      (and (<= 1 r rows) (<= 1 c cols)
-                           (empty? (windy? (inc t) loc))))]
+                      (and (<= 1 r rows) (<= 1 c cols) (clear? (inc t) loc)))]
         [r c]))))
 
 (defn route [t {:as info :keys [start end]}]
@@ -50,13 +50,13 @@
    (let [info (parse (slurp "input/2022/24-blizzards.txt"))]
      (route 0 info))) ; => 245
 
-  ;; puzzle 2 -- 6.3s
+  ;; puzzle 2 -- ~6.5s
   (time
    (let [info (parse (slurp "input/2022/24-blizzards.txt"))]
      (-> 0
          (route info)
          (route (set/rename-keys info {:start :end :end :start}))
-         (route info))))
+         (route info))))   ; => 798
   )
 
 ;; Some thoughts:
