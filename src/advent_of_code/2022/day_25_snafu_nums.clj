@@ -13,7 +13,7 @@
       (apply str acc)
       (let [r (rem n 5)
             carry (if (<= 3 r 4) 1 0)]
-        (recur (conj acc (ufans r)) (+ (/ (- n r) 5) carry))))))
+        (recur (conj acc (ufans r)) (+ (quot n 5) carry))))))
 
 (comment
   ;; puzzle 1
