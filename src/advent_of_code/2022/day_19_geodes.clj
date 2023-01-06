@@ -3,13 +3,15 @@
             [clojure.math :as math]
             [clojure.string :as str]))
 
+(def the-robots [:ore :clay :obsidian :geode])
+
 (defn- blueprint [b c d e f g]
   {:ore {:ore b}
    :clay {:ore c}
    :obsidian {:ore d :clay e}
    :geode {:ore f :obsidian g}})
 
-(defn- state<- [a b c d] {:ore a :clay b :obsidian c :geode d})
+(defn- state<- [a b c d] (zipmap the-robots [a b c d]))
 
 (defn parse [input]
   (->> input
@@ -25,82 +27,33 @@
                       ##Inf)))
        (apply max 0)))
 
-(comment
-  (let [blueprints (parse (slurp "input/2022/19-geodes-sample.txt"))
-        blueprint (:blueprint (first blueprints))
-        state {:minute 0
-               :robots (state<- 1 0 0 0)
-               :resources (state<- 5 0 0 0)}]
-    (map (fn [robot] [robot (time-to-build state (robot blueprint))]) [:ore :clay :obsidian :geode])))
-
 (defn- capacity [blueprint]
   (assoc (apply merge-with max (vals blueprint)) :geode ##Inf))
-
-(comment
-  (let [blueprints (parse (slurp "input/2022/19-geodes-sample.txt"))
-        blueprint (:blueprint (first blueprints))]
-    (capacity blueprint)))
 
 (defn- harvest [resources robots time]
   (merge-with + resources (update-vals robots #(* % time))))
 
-(comment
-  (let [state {:minute 0
-               :robots (state<- 1 1 0 0)
-               :resources (state<- 1 2 0 0)}]
-    (harvest (:resources state) (:robots state) 2)))
-
 (defn- pay [resources cost]
   (merge-with - resources cost))
 
-(comment
-  (let [blueprints (parse (slurp "input/2022/19-geodes-sample.txt"))
-        blueprint (:blueprint (first blueprints))
-        state {:minute 0
-               :robots (state<- 1 0 0 0)
-               :resources (state<- 5 0 0 0)}]
-    (pay (:resources state) (:ore blueprint))))
-
-(defn- build
-  "Return a state in the future when `robot` is built, or nil."
-  [{:as state :keys [minute robots resources]} robot blueprint]
-  (let [cost (robot blueprint)
-        time (time-to-build state cost)]
-    (when (< time ##Inf)
-      {:minute (+ minute (inc time))
-       :robots (update robots robot inc)
-       :resources (-> resources
-                      (harvest robots (inc time))
-                      (pay cost))})))
-
-(comment
-  (let [blueprints (parse (slurp "input/2022/19-geodes-sample.txt"))
-        blueprint (:blueprint (first blueprints))
-        state {:minute 10
-               :robots (state<- 1 3 0 0)
-               :resources (state<- 4 15 0 0)}]
-    (map (fn [robot] (build state robot blueprint)) [:ore :clay :obsidian :geode])))
-
-(defn next-states
-  "Return future states where we've built each (possible) robot."
-  [state blueprint]
+(defn- builder [blueprint]
   (let [most-needed (capacity blueprint)]
-    (->> [:ore :clay :obsidian :geode]
-         (filter #(< (-> state :robots %) (most-needed %)))
-         (keep #(build state % blueprint)))))
-
-(comment
-  (let [blueprints (parse (slurp "input/2022/19-geodes-sample.txt"))
-        blueprint (:blueprint (first blueprints))
-        state {:minute 0
-               :robots (state<- 1 14 0 0)
-               :resources (state<- 0 0 0 0)}]
-    (next-states state blueprint)))
+    (fn [{:as state :keys [minute robots resources]}]
+      (for [robot the-robots
+            :when (< (-> state :robots robot) (most-needed robot))
+            :let [cost (robot blueprint)
+                  time (time-to-build state cost)]
+            :when (< time ##Inf)]
+        {:minute (+ minute (inc time))
+         :robots (update robots robot inc)
+         :resources (-> resources
+                        (harvest robots (inc time))
+                        (pay cost))}))))
 
 (defn- geodes<- [state] (-> state :resources :geode))
 
 (defn- hypot-geodes
-  "Most geodes possible, assuming no resource constraints."
+  "Most geodes possible, assuming new robot every minute."
   [state stop]
   (let [time (- stop (:minute state))]
     (+ (geodes<- state)
@@ -117,8 +70,7 @@
     (if (and (empty? nexts) (pos? time))
       (list {:minute stop
              :robots robots
-             :resources (-> resources
-                            (harvest robots time))})
+             :resources (-> resources (harvest robots time))})
       nexts)))
 
 (defn- cull [blueprint state]
@@ -127,63 +79,47 @@
   (let [most-needed (capacity blueprint)]
     (update state :resources (partial merge-with min) most-needed)))
 
-(defn nexts [state stop leader blueprint]
-  (->> (next-states state blueprint)
-       (prune stop leader)
-       (graft stop state)
-       #_
-       (map #(cull blueprint %))))
+(defn next-stepper [stop blueprint]
+  (let [build (builder blueprint)]
+    (fn [state leader]
+      (->> (build state)
+           (prune stop leader)
+           (graft stop state)
+           #_(map #(cull blueprint %))))))
+
+(defn get-cracking [state stop blueprint]
+  (let [nexts (next-stepper stop blueprint)]
+    (loop [frontier [state] leader state seen #{state}]
+      (if-let [state (peek frontier)]
+        (let [nighs (remove seen (nexts state leader))]
+          (recur (into (pop frontier) nighs)
+                 (reduce (fn [l n] (if (> (geodes<- n) (geodes<- l)) n l)) leader nighs)
+                 (into seen nighs)))
+        leader))))
 
 (comment
-  (let [blueprints (parse (slurp "input/2022/19-geodes-sample.txt"))
-        blueprint (:blueprint (first blueprints))
-        stop 24
-        leader 0
-        state {:minute 23
-               :robots (state<- 4 14 1 0)
-               :resources (state<- 0 14 0 0)}]
-    (nexts state stop leader blueprint)))
+  ;; puzzle 1 -- 3.8s
+  (time
+   (let [blueprints (parse (slurp "input/2022/19-geodes.txt"))
+         #_#_blueprint (:blueprint (second blueprints))
+         stop 24
+         state {:minute 0
+                :robots (state<- 1 0 0 0)
+                :resources (state<- 0 0 0 0)}]
+     (->> blueprints
+          (pmap (fn [{:keys [id blueprint]}] [id (get-cracking state stop blueprint)]))
+          (map (fn [[id state]] (* id (geodes<- state))))
+          (apply +))))   ; => 1487
 
-(defn geodes [state stop blueprint]
-  (loop [frontier [state] leader state seen #{state}]
-    (if-let [state (peek frontier)]
-      (let [nighs (remove seen (nexts state stop leader blueprint))]
-        (recur (into (pop frontier) nighs)
-               (reduce (fn [l n] (if (> (geodes<- n) (geodes<- l)) n l)) leader nighs)
-               #_
-               (transduce (map (comp :geode :resources)) max leader nighs)
-               (into seen nighs)))
-      leader)))
-
-(comment
-  ;; puzzle 1
-  (let [blueprints (parse (slurp "input/2022/19-geodes.txt"))
-        #_#_blueprint (:blueprint (second blueprints))
-        stop 24
-        state {:minute 0
-               :robots (state<- 1 0 0 0)
-               :resources (state<- 0 0 0 0)}]
-    (->> blueprints
-         (pmap (fn [{:keys [id blueprint]}] [id (geodes state stop blueprint)]))
-         (map (fn [[id state]] (* id (geodes<- state))))
-         (apply +)))   ; => 1487
-
-  ;; puzzle 2
-  (let [blueprints (take 3 (parse (slurp "input/2022/19-geodes.txt")))
-        stop 32
-        state {:minute 0
-               :robots (state<- 1 0 0 0)
-               :resources (state<- 0 0 0 0)}]
-    (->> blueprints
-         (pmap (fn [{:keys [blueprint]}] (geodes state stop blueprint)))
-         (map geodes<-)
-         (apply *)))   ; I'm getting 77 but that is not correct. Aargh! Duh! multiply, not add.
+  ;; puzzle 2 -- 30s
+  (time
+   (let [blueprints (take 3 (parse (slurp "input/2022/19-geodes.txt")))
+         stop 32
+         state {:minute 0
+                :robots (state<- 1 0 0 0)
+                :resources (state<- 0 0 0 0)}]
+     (->> blueprints
+          (pmap (fn [{:keys [blueprint]}] (get-cracking state stop blueprint)))
+          (map geodes<-)
+          (apply *))))   ; I'm getting 77 but that is not correct. Aargh! Duh! multiply, not add.
   )
-
-;; This was my third build of the logic because I was stumped on Part 2, not
-;; realizing that I needed to _multiply_ the answers, not _add_ them.
-
-;; But anyway, I want to refactor this code because I don't like to pass around
-;; `blueprint` and friends to every function. I prefer to have functions that
-;; close around them and return a function to do the work. So I want to make
-;; those cleanups and then I'll rest for a season.
