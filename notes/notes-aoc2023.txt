@@ -1,0 +1,20 @@
+:project Advent of Code 2022
+   :created 2022-12-01
+   :author Mike Weaver
+
+:section Day 01
+
+   My son Isaac was watching me as I hurried to try and do the puzzles before
+   taking him to school. He was more interested in the "story" for 2023. Puzzle
+   1 was really quick and I was showing him the story and the code and hadn't
+   scrolled down yet to see what puzzle 2 was about, but I correclty predicted
+   to him that it would probably involve the "one" "two" etc that we were seeing
+   in the sample input. That turned out to be correct.
+
+   I _did_ notice that some of the words overlapped, but at first I didn't
+   consider that valid: I thought "eightwo" should be parsed as "eight" "wo" and
+   become only 8. Running my code on the sample data taught me that wasn't
+   correct. Then I forgot that, for capture groups, re-seq returns a _vector_ of
+   the matches. Unfortunately, my code still worked (in the sense that it didn't
+   throw an exception) and just returned wrong values, so it took a while to
+   realize.
