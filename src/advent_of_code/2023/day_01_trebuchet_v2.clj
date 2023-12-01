@@ -1,9 +1,8 @@
 (ns advent-of-code.2023.day-01-trebuchet-v2
-  (:require [clojure.string :as str]))
+  (:require [clojure.pprint :as pp]
+            [clojure.string :as str]))
 
-(def digit<-word {"one"   "1", "two"   "2", "three" "3",
-                  "four"  "4", "five"  "5", "six"   "6",
-                  "seven" "7", "eight" "8", "nine"  "9"})
+(def digit<-word (into {} (map (fn [x] [(pp/cl-format nil "~r" x) x])) (range 1 10)))
 
 (defn get-or [m k] (get m k k))
 
