@@ -10,7 +10,10 @@
 (defn first-digit [txf s src-re]
   (get-or digit<-word (txf (first (re-seq (re-pattern (txf src-re)) (txf s))))))
 
-(defn calib-number<- [src-re]
+(defn calib-number<-
+  "Create two-digit number from first and last match on string, last match comes
+   from reversing both the string and the regex."
+  [src-re]
   (fn [s]
     (parse-long (str (first-digit identity s src-re)
                      (first-digit str/reverse s src-re)))))
