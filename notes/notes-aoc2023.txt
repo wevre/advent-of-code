@@ -19,3 +19,8 @@
    middle of the transormation chain, my code still sort of worked (in the sense
    that it didn't throw an exception) but just returned wrong values, so it took
    a while to realize.
+
+   Another way to do this, after reading some of the comments on Clojurians
+   slack, is to just find the first match of "1|one|2|two..." and the _last_
+   match "1|eno|2|owt|..." and then keep just those. This doesn't care about
+   overlaps because you just need the first/outermost match.
