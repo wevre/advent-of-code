@@ -24,3 +24,30 @@
    slack, is to just find the first match of "1|one|2|two..." and the _last_
    match "1|eno|2|owt|..." and then keep just those. This doesn't care about
    overlaps because you just need the first/outermost match.
+
+:section Day 02
+
+   Was it just me or was this much easier than Day 01? I read the problem and
+   thought: I only need to know the maximum number of each color pulled out of
+   the bag. I don't really need to know (or at least, hopefully when puzzle 2 is
+   revealed, I won't need to know) how many sets were drawn for each game, or if
+   a set only had one color or any of those details like that. So I didn't model
+   sets when I parsed, I just read in a stream of digits and colors, partitioned
+   them into groups of two, and reduced them into a map keeping track of the max
+   number of cubes seen for each color.
+
+   It was a good gamble, because puzzle 2 also relied only on those max values.
+
+   I did do one refactor for puzzle 2, however. My original keep-only-max map
+   was keyed by strings. But when I got to puzzle 2, I wanted to destructure my
+   map keys, and ... wait. I can destructure string keys! I forgot. I thought I
+   had to turn my colors from strings into keywords so I could destructure them,
+   but no, I can destructure string keys. Wow! I forgot about that. I'm going to
+   go change that right now.
+
+   So, that's done. As I was saying above, I refactored my keys from strings
+   into keywords when I got to puzzle 2. But now I've done a second refactor
+   that cancels that out and I'm back to strings as keys, so and I guess I can
+   say that net of all these tweaks, I didn't have to change my approach for the
+   second puzzle (even though for a brief moment I did---we'll just say that was
+   explorative programming, or research, or "art").

@@ -3,16 +3,16 @@
 
 (defn parse-info [s]
   (let [[game-id & info] (re-seq #"\d+|blue|green|red" s)]
-    (reduce (fn [m [n k]] (update m (keyword k) max (parse-long n)))
-            {:blue 0 :green 0 :red 0 :game (parse-long game-id)}
+    (reduce (fn [m [n k]] (update m k max (parse-long n)))
+            {"blue" 0 "green" 0 "red" 0 :game (parse-long game-id)}
             (partition 2 info))))
 
-(def limits {:blue 14 :green 13 :red 12})
+(def limits {"blue" 14 "green" 13 "red" 12})
 
 (defn ?possible [game-info]
   (->> (merge-with - limits game-info) vals (not-any? neg?)))
 
-(defn power [{:keys [blue green red]}] (* blue green red))
+(defn power [{:strs [blue green red]}] (* blue green red))
 
 (defn games<- [input] (->> input slurp str/split-lines (map parse-info)))
 
