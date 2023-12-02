@@ -4,7 +4,8 @@
 (defn parse-info [s]
   (let [[game-id & info] (re-seq #"\d+|blue|green|red" s)]
     (reduce (fn [m [n k]] (update m (keyword k) max (parse-long n)))
-            {:blue 0 :green 0 :red 0 :game (parse-long game-id)} (partition 2 info))))
+            {:blue 0 :green 0 :red 0 :game (parse-long game-id)}
+            (partition 2 info))))
 
 (def limits {:blue 14 :green 13 :red 12})
 
