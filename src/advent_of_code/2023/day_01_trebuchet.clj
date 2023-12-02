@@ -20,13 +20,12 @@
    + lines))
 
 (comment
-
-  (let [input (slurp "input/2023/01-calibration.txt")
-        #_#_input "two1nine\neightwothree\nabcone2threexyz\nxtwone3four\n4nineeightseven2\nzoneight234\n7pqrstsixteen"]
-    (def lines (str/split-lines input)))
+  (def lines (->> (slurp "input/2023/01-calibration.txt") str/split-lines))
+  (def lines (str/split-lines "two1nine\neightwothree\nabcone2threexyz\nxtwone3four\n4nineeightseven2\nzoneight234\n7pqrstsixteen"))
 
   ;; year 2023 day 01 puzzle 1
-  (calibration-number<- lines #"(\d)")
+  (calibration-number<- lines #"(\d)")   ;; => 55621
 
   ;; year 2023 day 01 puzzle 2
-  (calibration-number<- lines #"(?=(\d|one|two|three|four|five|six|seven|eight|nine))"))
+  (calibration-number<- lines #"(?=(\d|one|two|three|four|five|six|seven|eight|nine))")   ;; => 53592
+  )

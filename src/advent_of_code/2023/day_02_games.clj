@@ -22,7 +22,9 @@
                    (filter (?possible {:blue 14 :green 13 :red 12}))
                    (map :game))
              +
-             lines)
+             lines)   ;; => 1853
+
 
   ;; year 2023 day 01 puzzle 2
-  (transduce (comp (map parse-info) (map power)) + lines))
+  (transduce (comp (map parse-info) (map power)) + lines)   ;; => 72706
+)
