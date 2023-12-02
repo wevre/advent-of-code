@@ -12,11 +12,11 @@
 
 (defn power [{:keys [blue green red]}] (* blue green red))
 
-(defn get-games [input] (->> input slurp str/split-lines (map parse-info)))
+(defn games<- [input] (->> input slurp str/split-lines (map parse-info)))
 
 (comment
-  (def games (get-games "input/2023/02-games.txt"))
-  (def games (get-games "input/2023/02-sample-games.txt"))
+  (def games (games<- "input/2023/02-games.txt"))
+  (def games (games<- "input/2023/02-sample-games.txt"))
 
   ;; year 2023 day 01 puzzle 1
   (let [xform (comp (filter (?possible {:blue 14 :green 13 :red 12})) (map :game))]
