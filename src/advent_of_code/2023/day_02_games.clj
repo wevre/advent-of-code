@@ -8,8 +8,7 @@
             (partition 2 info))))
 
 (defn ?possible [limits]
-  (fn [game-info]
-    (->> (merge-with - limits game-info) vals (not-any? neg?))))
+  (fn [game-info] (->> (merge-with - limits game-info) vals (not-any? neg?))))
 
 (defn power [{:keys [blue green red]}] (* blue green red))
 
@@ -18,11 +17,10 @@
   (def lines (-> (slurp "input/2023/02-sample-games.txt") str/split-lines))
 
   ;; year 2023 day 01 puzzle 1
-  (transduce (comp (map parse-info)
-                   (filter (?possible {:blue 14 :green 13 :red 12}))
-                   (map :game))
-             +
-             lines)   ;; => 1853
+  (let [xform (comp (map parse-info)
+                    (filter (?possible {:blue 14 :green 13 :red 12}))
+                    (map :game))]
+    (transduce xform + lines))   ;; => 1853
 
 
   ;; year 2023 day 01 puzzle 2
