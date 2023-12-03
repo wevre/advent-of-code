@@ -51,3 +51,31 @@
    say that net of all these tweaks, I didn't have to change my approach for the
    second puzzle (even though for a brief moment I did---we'll just say that was
    explorative programming, or research, or "art").
+
+:section Day 03
+
+   I have the luxury (on weekends, at least) to be awake at 10pm when the
+   puzzles come out, so I can sometimes do them right away. I came up with a
+   solution for Day 03 using my already-built `locmap<-` function, which was
+   "easy" (and yes, that's a loaded term in the Clojureverse), because it gives
+   me a map of positions to characters. But the rest of my solution, especially
+   stitching together the part numbers, was convoluted---everything forced to
+   deal with the fact that I had (blindly) parsed _first_ and then had to go
+   back _after_ to make sense of it all. I submitted my answer and went to bed,
+   but I was already thinking of a different approach based on doing my own
+   custom parsing and gathering important stuff (like the part numbers) along
+   the way.
+
+   I woke up and had a busy morning but was finally able to go try out
+   implementing the idea I'd coded in my head last night instead of falling
+   asleep. I know others probably did something similar to this approach, but
+   the only one I've looked at so far is @zelark's. He parsed each line and made
+   good use of the `.start` and `.end` methods in `java.util.regex.Matcher`
+   (TIL). Brilliant. I kept to my original idea of parsing the whole thing as a
+   stream of characters, treating \newline as just one more character to deal
+   with.
+
+   I like this v2 solution. It's shorter, but I also think it is easier to grok,
+   which makes sense because I'm not forcing myself into a corner with my
+   `locmap<-` function. Don't worry, `locmap<-`, I'm sure there's a GameOfLife
+   kind of puzzle coming up and you'll be called into duty.
