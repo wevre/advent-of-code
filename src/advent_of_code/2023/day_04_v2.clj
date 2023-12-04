@@ -3,8 +3,8 @@
             [clojure.math :as math]))
 
 ;; Trying out Sam Ferrell's (samfc) approach processing backwards with a stack.
-;; It's still, under the hood, a nested reduce. Actually it's a lot of nested
-;; reduces. But it's fast. And you don't have to keep track of the card number.
+;; It's still, under the hood, a nested reduce. But it's fast. And you don't
+;; have to keep track of the card number.
 
 (defn card-info [n]
   (fn [line]
