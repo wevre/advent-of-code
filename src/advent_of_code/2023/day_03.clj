@@ -72,7 +72,6 @@
        vals
        (reduce +))   ;; => 538046
 
-
   ;; year 2023 day 03 puzzle 2
   (->> schematic
        (filter (fn [{:keys [v]}] (= v \*)))
