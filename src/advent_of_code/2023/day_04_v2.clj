@@ -19,12 +19,14 @@
 (defn parse [n input]
   (map (card-info n) (str/split-lines input)))
 
+(defn points [wins] (long (math/pow 2 (dec wins))))
+
 (comment
   (def cards (parse 5 (slurp "input/2023/04-sample-scratchcards.txt")))
   (def cards (parse 10 (slurp "input/2023/04-scratchcards.txt")))
 
   ;; year 2023 day 04 puzzle 1
-  (transduce (comp (filter pos?) (map #(long (math/pow 2 (dec %))))) + cards)   ;; => 15205
+  (transduce (comp (filter pos?) (map points)) + cards)   ;; => 15205
 
   ;; year 2023 day 04 puzzle 2
   (time
