@@ -79,3 +79,20 @@
    which makes sense because I'm not forcing myself into a corner with my
    `locmap<-` function. Don't worry, `locmap<-`, I'm sure there's a GameOfLife
    kind of puzzle coming up and you'll be called into duty.
+
+:section Day 04
+
+   I chose not so stay up later on Sunday night to work on this, so just tackled
+   it in the morning, in between waking up kids and getting lunches ready. Part
+   1 was very easy. For part 2, I did a straightforward solution probably
+   similar to everyone else. I had a hunch there was some more 'mathmatical' way
+   to do it rather than just incrementing buckets, but I didn't want to try and
+   figure it out.
+
+   After I posted and started reading through the Clojurians slack, Sam Ferrell
+   had implemented that other way. As @genmeblog aptly stated, it's the
+   difference between reverse processing and forward processing. I created a v2
+   to try out Sam's approach and, because I was curious, to test out execution
+   times. This data probably isn't large enough to really tell, but the reverse
+   approach appears to be slightly faster. And, bonus, you don't have to keep
+   track of card numbers.
