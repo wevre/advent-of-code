@@ -32,7 +32,8 @@
        (reduce +))   ;; => 15205
 
   ;; year 2023 day 04 puzzle 2
-  (->> (count-em-up cards)
-       vals
-       (reduce +))   ;; => 6189740
+  (time
+   (->> (count-em-up cards)
+        vals
+        (reduce +)))   ;; => 6189740
   )
