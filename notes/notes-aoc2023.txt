@@ -96,3 +96,31 @@
    times. This data probably isn't large enough to really tell, but the reverse
    approach appears to be slightly faster. And, bonus, you don't have to keep
    track of card numbers.
+
+:section Day 05
+
+   We got home late from a party so I decided to stay up and tackle day 05
+   instead of (what I should have done) going to bed. The first part was easy
+   and I should have guessed at what would be coming up in part 2. Even though I
+   knew it wouldn't work, I tried the brute force approach of sending nearly 2
+   billion seed values through the chain of maps like I'd done for part 1. Of
+   course that would take way to long, so then I knew I had to deal with
+   sub-dividing ranges. I haven't gone back to go find it, but it seems like
+   there was a 3-D version of this same type of problem in a previous year.
+
+   I had used `reduced` in my 1-D solution, so when I adapted all the code over
+   to 2-D I kept that in there. Once I successfully mapped a sub-range from src
+   to dst, I marked it as reduced and skipped it in later sweeps. I guess the
+   other way to approach that is to keep two lists, one for ranges that haven't
+   been mapped yet, and one for those that have. I just kept one list but
+   started marking converted ranges with reduced.
+
+   I wanted to do some refactoring on my parsing logic, since I had two or three
+   steps of input parsing logic repeated for both puzzles, but I went to bed
+   instead. When I got up this morning, I did that refactoring and I also went
+   back and cleaned up by break-up-a-range-into-sub-ranges logic a little bit.
+   It's still the same logic and approach, but I think this version is a little
+   easier (maybe?) to understand what is going on. Instead dealing with each of
+   the six overlap/subrange cases (where there is some repeated logic among
+   the six cases), I boiled that down to generating three (possibly invalid)
+   sub-ranges, and drop any that have negative lengths.
