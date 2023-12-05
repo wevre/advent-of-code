@@ -36,6 +36,11 @@
     {:seeds (common/parse-longs (first seeds))
      :maps (map parse-map maps)}))
 
+(defn solve [maps seeds]
+  (->> (mapcat #(convert % maps) seeds)
+       (map first)
+       (apply min)))
+
 (comment
   (def input (slurp "input/2023/05-seeds.txt"))
   (def input (slurp "input/2023/05-sample-seeds.txt"))
@@ -44,15 +49,11 @@
   (time
    (let [{:keys [seeds maps]} (parse-input input)
          seeds (for [v seeds] [v 1])]
-     (->> (mapcat #(convert % maps) seeds)
-          (map first)
-          (apply min))))   ;; => 51580674
+     (solve maps seeds)))   ;; => 51580674
 
   ;; year 2023 day 05 puzzle 2
   (time
    (let [{:keys [seeds maps]} (parse-input input)
          seeds (partition 2 seeds)]
-     (->> (mapcat #(convert % maps) seeds)
-          (map first)
-          (apply min))))   ;; => 99751240
+     (solve maps seeds)))   ;; => 99751240
   )
