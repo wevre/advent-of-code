@@ -1,4 +1,4 @@
-(ns advent-of-code.2023.day-03-v2
+(ns advent-of-code.2023.day-03-gear-ratios-v2
   (:require [clojure.string :as str]))
 
 (def ?digit #{\0 \1 \2 \3 \4 \5 \6 \7 \8 \9})

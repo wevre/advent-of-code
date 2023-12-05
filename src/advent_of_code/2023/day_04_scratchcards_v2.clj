@@ -1,4 +1,4 @@
-(ns advent-of-code.2023.day-04-v2
+(ns advent-of-code.2023.day-04-scratchcards-v2
   (:require [clojure.string :as str]
             [clojure.math :as math]))
 

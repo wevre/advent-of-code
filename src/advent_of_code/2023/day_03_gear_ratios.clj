@@ -1,4 +1,4 @@
-(ns advent-of-code.2023.day-03
+(ns advent-of-code.2023.day-03-gear-ratios
   (:require [advent-of-code.common :refer [locmap<-]]))
 
 (def ?digit #{\0 \1 \2 \3 \4 \5 \6 \7 \8 \9})
