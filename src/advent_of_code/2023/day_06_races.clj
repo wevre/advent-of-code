@@ -29,16 +29,15 @@
 
   ;; year 2023 day 06 puzzle 2 -- visual inspection
   (let [[time record] [60808676.0 601116315591300.0]
-        n1 (long (/ (- time (math/sqrt (- (* time time) (* 4 record)))) 2.0))
-        n2 (long (/ (+ time (math/sqrt (- (* time time) (* 4 record)))) 2.0))]
+        n1 (long (math/ceil (/ (- time (math/sqrt (- (* time time) (* 4 record)))) 2.0)))
+        n2 (long (math/floor (/ (+ time (math/sqrt (- (* time time) (* 4 record)))) 2.0)))]
     (for [nudge (range -1 2)
           :let [n1 (+ n1 nudge) n2 (+ n2 nudge)]]
       (map (juxt identity (beat time record)) [n1 n2])))
-  ;; => (([12423584 false] [48385089 true])
-  ;;     ([12423585 false] [48385090 true])
-  ;;                        ^^^^^^^^
-  ;;     ([12423586 true] [48385091 false]))
-  ;;       ^^^^^^^^
+  ;; => (([12423585 false] [48385089 true])
+  ;;     ([12423586 false] [48385090 true])
+  ;;       ^^^^^^^^         ^^^^^^^^
+  ;;     ([12423587 true] [48385091 false]))
 
   (inc (- 48385090 12423586))   ;; => 35961505
 
