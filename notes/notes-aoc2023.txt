@@ -124,3 +124,9 @@
    the six overlap/subrange cases (where there is some repeated logic among
    the six cases), I boiled that down to generating three (possibly invalid)
    sub-ranges, and drop any that have negative lengths.
+
+:section Day 06
+
+   I solved this with pen and paper. It's just the quadratic formula.
+
+:section Day 07
