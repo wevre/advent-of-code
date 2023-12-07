@@ -157,7 +157,7 @@
 
    For part two I made new versions of things. My j-type<- function now checked
    for \J as a key in the frequencies map and altered the return type based on
-   that. For the situation where the vals were [2 1 1] it depended on whether \J
+   that. For the situation where the vals were [2 2 1] it depended on whether \J
    was two cards (which results in :four) or one card (which results in :house).
    Initially I thought "Oh, I'll combine the \J count with the largest and then
    re-determine the hand type" but that is extra work that is not needed. For
@@ -184,3 +184,7 @@
    signatures. Doing so probably cleans up my nested `case`'s, but you
    still have to deal with the [2 2 1] situation and whether \J is one or two
    cards in the hand. Maybe I'll have some fun and do a v3.
+
+   I did a version 3 and I like it best of all. I created a signature map, and
+   for wild cards, I put a 0 in the signature. That gets rid of all my case
+   statements, they are now encoded as data in the signature map.

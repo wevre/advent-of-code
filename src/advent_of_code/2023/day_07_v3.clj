@@ -3,35 +3,29 @@
 
 (def strength {:five 50 :four 40 :house 32 :three 30 :two-pair 22 :one-pair 20 :high-card 10})
 
-;; Remap upper cards so they sort correctly by card strength.
+(def type<- {[1 1 1 1 1] :high-card
+             [2 1 1 1] :one-pair, [1 1 1 1 0] :one-pair
+             [2 2 1] :two-pair
+             [3 2] :house, [2 2 0] :house
+             [3 1 1] :three, [1 1 1 0] :three, [2 1 1 0] :three
+             [4 1] :four, [3 1 0] :four, [1 1 0] :four, [2 1 0] :four
+             [5] :five, [3 0] :five, [2 0] :five, [4 0] :five, [1 0] :five, [0] :five})
+
 (def escapes {\A \E \K \D \Q \C \J \B \T \A})
 (def j-escapes (assoc escapes \J \1))
 
-(defn type<- [hand]
-  (let [fr's (frequencies hand)
-        sig (vec (sort > (vals fr's)))
-        ?best (get fr's \1)]
-    (case sig
-      [1 1 1 1 1] (if ?best :one-pair :high-card)
-      [2 1 1 1] (if ?best :three :one-pair)
-      [2 2 1] (case ?best nil :two-pair 1 :house 2 :four)
-      [3 2] (if ?best :five :house)
-      [3 1 1] (if ?best :four :three)
-      [4 1] (if ?best :five :four)
-      [5] :five)))
+(defn sig<- [hand]
+  (into [] (sort > (->> (frequencies hand) (map (fn [[k v]] (if (= k \1) 0 v)))))))
 
 (defn parse-line [escape-er]
   (fn [l]
     (let [[cards bid] (str/split l #" ")
           sortable (str/escape cards escape-er)
-          type (type<- sortable)]
-      ;; The vector [strength sortable type cards bid] will sort/rank correctly.
-      ;; But it also keeps human-readable info for debugging.
+          type (type<- (sig<- sortable))]
       [(strength type) sortable type cards (parse-long bid)])))
 
 (defn solve [input escape-er]
-  (->> input
-       str/split-lines
+  (->> (str/split-lines input)
        (map (parse-line escape-er))
        sort
        (map-indexed (fn [rank info] (* (inc rank) (last info))))
