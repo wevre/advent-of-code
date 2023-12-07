@@ -130,3 +130,57 @@
    I solved this with pen and paper. It's just the quadratic formula.
 
 :section Day 07
+
+   I did a 'signature' approach. The frequencies of the cards map directly to
+   the hand type. For example, if (vals (frequencies)) is (1 1 1 1 1) then you
+   have a :high-card type for the hand. I actually did the `count` of the
+   frequencies as my signature (to avoid having to sort the vals):
+
+   |||
+      cnt | type
+      5   | :high-card
+      4   | :one-pair
+      3   | either :three (3 1 1) or :two-pair (2 2 1)
+      2   | either :four (4 1) or :house (3 2)
+      1   | :five
+
+   So I wrote a conditional based on the counts, and then for cases 3 and 2 I
+   assigned hand type using a set of the vals.
+
+   I converted from hand type to hand strength with a map and I chose values
+   that sort of mimicked the hand type, which made my life easier when printing
+   out examples and debugging.
+
+   I also created a custom comparator because why not? I knew I could just put
+   hand strength and cards in a vector and it would sort properly but I guess I
+   was feeling adventurous.
+
+   For part two I made new versions of things. My j-type<- function now checked
+   for \J as a key in the frequencies map and altered the return type based on
+   that. For the situation where the vals were [2 1 1] it depended on whether \J
+   was two cards (which results in :four) or one card (which results in :house).
+   Initially I thought "Oh, I'll combine the \J count with the largest and then
+   re-determine the hand type" but that is extra work that is not needed. For
+   all the situations except for [2 1 1] there is only one choice of alternative
+   hand type when \J is present.
+
+   I looked over my solution and I liked it. I thought: I could unify my two
+   type<- functions, but whatever I'm submitting it. So I did.
+
+   Then I went and perused the slack channel and my favorite idea to steal (from
+   @genmeblog) was to remap the 'face cards' from AKQJT to EDCBA to make them
+   'sort ready'. Based on that change I followed through with some stuff that I
+   was too lazy in my first pass. So my changes in v2 were:
+
+      1. Map 'face cards' to 'sortable' characters (removes the need to have two
+      card-strength maps).
+      2. Put strength and sortable in a vector that will sort properly (removes
+      the need to have a custom comparator).
+      3. Do all of that right in the parse-line function.
+      4. Unify the two type<- functions. Now I just check for \1 and I know that
+      I'm dealing with puzzle 2.
+
+   One thing I didn't try was to use the sorted vals of the frequency map as the
+   signatures. Doing so probably cleans up my nested `case`'s, but you
+   still have to deal with the [2 2 1] situation and whether \J is one or two
+   cards in the hand. Maybe I'll have some fun and do a v3.

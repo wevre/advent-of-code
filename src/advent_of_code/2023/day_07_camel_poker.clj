@@ -9,7 +9,7 @@
 
 (def j-card-strength (assoc card-strength \J 1))
 
-(def type-strength {:five 50 :four 40 :house 35 :three 30 :two-pair 25 :one-pair 20 :high-card 10})
+(def type-strength {:five 50 :four 40 :house 32 :three 30 :two-pair 22 :one-pair 20 :high-card 10})
 
 (defn type<- [hand]
   (let [fr's (frequencies hand)
