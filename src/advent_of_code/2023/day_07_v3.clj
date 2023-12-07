@@ -14,7 +14,7 @@
     (case sig
       [1 1 1 1 1] (if ?best :one-pair :high-card)
       [2 1 1 1] (if ?best :three :one-pair)
-      [2 2 1] (case (get fr's \1 0) 0 :two-pair 1 :house 2 :four)
+      [2 2 1] (case ?best nil :two-pair 1 :house 2 :four)
       [3 2] (if ?best :five :house)
       [3 1 1] (if ?best :four :three)
       [4 1] (if ?best :five :four)
