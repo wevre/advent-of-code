@@ -2,9 +2,7 @@
   (:require [advent-of-code.common :as common]))
 
 (defn predict [s]
-  (transduce (comp (take-while seq) (map last))
-             +
-             (iterate #(map - (next %) %) s)))
+  (transduce (comp (take-while seq) (map last)) + (iterate #(map - (next %) %) s)))
 
 (comment
   (def lines (common/split-long-lines (slurp "input/2023/09-seqs.txt")))
