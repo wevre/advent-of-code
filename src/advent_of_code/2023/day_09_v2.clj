@@ -2,7 +2,7 @@
   (:require [advent-of-code.common :as common]))
 
 (defn predict [s]
-  (transduce (comp (take-while #(apply not= 0 %)) (map last))
+  (transduce (comp (take-while seq) (map last))
              +
              (iterate #(map - (next %) %) s)))
 
