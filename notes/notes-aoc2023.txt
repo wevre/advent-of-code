@@ -206,3 +206,16 @@
    wrote one function to parse the input, and one function to find the cycles
    and the rest is all in rich comments, documenting how I explored and
    confirmed my hunches about the inputs.
+
+:section Day 09
+
+   We had a fun ski day, then went straight to a piano recital, and the kids
+   wanted to eat something and we finally got home right before AoC opened up.
+   And, wow, this was probably the easiest day so far. How come this wasn't day
+   1? Maybe it didn't fit well into the storyline. Who knows?
+
+   I wrote both a post-predict and a pre-predict function, where one added last
+   values, and the other subtracted first values, and then I had a thought that
+   maybe the same predict function on the _reversed_ sequence would give us the
+   backwards-extrapolated values. It was easy to check and it worked!, so I
+   ditched the pre-predict function and just reversed the input for part 2.
