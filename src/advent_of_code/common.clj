@@ -36,6 +36,9 @@
 (defn parse-longs [s]
   (map parse-long (re-seq #"-?\d+" s)))
 
+(defn split-long-lines [s]
+  (map parse-longs (str/split-lines s)))
+
 (defn split-grouped-lines [input]
   (->> input
        str/split-lines
