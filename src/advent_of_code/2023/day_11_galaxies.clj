@@ -9,19 +9,18 @@
 (defn path-dist [[ra ca] [rb cb] empty-rows empty-cols factor]
   (+ (abs (- rb ra))
      (abs (- cb ca))
-     (* (dec factor) (count-gaps rb ra empty-rows))
-     (* (dec factor) (count-gaps cb ca empty-cols))))
+     (* (dec factor) (+ (count-gaps rb ra empty-rows)
+                        (count-gaps cb ca empty-cols)))))
 
 (defn parse [input]
   (let [{:keys [locmap size]} (common/locmap<- input)
         galaxies (->> locmap (keep (fn [[loc c]] (when (= c \#) loc))))
-        galaxy-rows (->> galaxies (map first) set)
-        galaxy-cols (->> galaxies (map second) set)
-        empty-rows (->> (range (first size)) (remove galaxy-rows) sort)
-        empty-cols (->> (range (second size)) (remove galaxy-cols) sort)]
+        empty's (fn [f] (->> (range (f size))
+                             (remove (set (map f galaxies)))
+                             sort))]
     {:galaxies galaxies
-     :empty-rows empty-rows
-     :empty-cols empty-cols}))
+     :empty-rows (empty's first)
+     :empty-cols (empty's second)}))
 
 (defn solve [{:keys [galaxies empty-rows empty-cols]} expand]
   (transduce (map (fn [[a b]] (path-dist a b empty-rows empty-cols expand)))
