@@ -219,3 +219,7 @@
    maybe the same predict function on the _reversed_ sequence would give us the
    backwards-extrapolated values. It was easy to check and it worked!, so I
    ditched the pre-predict function and just reversed the input for part 2.
+
+:section Day 10
+
+:section Day 11
