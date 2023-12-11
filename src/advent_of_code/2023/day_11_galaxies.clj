@@ -4,7 +4,7 @@
 
 (defn count-gaps [a b empty's]
   (let [[a b] (sort [a b])]
-    (->> empty's (filter #(<= a % b)) count)))
+    (->> empty's (filter #(< a % b)) count)))
 
 (defn path-dist [[ra ca] [rb cb] empty-rows empty-cols factor]
   (+ (abs (- rb ra))
