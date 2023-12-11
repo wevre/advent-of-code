@@ -9,8 +9,8 @@
 (defn path-dist [[ra ca] [rb cb] empty-rows empty-cols factor]
   (+ (abs (- rb ra))
      (abs (- cb ca))
-     (* factor (count-gaps rb ra empty-rows))
-     (* factor (count-gaps cb ca empty-cols))))
+     (* (dec factor) (count-gaps rb ra empty-rows))
+     (* (dec factor) (count-gaps cb ca empty-cols))))
 
 (defn parse [input]
   (let [{:keys [locmap size]} (common/locmap<- input)
@@ -33,10 +33,10 @@
   (def input (parse "...#......\n.......#..\n#.........\n..........\n......#...\n.#........\n.........#\n..........\n.......#..\n#...#.....\n"))
 
   ;; year 2023 day 11 puzzle 1
-  (solve input 1)
+  (solve input 2)
   ;; => 9769724
 
   ;; year 2023 day 11 puzzle 2
-  (solve input 999999)
+  (solve input 1000000)
   ;; => 603020563700
   )
