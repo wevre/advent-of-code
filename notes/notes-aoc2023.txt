@@ -222,4 +222,53 @@
 
 :section Day 10
 
+   I made a map (called next<-) that takes a pipe type (pype?) and the move
+   _into_ the pipe (for example [0 -1] means we decremented the column, i.e.
+   moved left into the new pipe) and returns the move _out_ of the pipe. For
+   example, moving into a pype '7' from [0 1] (right) would move us out to [1 0]
+   (down).
+
+   From there I examined the input to find 'S', and looked at the input to see
+   what pype replaced 'S' (for my input it was '-') and then did a fn/recur
+   moving into and out of pypes until I was back at the starting loc. That to
+   define the path.
+
+   For the answer to part 2 I used the even-odd rule, but I had to be careful
+   about what I counted as 'crossing' the path. If I was searching along the
+   row, then a pattern like this: 'F--7' did not count as crossing the path. But
+   a pattern like this: 'L--7' _did_ count as crossing the path. In the first
+   instance, it's like the path came up to meet us, but then went back down
+   again, so no crossing (it's more like a tangent, or a kiss); whereas in the
+   second pattern, the path came down and then kept going down so it is a true
+   crossing.
+
+   I was going to be efficient in my rays and always go towards the nearest
+   edge, but I didn't want to code up all the intricate crossings vs kisses, so
+   I just searched 'up' for every cell.
+
+   I thought about it afterwards and a more efficient approach, I think, would
+   be to scan each row of the input, and count crossings by looking for L7 and
+   FJ patterns (and of course, |) and incrementing each time we hit a cell
+   'inside' the path (because our current crossing count would be odd). This
+   would require only one pass over the data, instead of my less efficient
+   algorithm (I think it is like O(x^3) because it re-traverses the same cells
+   over and over again as it works its way down the map, but always searching
+   upwards from every loc). I had that idea but I haven't implemented it (yet)
+   as my free time is somewhat limited at the moment.
+
 :section Day 11
+
+   This wasn't too hard of a puzzle. My solution was pretty straightforward. I
+   used a filter to examine the rows/cols between each pair of galaxies and
+   determine if they were empty (using pre-generated sets of all the empty rows
+   and cols.) @erdos used a sorted set, a collection I don't think I've ever
+   used before, which is more efficient. @zelark had a nice idea to compare the
+   rows/cols along the path to the galaxy coords themselves to determine
+   empty-ness.
+
+   I liked that idea of @zelark's because it means I only have to keep track of
+   the galaxies instead of the "empty's" nor the size. I also thought about it
+   and came up with this idea: a manhattan distance is easy to do, no loop
+   required. But to find the empty's we still have to do a loop. Since we're
+   already doing a loop anyway, just add either a 1 or an `expand` as we do the
+   loop.
