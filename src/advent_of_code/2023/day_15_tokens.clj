@@ -22,16 +22,17 @@
   (remove (fn [[l _]] (= label l)) contents))
 
 (defn HASHMAP [step's]
-  (reduce (fn [boxes [label flen]]
-            (let [box-no (HASH label)]
+  (reduce (fn [boxes step]
+            (let [[label flen] (str/split step #"=|-")
+                  box-no (HASH label)]
               (if flen
                 (update boxes box-no insert-lens label (parse-long flen))
                 (update boxes box-no remove-lens label))))
           {}
           step's))
 
-(defn focusing-power [box-no]
-  (fn [i [_l fl]] (* (inc box-no) (inc i) fl)))
+(defn focusing-power [[box-no contents]]
+  (map-indexed (fn [i [_l fl]] (* (inc box-no) (inc i) fl)) contents))
 
 (comment
   (def input (str/split (slurp "input/2023/15-tokens.txt") #","))
@@ -42,10 +43,6 @@
   ;; => 510792
 
   ;; year 2023 day 15 puzzle 2
-  (->> input
-       (map #(str/split % #"=|-"))
-       HASHMAP
-       (mapcat (fn [[box-no contents]] (map-indexed (focusing-power box-no) contents)))
-       (reduce +))
+  (transduce (mapcat focusing-power) + (HASHMAP input))
   ;; => 269410
   )
