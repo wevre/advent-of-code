@@ -1,5 +1,5 @@
 (ns advent-of-code.2023.day-11-v2
-  (:require [advent-of-code.common :as common]
+  (:require [advent-of-code.common2 :as common2]
             [clojure.math.combinatorics :as combo]))
 
 (defn dist [a b coords expand]
@@ -19,9 +19,7 @@
 (defn parse
   "Create a locmap then return a set of the galaxy (#) loc's."
   [input]
-  (->> (common/locmap<- input)
-       :locmap
-       (keep (fn [[loc c]] (when (= c \#) loc)))))
+  (keys (into {} (common2/locmap<- #{\#}) input)))
 
 (comment
   (def galaxies (parse (slurp "input/2023/11-galaxies.txt")))

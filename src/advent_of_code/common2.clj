@@ -26,3 +26,32 @@
 
 (comment
   (sequence (split-grouped-lines) "\n\n123\n\n\n456\n789\n\nabc\ndef\nghi\n\n"))
+
+(defn locmap<-
+  ([] (locmap<- identity))
+  ([keep-fn & {:keys [?size] :or {?size false}}]
+   (fn [rf]
+     (let [rv (volatile! 0)
+           cv (volatile! 0)
+           cm (volatile! 0)]
+       (fn
+         ([] (rf))
+         ([result]
+          (when ?size (rf result [:size [@rv @cm]]))
+          (rf result))
+         ([result input]
+          (if (= \newline input)
+            (do
+              (vswap! rv inc)
+              (vreset! cv 0)
+              result)
+            (let [rval @rv
+                  cval @cv]
+              (vswap! cv inc)
+              (vswap! cm max (inc cval))
+              (if-let [kept (keep-fn input)]
+                (rf result [[rval cval] kept])
+                result)))))))))
+
+(comment
+  (into {} (locmap<- #{\| \- \F \J \L \7}) (slurp "input/2023/10-sample-pipes.txt")))
