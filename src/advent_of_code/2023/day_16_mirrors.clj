@@ -43,10 +43,7 @@
 
 (defn energized [to<-from]
   (dec   ; Ha! because we have [0 -1] (or some other initial OOB loc) in the map.
-   (count
-    (reduce-kv (fn [i k v] (into (conj i k) v))
-               #{}
-               to<-from))))
+   (count (reduce-kv (fn [i k v] (into (conj i k) v)) #{} to<-from))))
 
 (comment
   (do
