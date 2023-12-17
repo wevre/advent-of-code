@@ -35,7 +35,9 @@
     (fn walk [loc frm to<-from]
       (if (or (out-of-bounds loc size) (get (get to<-from frm #{}) loc))
         to<-from
-        (let [to<-from (update to<-from frm (fnil conj #{}) loc)
+        (let [to<-from (-> to<-from
+                           (update frm (fnil conj #{}) loc)
+                           (update loc (fnil conj #{}) frm))
               next's (get-nexts locmap loc frm)]
           (if (= 1 (count next's))
             (recur (vec+ (first next's) loc) loc to<-from)
