@@ -272,3 +272,26 @@
    required. But to find the empty's we still have to do a loop. Since we're
    already doing a loop anyway, just add either a 1 or an `expand` as we do the
    loop.
+
+:section Day 17
+
+   I tried to do this with a Dijkstra algorithm, but that won't work. I had to
+   go educate myself on the differences between A-start and Dijkstra and got
+   that sorted. I relied a lot on @zelark's code to realize what was going on.
+   Then I had to do one more tweak: the "key" for each node had to be the
+   location _plus_ the direction from which we arrived at that location. Without
+   both of those, we drop too many nodes. The direction we arrive at a node
+   determines which nodes we can further search, so it turns this from a 2-D to
+   a 3-D search.
+
+   My code is really slow. It takes 40-50 seconds to complete the search. I'm
+   sure there are ways to speed it up. I'm not interested in taking the time to
+   do that. It might be nice to understand what could be done, but I have other
+   things to worry about this time of year.
+
+   I did come up with one optimization which roughly halved the search time:
+   instead of storing [loc dir] as our identifier for each node (this making
+   the dir we reached part of the "key" as explained above); instead of that I
+   stored [loc orient] where orient was :H for R and L, and :V to U and D. The
+   idea is that approaching a node from up or down (left or right) is the same.
+   In the sense that our subsequent search space is the same.

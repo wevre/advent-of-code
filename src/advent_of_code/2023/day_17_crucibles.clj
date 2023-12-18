@@ -29,6 +29,8 @@
    R [U D]
    L [U D]})
 
+(def orient {U :V D :V R :H L :H})
+
 (defn nigh's [locmap lo hi]
   (let [step-er (fn [∆]
                   (fn [{:keys [cost path loc]}]
@@ -42,43 +44,37 @@
             :when (locmap (:loc nxt))]
         nxt))))
 
-;; test this next's
-
 (defn update-costs [costs nxt]
-  (update costs (:loc nxt)
+  (update costs [(:loc nxt) (orient (:dir nxt))]
           (fnil (fn [cur] (if (< (:cost nxt) (:cost cur)) nxt cur)) nxt)))
 
-(defn lowest-cost [locmap stop]
+(defn lowest-cost [locmap lo hi]
   (let [end (mapv dec (:size locmap))
-        nigh's-er (nigh's locmap 1 3)
-        loc [0 0]
-        node {:loc loc :cost 0 :dir [1 1] :path (list loc)}
+        nigh's-er (nigh's locmap lo hi)
+        loc [0 0] dir [1 1]
+        node-key [loc :D]
+        node {:loc loc :cost 0 :dir dir :path (list loc)}
         g-score (fn [{:keys [cost]}] cost)
         h-score (fn [{:keys [loc]}] (reduce + (map - end loc)))
         f-score (fn [n] (+ (g-score n) (h-score n)))]
-    (loop [i 0 costs (priority-map-keyfn f-score loc node)]
-      (if (= i stop)
-        costs
-        (when-let [[[loc node] costs] ((juxt peek pop) costs)]
-          (if (= end loc)
-            node
-            (let [nighs (nigh's-er node)
-                  _ (when *debug* (println "curr node:") (pp/pprint node))
-                  _ (when *debug* (println "nighs:") (pp/pprint nighs))
-                  _ (when *debug* (println "costs:") (pp/pprint costs))]
-              (recur (inc i) (reduce update-costs costs (nigh's-er node))))))))))
+    (loop [i 0 costs (priority-map-keyfn f-score node-key node)]
+      (when-let [[[[loc _orient] node] costs] ((juxt peek pop) costs)]
+        (if (= end loc)
+          node
+          (recur (inc i) (reduce update-costs costs (nigh's-er node))))))))
 
 (comment
   (def locmap (into {} (common2/locmap<- #(- (int %) (int \0)) :?size true) (slurp "input/2023/17-sample.txt")))
+  (def locmap (into {} (common2/locmap<- #(- (int %) (int \0)) :?size true) (slurp "input/2023/17-crucible.txt")))
 
+  ;; year 2023 day 17 puzzle 1
+  (time
+   (:cost (lowest-cost locmap 1 3)))
+  ;; => 1023 (56 seconds! so slow! don't care!)
 
-  (let [info (lowest-cost locmap ##Inf)]
-    (println "costs:")
-    (pp/pprint info)
-    (draw-path locmap (:path info)))
-
-  (let [loc [0 0]]
-    ()
-    ((nigh's locmap 1 3) {:loc loc :cost 0 :dir [1 1] :path (loc)}))
+  ;; year 2023 day 17 puzzle 2
+  (time
+   (:cost (lowest-cost locmap 4 10)))
+  ;; => 1165 (42 seconds)
 
   )
