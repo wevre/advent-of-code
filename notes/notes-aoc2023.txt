@@ -295,3 +295,7 @@
    stored [loc orient] where orient was :H for R and L, and :V to U and D. The
    idea is that approaching a node from up or down (left or right) is the same.
    In the sense that our subsequent search space is the same.
+
+   So I wonder if I stop keeping track of the path will that speed things up?
+   Or does that even matter? An alternate way to drack our path is to keep a map
+   of to<-from and then walk that from whatever the final node ends up being.
