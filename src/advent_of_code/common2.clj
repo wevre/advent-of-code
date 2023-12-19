@@ -1,4 +1,5 @@
-(ns advent-of-code.common2)
+(ns advent-of-code.common2
+  (:require [clojure.string :as str]))
 
 (defn split-grouped-lines []
   (fn [xf]
@@ -7,7 +8,7 @@
       (fn
         ([] (xf))
         ([result]
-         (when-let [curr-run @run] (vswap! grp (fnil conj []) curr-run))
+         (when-let [curr-run @run] (vswap! grp (fnil conj []) (str/join curr-run)))
          (when-let [curr-grp @grp] (xf result curr-grp))
          (xf result))
         ([result input]
@@ -15,7 +16,7 @@
            (let [curr-run @run
                  curr-grp @grp]
              (cond
-               curr-run (do (vswap! grp (fnil conj []) curr-run)
+               curr-run (do (vswap! grp (fnil conj []) (str/join curr-run))
                             (vreset! run nil)
                             result)
                curr-grp (do (vreset! grp nil)
