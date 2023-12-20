@@ -56,8 +56,6 @@
   (def config (parse (slurp "input/2023/20-sample-2.txt")))
   (def config (parse (slurp "input/2023/20-pulses.txt")))
 
-  (get config "dr")
-
   ;; year 2023 day 20 puzzle 1
   (->> (iterate push-button {:config config :pulses {:hi 0 :lo 0}})
        (drop 1000)
@@ -78,6 +76,6 @@
         ;; a MOD counter.
         ff's (:dest (config "broadcaster"))]
     (->> (map #(find-loop iters %) ff's)
-         (apply remainders/lcm)))
+         (reduce remainders/lcm)))
   ;; => 247702167614647
   )
