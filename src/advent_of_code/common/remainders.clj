@@ -44,7 +44,11 @@
 
 (defn gcd [a b] (if (= 0 b) a (recur b (mod a b))))
 
-(defn lcm [a b] (/ (* a b) (gcd a b)))
+(defn lcm
+  ([] 1)
+  ([a] a)
+  ([a b] (/ (* a b) (gcd a b)))
+  ([a b & rst] (reduce lcm (lcm a b) rst)))
 
 (defn congruent [[n1 a1] [n2 a2]]
   (if (= (mod a1 n2) a2)
