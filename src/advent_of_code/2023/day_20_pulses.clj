@@ -49,7 +49,7 @@
   (->> iters
        (map-indexed (fn [i state] [i (get-in state [:config module :?on])]))
        (partition 2 1)
-       (some (fn [[a b]] (when (= (second a) (second b)) (first b))))))
+       (some (fn [[[_ ?on-a] [i-b ?on-b]]] (when (= ?on-a ?on-b) i-b)))))
 
 (comment
   (def config (parse (slurp "input/2023/20-sample-1.txt")))
