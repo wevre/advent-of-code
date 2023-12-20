@@ -56,6 +56,8 @@
   (def config (parse (slurp "input/2023/20-sample-2.txt")))
   (def config (parse (slurp "input/2023/20-pulses.txt")))
 
+  (get config "dr")
+
   ;; year 2023 day 20 puzzle 1
   (->> (iterate push-button {:config config :pulses {:hi 0 :lo 0}})
        (drop 1000)
@@ -66,7 +68,14 @@
 
   ;; year 2023 day 20 puzzle 2
   (let [iters (iterate push-button {:config config :pulses {:hi 0 :lo 0}})
-        ;; Grab the flip-flips that are connected to broadcaster
+        ;; Grab the flip-flips that are directly connected to broadcaster. Each
+        ;; of those is a branch, and when the other end of the branch finally
+        ;; sends a :lo signal to "rx", this flip flop also gets reset. So the
+        ;; history of this flip-flop will be alternating on and off, but when
+        ;; the one magic pulse goes through, it will make the history show two
+        ;; off's in a row. We can use that to find the cycle, and then find the
+        ;; LCM of all the branch cycles. This is basically an implementation of
+        ;; a MOD counter.
         ff's (:dest (config "broadcaster"))]
     (->> (map #(find-loop iters %) ff's)
          (apply remainders/lcm)))
