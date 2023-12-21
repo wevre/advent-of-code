@@ -31,23 +31,21 @@
   (count (state-at-n garden #{start} 64))
   ;; => 3746
 
+  ;; year 2023 day 21 puzzle 2
   (let [even's (state-at-n garden #{start} 130)
         E (count even's) O (count (state-at-n garden even's 1))
+        N (dec 202300)   ; (/ (- 26501365 65) 131) => 202300
         tips (for [loc [[0 65] [65 0] [65 130] [130 65]]]
                (count (state-at-n garden #{loc} 130)))
         edges (for [loc [[0 0] [130 0] [0 130] [130 130]]]
                 (let [outer (state-at-n garden #{loc} 64)]
-                  [(count (state-at-n garden outer 131)) (count outer)]))
-        N (dec 202300)]
+                  (+ (* N (count (state-at-n garden outer 131)))
+                     (* (inc N) (count outer)))))]
     (+ O                           ; central garden
        (* O (inc N) (dec N))       ; odd full gardens
        (* E (* (inc N) (inc N)))   ; even full gardens
-       ;; the N/S/E/W points
        (reduce + tips)
-       ;; the NW/NE/SW/SE edges
-       (->> edges
-            (map (fn [[inner outer]] (+ (* inner N) (* outer (inc N)))))
-            (reduce +))))
+       (reduce + edges)))
   ;; => 623540829615589
   )
 
