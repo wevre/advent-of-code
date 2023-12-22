@@ -50,6 +50,13 @@
   (->> (get-in stack [id :supports])
        (map (juxt identity #(get-in stack [% :rests-on])))))
 
+(defn ?can-remove [stack]
+  (fn [id]
+    (->> (other-supporters stack id)
+         (map second)
+         (map count)
+         (every? #(< 1 %)))))
+
 (defn remove-brick [stack]
   (fn [id]
     (loop [queue (common/queue id) n 0 goners #{}]
@@ -72,12 +79,10 @@
     (def stack (get-stack bricks)))
 
   ;; year 2023 day 22 puzzle 1
-  (reduce (fn [n {:keys [id]}]
-            (if (every? #(< 1 %) (->> (other-supporters stack id) (map second) (map count)))
-              (inc n)
-              n))
-          0
-          bricks)
+  (->> bricks
+       (map :id)
+       (filter (?can-remove stack))
+       count)
   ;; => 473
 
   ;; year 2023 day 22 puzzle 2
