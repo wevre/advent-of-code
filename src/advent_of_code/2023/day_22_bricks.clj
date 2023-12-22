@@ -1,4 +1,4 @@
-(ns advent-of-code.2023.22-bricks
+(ns advent-of-code.2023.day-22-bricks
   (:require [advent-of-code.common :as common]))
 
 ;; --- Parsing ---
