@@ -1,5 +1,6 @@
 (ns advent-of-code.common2
-  (:require [clojure.string :as str]))
+  (:require [advent-of-code.common :as common]
+            [clojure.string :as str]))
 
 (defn split-grouped-lines []
   (fn [xf]
