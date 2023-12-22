@@ -57,6 +57,10 @@
          (map count)
          (every? #(< 1 %)))))
 
+(defn relies-on [stack id goners]
+  (->> (other-supporters stack id)
+       (keep (fn [[b supports]] (when (empty? (remove goners supports)) b)))))
+
 (defn remove-brick [stack]
   (fn [id]
     (loop [queue (common/queue id) n 0 goners #{}]
@@ -64,9 +68,7 @@
         (if-not b
           (dec n)
           (let [goners (conj goners b)]
-            (recur (into queue (->> (other-supporters stack b)
-                                    (keep (fn [[a b]]
-                                            (when (empty? (remove goners b)) a)))))
+            (recur (into queue (relies-on stack b goners))
                    (inc n)
                    goners)))))))
 
