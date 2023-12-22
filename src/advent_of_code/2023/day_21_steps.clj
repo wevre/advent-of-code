@@ -32,32 +32,39 @@
   ;; => 3746
 
   ;; year 2023 day 21 puzzle 2
-  (let [even's (state-at-n garden #{start} 130)
-        E (count even's) O (count (state-at-n garden even's 1))
-        N (dec 202300)   ; (/ (- 26501365 65) 131) => 202300
-        tips (for [loc [[0 65] [65 0] [65 130] [130 65]]]
-               (count (state-at-n garden #{loc} 130)))
-        edges (for [loc [[0 0] [130 0] [0 130] [130 130]]]
-                (let [outer (state-at-n garden #{loc} 64)]
-                  (+ (* N (count (state-at-n garden outer 131)))
-                     (* (inc N) (count outer)))))]
-    (+ O                           ; central garden
-       (* O (inc N) (dec N))       ; odd full gardens
-       (* E (* (inc N) (inc N)))   ; even full gardens
-       (reduce + tips)
-       (reduce + edges)))
-  ;; => 623540829615589
+  (time
+   (let [[rows _cols] (:size garden)   ; => [131 131]
+         even's (state-at-n garden #{start} (dec rows))
+         E (count even's) O (count (state-at-n garden even's 1))
+         N (dec (/ (- 26501365 65) rows))   ; => 202299
+         mid (/ (dec rows) 2)
+         verts (for [loc [[0 mid] [mid 0] [mid (dec rows)] [(dec rows) mid]]]
+                (count (state-at-n garden #{loc} (dec rows))))
+         edges (for [loc [[0 0] [(dec rows) 0] [0 (dec rows)] [(dec rows) (dec rows)]]]
+                 (let [outer (state-at-n garden #{loc} (dec mid))
+                       inner (state-at-n garden outer rows)]
+                   (+ (* N (count inner)) (* (inc N) (count outer)))))]
+     (+ O                       ; central garden
+        (* O (inc N) (dec N))   ; odd full gardens
+        (* E (inc N) (inc N))   ; even full gardens
+        (reduce + verts)
+        (reduce + edges))))
+  ;; => 623540829615589 (about 21s)
   )
 
-;; For drawing out the gardens.
+;; For drawing/investigating the garden.
 (defn draw-locs [garden]
-  (let [[rows cols] (:size garden)]
+  (let [[rows cols] (:size garden)
+        mid (/ (dec rows) 2)]
     (fn [loc's]
-      (println (str (apply str (repeat 65 \-)) \+ (apply str (repeat 65 \-))))
+      (println (str \+ (apply str (repeat mid \-)) \+ (apply str (repeat mid \-)) \+))
       (doseq [r (range rows)]
-        (print (if (= r 65) \+ \|))
+        (print (if (= r mid) \+ \|))
         (doseq [c (range cols)]
           (let [g (garden [r c])]
-            (print (cond (= g \S) \S (loc's [r c]) \O :else g))))
-        (println (if (= r 65) \+ \|)))
-      (println (str (apply str (repeat 65 \-)) \+ (apply str (repeat 65 \-)))))))
+            (print (cond (= g \S) \S (loc's [r c]) \O (= r mid) \- (= c mid) \| :else g))))
+        (println (if (= r mid) \+ \|)))
+      (println (str \+ (apply str (repeat mid \-)) \+ (apply str (repeat mid \-)) \+)))))
+
+(comment
+  ((draw-locs garden) (state-at-n garden #{[0 0]} 65)))
