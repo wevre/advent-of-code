@@ -36,9 +36,11 @@
                               (group-by first)
                               (sort-by first >)
                               first)
-            lands-on (keep second lands-on)
+            lands-on (keep second lands-on)   ; Keep just the brick-id's
             orig-z (z-coord (first brick))
             new-loc's (map #(vec+ % [0 0 (- (inc z) orig-z)]) brick)]
+        ;; `tops` is a map from xy-coord to the [z-coord id] of the tallest
+        ;; cube/brick in that particular column.
         (recur brick's
                (inc id)
                (into tops (map (fn [[x y z]] [[x y] [z id]]) new-loc's))
