@@ -47,15 +47,15 @@
         :else (recur n's m's (conj acc n))))))
 
 ;; Take two hailstones, i and j, that have the same velocity in one coordinate.
-;; So we have vxi = vxj = vx. These stones with same velocity give us a clue to
-;; the rock's velocity, vr: (vr - vx) has to be a factor of (xi - xj). So we can
+;; So we have vi = vj = v. These stones with same velocity give us a clue to
+;; the rock's velocity, vr: (vr - v) has to be a factor of (xi - xj). So we can
 ;; follow this algorithm to find vr:
 ;;    1. Find a group of stones with same velocity.
 ;;    2. Find all the pairwise delta's between positions: (xi - xj)
 ;;    3. Find the prime factorization of each delta.
 ;;    4. Find the common factors across all the prime factorizations.
-;;    5. Generate all the multiples, p, from all possible factor subsets.
-;;    6. Generate (+ p vx) and (- vx p) for all p's.
+;;    5. Generate all numbers, p, by multiplying all subsets of prime factors.
+;;    6. Generate (+ v p) and (- v p) for all p's.
 ;;    7. Take all the numbers from #6 for all the common velocity groups, and
 ;;       find the common number across all of them. This is vr.
 
@@ -71,7 +71,8 @@
            possible's (map #(reduce * %) (combo/subsets common-factors))]
        (sort (concat (map #(+ % v) possible's)
                      (map #(- v %) possible's)))))
-   (reduce common)))
+   (reduce common)
+   first))
 
 (comment
   (do
@@ -93,10 +94,10 @@
   ;; => 16050
 
   ;; year 2023 day 24 puzzle 2
-  ;; The following three give us the rock's velocity: vx, vy, vz
-  (find-rock-velocity input 0 3)   ;; => [214]
-  (find-rock-velocity input 1 4)   ;; => [-168]
-  (find-rock-velocity input 2 5)   ;; => [249]
+  ;; The following three give us the rock's velocity: u, v, w
+  (def u (find-rock-velocity input 0 3))   ;; => 214
+  (def v (find-rock-velocity input 1 4))   ;; => -168
+  (def w (find-rock-velocity input 2 5))   ;; => 249
   ;; With these velocities in hand it is not too difficult algebra, using
   ;; equations based on the first 2 input hailstones, to find initial positions
   ;; x, y, z. Here is an equation that solves it:
@@ -104,12 +105,11 @@
         stone2 [230532038994496, 112919194224200, 73640306314241, 98, 303, 398]
         [a b _c u1 v1 _w1] stone1
         [d e f u2 v2 w2] stone2
-        vx 214 vy -168 vz 249
-        s (/ (- (* (- e b) (- u1 vx)) (* (- d a) (- v1 vy)))
-             (- (* (- v1 vy) (- u2 vx)) (* (- v2 vy) (- u1 vx))))
-        x (+ d (* s (- u2 vx)))
-        y (+ e (* s (- v2 vy)))
-        z (+ f (* s (- w2 vz)))]
-    [x y z])
-  ;; => [172543224455736 348373777394510 148125938782131]
+        s (/ (- (* (- e b) (- u1 u)) (* (- d a) (- v1 v)))
+             (- (* (- v1 v) (- u2 u)) (* (- v2 v) (- u1 u))))
+        x (+ d (* s (- u2 u)))
+        y (+ e (* s (- v2 v)))
+        z (+ f (* s (- w2 w)))]
+    [x y z (+ x y z)])
+  ;; => [172543224455736 348373777394510 148125938782131 669042940632377]
   )
