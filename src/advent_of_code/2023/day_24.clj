@@ -32,11 +32,6 @@
           (recur (/ n f) f (conj r f))
           (recur n (if (= 2 f) 3 (+ 2 f)) r))))))
 
-(defn pairs [input]
-  (for [[a b] (combo/combinations input 2)]
-    (let [d (abs (- a b))]
-      (primes d))))
-
 (defn common [l1 l2]
   (loop [[n & n's :as l1] l1 [m & m's :as l2] l2 acc []]
     (if-not (and n m)
@@ -95,23 +90,25 @@
        count)
   ;; => 16050
 
-  ;; year 2023 day 24 puzzle 2
+  ;; year 2023 day 24 puzzle 2 (about 7s)
   ;; The following three give us the rock's velocity: u, v, w
-  (def u (find-rock-velocity input 0 3))   ;; => 214
-  (def v (find-rock-velocity input 1 4))   ;; => -168
-  (def w (find-rock-velocity input 2 5))   ;; => 249
-  ;; With these velocities in hand it is not too difficult algebra, using
-  ;; equations based on the first 2 input hailstones, to find initial positions
-  ;; x, y, z. Here is an equation that solves it:
-  (let [stone1 [176253337504656, 321166281702430, 134367602892386, 190, 8, 338]
-        stone2 [230532038994496, 112919194224200, 73640306314241, 98, 303, 398]
-        [a b _c u1 v1 _w1] stone1
-        [d e f u2 v2 w2] stone2
-        s (/ (- (* (- e b) (- u1 u)) (* (- d a) (- v1 v)))
-             (- (* (- v1 v) (- u2 u)) (* (- v2 v) (- u1 u))))
-        x (+ d (* s (- u2 u)))
-        y (+ e (* s (- v2 v)))
-        z (+ f (* s (- w2 w)))]
-    [x y z (+ x y z)])
-  ;; => [172543224455736 348373777394510 148125938782131 669042940632377]
+  (time
+   (do
+     (def u (find-rock-velocity input 0 3)) ;; => 214
+     (def v (find-rock-velocity input 1 4)) ;; => -168
+     (def w (find-rock-velocity input 2 5)) ;; => 249
+     ;; With these velocities in hand it is not too difficult algebra, using
+     ;; equations based on the first 2 input hailstones, to find initial
+     ;; positions x, y, z. Here is an equation that solves it:
+     (let [stone1 [176253337504656, 321166281702430, 134367602892386, 190, 8, 338]
+           stone2 [230532038994496, 112919194224200, 73640306314241, 98, 303, 398]
+           [a b _c u1 v1 _w1] stone1
+           [d e f u2 v2 w2] stone2
+           s (/ (- (* (- e b) (- u1 u)) (* (- d a) (- v1 v)))
+                (- (* (- v1 v) (- u2 u)) (* (- v2 v) (- u1 u))))
+           x (+ d (* s (- u2 u)))
+           y (+ e (* s (- v2 v)))
+           z (+ f (* s (- w2 w)))]
+       [x y z (+ x y z)])))
+   ;; => [172543224455736 348373777394510 148125938782131 669042940632377]
   )
