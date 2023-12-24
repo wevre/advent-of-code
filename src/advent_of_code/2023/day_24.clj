@@ -97,13 +97,12 @@
   (find-rock-velocity input 0 3)   ;; => [214]
   (find-rock-velocity input 1 4)   ;; => [-168]
   (find-rock-velocity input 2 5)   ;; => [249]
-  ;; With these velocitie's in hand it is not too difficulet algebra, using
+  ;; With these velocities in hand it is not too difficult algebra, using
   ;; equations based on the first 2 input hailstones, to find initial positions
-  ;; x, y, z.
-  ;; Here is an equation that solves it:
+  ;; x, y, z. Here is an equation that solves it:
   (let [stone1 [176253337504656, 321166281702430, 134367602892386, 190, 8, 338]
         stone2 [230532038994496, 112919194224200, 73640306314241, 98, 303, 398]
-        [a b c u1 v1 w1] stone1
+        [a b _c u1 v1 _w1] stone1
         [d e f u2 v2 w2] stone2
         vx 214 vy -168 vz 249
         s (/ (- (* (- e b) (- u1 vx)) (* (- d a) (- v1 vy)))
