@@ -7,6 +7,16 @@
   (->> (common/parse-longs input)
        (partition 6)))
 
+(comment
+  (do
+    (def input (parse (slurp "input/2023/24-sample.txt")))
+    (def lo 7)
+    (def hi 27))
+  (do
+    (def input (parse (slurp "input/2023/24-hailstones.txt")))
+    (def lo 200000000000000)
+    (def hi 400000000000000)))
+
 (defn slope-intercept [[px py _pz vx vy _vz]]
   (let [slope (/ vy vx)]
     [slope (- py (* px slope))]))
@@ -21,6 +31,17 @@
             t1 (/ (- x px1) vx1)
             t2 (/ (- x px2) vx2)]
         [x (+ (* m1 x) b1) t1 t2]))))
+
+(comment
+  ;; year 2023 day 24 puzzle 1
+  (->> (combo/combinations input 2)
+       (keep (fn [[a b]] (intersection a b)))
+       (filter (fn [[x y t1 t2]]
+                 (and (<= lo x hi) (<= lo y hi)
+                      (<= 0 t1) (<= 0 t2))))
+       count)
+  ;; => 16050
+  )
 
 (defn primes [n]
   (let [hi (sqrt n)]
@@ -72,24 +93,6 @@
    first))
 
 (comment
-  (do
-    (def input (parse (slurp "input/2023/24-sample.txt")))
-    (def lo 7)
-    (def hi 27))
-  (do
-    (def input (parse (slurp "input/2023/24-hailstones.txt")))
-    (def lo 200000000000000)
-    (def hi 400000000000000))
-
-  ;; year 2023 day 24 puzzle 1
-  (->> (combo/combinations input 2)
-       (keep (fn [[a b]] (intersection a b)))
-       (filter (fn [[x y t1 t2]]
-                 (and (<= lo x hi) (<= lo y hi)
-                      (<= 0 t1) (<= 0 t2))))
-       count)
-  ;; => 16050
-
   ;; year 2023 day 24 puzzle 2 (about 7s)
   ;; The following three give us the rock's velocity: u, v, w
   (time
