@@ -54,10 +54,12 @@
 ;;    2. Find all the pairwise delta's between positions: (xi - xj)
 ;;    3. Find the prime factorization of each delta.
 ;;    4. Find the common factors across all the prime factorizations.
-;;    5. Generate all numbers, p, by multiplying all subsets of prime factors.
+;;    5. Generate all numbers, p, from the common prime factors.
+;;       Since (vr - v) =? p, and we might have negative factors, we check both
+;;       vr = v + p and vr = v - p.
 ;;    6. Generate (+ v p) and (- v p) for all p's.
 ;;    7. Take all the numbers from #6 for all the common velocity groups, and
-;;       find the common number across all of them. This is vr.
+;;       find the common number across all of them. There will be one. It is vr.
 
 (defn find-rock-velocity [input pos vel]
   (->>
